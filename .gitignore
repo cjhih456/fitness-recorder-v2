@@ -7,3 +7,4 @@ storybook-static
 
 .yarn
 node_modules
+vitest.config.*.timestamp*
