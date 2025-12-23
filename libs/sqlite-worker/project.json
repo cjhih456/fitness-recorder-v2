@@ -1,0 +1,9 @@
+{
+  "name": "sqlite-worker",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/sqlite-worker/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project sqlite-worker --web",
+  "targets": {}
+}
