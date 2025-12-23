@@ -14,7 +14,16 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@fitness-recoder/vite-plugin-i18next-language-package-loader": [
+        "libs/vite-plugin-i18next-language-package-loader/src/index.ts"
+      ],
+      "@fitness-recoder/vite-plugin-graphql-server": [
+        "libs/vite-plugin-graphql-server/src/index.ts"
+      ],
+      "@fitness-recoder/structure": ["libs/structure/src/index.ts"],
+      "@fitness-recoder/sqlite-worker": ["libs/sqlite-worker/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
