@@ -1,9 +1,0 @@
-{
-  "name": "vite-plugin-graphql-server",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/vite-plugin-graphql-server/src",
-  "projectType": "library",
-  "tags": [],
-  "// targets": "to see all targets run: nx show project vite-plugin-graphql-server --web",
-  "targets": {}
-}

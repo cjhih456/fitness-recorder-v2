@@ -1,5 +1,5 @@
 {
-  "name": "@fitness-recoder/sqlite-worker",
+  "name": "@fitness-recoder/graphql-sqlite-worker",
   "version": "0.0.1",
   "private": true,
   "type": "module",

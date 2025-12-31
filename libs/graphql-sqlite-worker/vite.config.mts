@@ -7,7 +7,7 @@ import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
-  cacheDir: '../../node_modules/.vite/libs/sqlite-worker',
+  cacheDir: '../../node_modules/.vite/libs/graphql-sqlite-worker',
   plugins: [
     nxViteTsPaths(),
     nxCopyAssetsPlugin(['*.md']),
@@ -24,7 +24,7 @@ export default defineConfig(() => ({
   // Configuration for building your library.
   // See: https://vite.dev/guide/build.html#library-mode
   build: {
-    outDir: '../../dist/libs/sqlite-worker',
+    outDir: '../../dist/libs/graphql-sqlite-worker',
     emptyOutDir: true,
     reportCompressedSize: true,
     commonjsOptions: {
@@ -33,7 +33,7 @@ export default defineConfig(() => ({
     lib: {
       // Could also be a dictionary or array of multiple entry points.
       entry: 'src/index.ts',
-      name: 'sqlite-worker',
+      name: 'graphql-sqlite-worker',
       fileName: 'index',
       // Change this to the formats you want to support.
       // Don't forget to update your package.json as well.
