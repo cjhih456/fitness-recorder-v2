@@ -16,6 +16,11 @@ export default defineConfig(() => ({
       tsconfigPath: path.join(import.meta.dirname, 'tsconfig.lib.json'),
       pathsToAliases: false,
     }),
+    dts({
+      entryRoot: 'src',
+      tsconfigPath: path.join(import.meta.dirname, 'tsconfig.worker.json'),
+      pathsToAliases: false,
+    }),
   ],
   // Uncomment this if you are using workers.
   // worker: {
