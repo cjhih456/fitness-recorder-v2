@@ -13,7 +13,7 @@ export interface SQLiteWorkerConfig {
 
 export interface SQLiteWorkerMessage {
   id: string;
-  type: 'query' | 'exec' | 'close' | 'init';
+  type: 'query' | 'exec' | 'close' | 'init' | 'connect-port';
   payload?: unknown;
 }
 

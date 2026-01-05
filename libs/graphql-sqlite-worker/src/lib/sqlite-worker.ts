@@ -134,6 +134,36 @@ export class SQLiteWorker {
   }
 
   /**
+   * Service Worker와 DB Worker 간 통신을 위한 MessageChannel을 생성합니다.
+   * @returns Service Worker에 전달할 MessagePort
+   */
+  async createMessageChannel(): Promise<MessagePort> {
+    if (!this.initialized) {
+      await this.init();
+    }
+
+    if (!this.worker) {
+      throw new Error('Worker is not initialized');
+    }
+
+    const channel = new MessageChannel();
+    const port1 = channel.port1;
+    const port2 = channel.port2;
+
+    // DB Worker에 port2 전달
+    this.worker.postMessage(
+      {
+        id: this.generateId(),
+        type: 'connect-port',
+        payload: { port: port2 },
+      },
+      [port2]
+    );
+
+    return port1;
+  }
+
+  /**
    * Worker에 메시지를 전송하고 응답을 기다립니다.
    */
   private sendMessage<T = unknown>(message: SQLiteWorkerMessage): Promise<T> {
