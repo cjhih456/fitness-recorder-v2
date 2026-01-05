@@ -1,0 +1,45 @@
+enum WeightUnit {
+  kg
+  lbs
+}
+
+type Sets {
+  id: Int!
+  exerciseId: Int!
+  repeat: Int!
+  isDone: Boolean!
+  weightUnit: WeightUnit!
+  weight: Float
+  duration: Int
+}
+
+input CreateSetsInput {
+  exerciseId: Int!
+  repeat: Int!
+  isDone: Boolean!
+  weightUnit: WeightUnit!
+  weight: Float
+  duration: Int
+}
+
+input UpdateSetsInput {
+  id: Int!
+  exerciseId: Int
+  repeat: Int!
+  isDone: Boolean!
+  weightUnit: WeightUnit!
+  weight: Float
+  duration: Int
+}
+
+type Query {
+  getSetByIds(ids: [Int!]): [Sets!]
+  getSetById(id: Int!): Sets
+  getSetListByExerciseId(id: Int!): [Sets!]
+}
+
+type Mutation {
+  createSet(sets: CreateSetsInput!): Sets
+  updateSet(sets: UpdateSetsInput!): Sets
+  deleteSetById(id: Int!): String
+}

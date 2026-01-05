@@ -1,0 +1,92 @@
+enum IMuscle {
+  abdominals
+  hamstrings
+  calves
+  shoulders
+  adductors
+  glutes
+  quadriceps
+  biceps
+  forearms
+  abductors
+  triceps
+  chest
+  lower_back
+  traps
+  middle_back
+  lats
+  neck
+}
+
+enum IForce {
+  pull
+  push
+  static
+}
+
+enum ILevel {
+  beginner
+  intermediate
+  expert
+}
+
+enum IMechanic {
+  compound
+  isolation
+}
+
+enum IEquipment {
+  body_only
+  machine
+  kettlebells
+  dumbbell
+  cable
+  barbell
+  bands
+  medicine_ball
+  exercise_ball
+  e_z_curl_bar
+  foam_roll
+  other
+}
+
+enum ICategory {
+  strength
+  stretching
+  plyometrics
+  strongman
+  powerlifting
+  cardio
+  olympic_weightlifting
+  crossfit
+  weighted_bodyweight
+  assisted_bodyweight
+}
+
+type Fitness {
+  id: Int!
+  name: String!
+  aliases: [String]
+  primaryMuscles: [IMuscle]
+  secondaryMuscles: [IMuscle]
+  force: IForce
+  level: ILevel
+  mechanic: IMechanic
+  equipment: IEquipment
+  category: ICategory
+  instructions: [String]
+  description: String
+  tips: [String]
+}
+
+type Query {
+  getFitnessListByIds(ids: [Int!]): [Fitness!]
+  getFitnessById(id: Int): Fitness
+  getFitnessListByKeywords(
+    name: String,
+    category: [ICategory],
+    muscle: [IMuscle],
+    limit: Int,
+    offset: Int
+  ): [Fitness!]
+}

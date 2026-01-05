@@ -1,0 +1,35 @@
+interface ExercisePreset {
+  id: Int!
+  name: String!
+  deps: Int!
+}
+
+type ExercisePresetWithList implements ExercisePreset {
+  id: Int!
+  name: String!
+  deps: Int!
+  exerciseList: [ExerciseWithFitness!]
+}
+
+type Query {
+  getExercisePresetWithListByIds(ids: Int): [ExercisePresetWithList!]
+  getExercisePresetWithListById(id: Int): ExercisePresetWithList
+  getExercisePresetWithListByOffset(offset: Int, size: Int): [ExercisePresetWithList!]
+}
+
+input CreateExercisePresetInput {
+  name: String!
+}
+
+input UpdateExercisePresetInput {
+  id: Int!
+  name: String!
+  deps: Int!
+}
+
+type Mutation {
+  createExercisePreset(exercisePreset: CreateExercisePresetInput): ExercisePresetWithList
+  updateExercisePreset(exercisePreset: UpdateExercisePresetInput): ExercisePresetWithList
+  deleteExercisePreset(id: Int!): String
+  copyExercisePresetFromSchedule(scheduleId: Int!, name: String!): ExercisePresetWithList
+}
