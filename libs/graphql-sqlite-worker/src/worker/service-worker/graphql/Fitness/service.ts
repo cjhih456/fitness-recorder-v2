@@ -11,9 +11,8 @@ interface GetFitnessListByKeywordsArgs {
   offset: number
 }
 
-export const getFitnessById: ResponseBuilder<GetFitnessByIdArgs, Fitness | null> = async ({ client, dbBus}, { id }) => {
+export const getFitnessById: ResponseBuilder<GetFitnessByIdArgs, Fitness | null> = async ({ dbBus}, { id }) => {
   const result = await dbBus?.sendTransaction<FitnessDB>(
-    client,
     'select',
     'select * from fitness where id=?',
     [id]
@@ -22,10 +21,9 @@ export const getFitnessById: ResponseBuilder<GetFitnessByIdArgs, Fitness | null>
   return IFitnessSchema.parse(result)
 }
 
-export const getFitnessByIds: ResponseBuilder<GetFitnessByIdsArgs, Fitness[] | null> = async ({ client, dbBus}, { ids }) => {
+export const getFitnessByIds: ResponseBuilder<GetFitnessByIdsArgs, Fitness[] | null> = async ({ dbBus}, { ids }) => {
   const temp = new Array(ids.length).fill('?').join(', ')
   const result = await dbBus?.sendTransaction<FitnessDB[]>(
-    client,
     'selects',
     `select * from fitness where id in (${temp})`,
     ids
@@ -34,7 +32,7 @@ export const getFitnessByIds: ResponseBuilder<GetFitnessByIdsArgs, Fitness[] | n
   return result.map(res => IFitnessSchema.parse(res))
 }
 
-export const getFitnessListByKeywords: ResponseBuilder<GetFitnessListByKeywordsArgs, Fitness[] | null> = async ({ client, dbBus}, { name, category = [], muscle = [], limit, offset }) => {
+export const getFitnessListByKeywords: ResponseBuilder<GetFitnessListByKeywordsArgs, Fitness[] | null> = async ({ dbBus}, { name, category = [], muscle = [], limit, offset }) => {
   const whereQuery = []
   const argsQuery = []
   if (name) {
@@ -54,7 +52,6 @@ export const getFitnessListByKeywords: ResponseBuilder<GetFitnessListByKeywordsA
   }
   const query = `select * from fitness ${whereQuery.length ? 'where ' + whereQuery.join(' and ') : ''} limit ?,?`
   const result = await dbBus?.sendTransaction<FitnessDB>(
-    client,
     'selects',
     query,
     [...argsQuery, offset, limit]
