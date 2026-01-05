@@ -16,7 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@fitness-recoder/structure": ["libs/structure/src/index.ts"],
-      "@fitness-recoder/sqlite-worker": ["libs/sqlite-worker/src/index.ts"]
+      "@fitness-recoder/graphql-sqlite-worker": ["libs/graphql-sqlite-worker/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

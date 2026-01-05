@@ -1,0 +1,141 @@
+/**
+ * SQLite DB Worker
+ * 실제 Worker 코드는 sqlite-worker.ts에서 동적으로 생성됩니다.
+ * 이 파일은 참조용입니다.
+ */
+
+
+import Sqlite3InitModule from '@sqlite.org/sqlite-wasm';
+import type { BindingSpec, Database } from '@sqlite.org/sqlite-wasm';
+let db: Database | null = null;
+let useOPFS = false;
+let serviceWorkerPort: MessagePort | null = null;
+
+interface WorkerMessage {
+  id: string;
+  type: string;
+  payload?: unknown;
+}
+
+interface WorkerResponse {
+  id: string;
+  success: boolean;
+  data?: unknown;
+  error?: string;
+}
+
+/**
+ * 메시지를 처리하고 응답을 전송합니다.
+ */
+async function handleMessage(
+  message: WorkerMessage,
+  postMessage: (response: WorkerResponse) => void
+): Promise<void> {
+  try {
+    switch (message.type) {
+      case 'init':
+        await handleInit(message.payload as { dbName: string; useOPFS: boolean; initScript?: string });
+        postMessage({ id: message.id, success: true });
+        break;
+      case 'query': {
+        const queryResult = await handleQuery(message.payload as { sql: string; params: BindingSpec });
+        postMessage({ id: message.id, success: true, data: queryResult });
+        break;
+      }
+      case 'exec': {
+        const execResult = await handleExec(message.payload as { sql: string; params: BindingSpec });
+        postMessage({ id: message.id, success: true, data: execResult });
+        break;
+      }
+      case 'close':
+        await handleClose();
+        postMessage({ id: message.id, success: true });
+        break;
+      case 'connect-port': {
+        const port = (message.payload as { port?: MessagePort })?.port;
+        if (port) {
+          serviceWorkerPort = port;
+          serviceWorkerPort.onmessage = async (event: MessageEvent) => {
+            await handleMessage(event.data as WorkerMessage, (response) => {
+              if (serviceWorkerPort) {
+                serviceWorkerPort.postMessage(response);
+              }
+            });
+          };
+          postMessage({ id: message.id, success: true });
+        } else {
+          postMessage({
+            id: message.id,
+            success: false,
+            error: 'Port is required',
+          });
+        }
+        break;
+      }
+      default:
+        postMessage({
+          id: message.id,
+          success: false,
+          error: `Unknown message type: ${message.type}`,
+        });
+    }
+  } catch (error) {
+    postMessage({
+      id: message.id,
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
+
+self.onmessage = async (event: MessageEvent) => {
+  await handleMessage(event.data, (response) => {
+    self.postMessage(response);
+  });
+};
+
+async function handleInit(payload: {
+  dbName: string;
+  useOPFS: boolean;
+  initScript?: string;
+}) {
+  useOPFS = payload.useOPFS;
+  const sqlite3 = await Sqlite3InitModule();
+
+  if (useOPFS && 'getDirectory' in navigator.storage) {
+    // const directory = await navigator.storage.getDirectory();
+    // const dbFile = await directory.getFileHandle(payload.dbName, { create: true });
+    // const dbAccessHandle = await dbFile.createSyncAccessHandle();
+    db = new sqlite3.oo1.OpfsDb(payload.dbName);
+  } else {
+    db = new sqlite3.oo1.DB(payload.dbName);
+  }
+
+  if (payload.initScript) {
+    db.exec(payload.initScript);
+  }
+}
+
+async function handleQuery(payload: { sql: string; params: BindingSpec }) {
+  if(!db) {
+    throw new Error('Database not initialized');
+  }
+  const stmt = db.selectObjects(payload.sql, payload.params);
+
+  return stmt;
+}
+
+async function handleExec(payload: { sql: string; params: BindingSpec }) {
+  if(!db) {
+    throw new Error('Database not initialized');
+  }
+  return db.exec(payload.sql, { bind: payload.params, returnValue: 'resultRows', rowMode: 'object'});
+}
+
+async function handleClose() {
+  if (db) {
+    db.close();
+    db = null;
+  }
+}
+

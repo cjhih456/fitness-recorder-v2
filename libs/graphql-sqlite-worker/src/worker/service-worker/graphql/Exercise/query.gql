@@ -1,0 +1,69 @@
+interface BaseExercise{
+  id: Int!
+  fitnessId: Int!
+  deps: Int
+}
+
+type Exercise implements BaseExercise {
+  id: Int!
+  fitnessId: Int!
+  deps: Int
+}
+
+type ExerciseWithFitness implements BaseExercise {
+  id: Int!
+  fitnessId: Int!
+  deps: Int
+  fitness: Fitness
+}
+
+type ExerciseHistoryData {
+  id: Int!
+  year: Int!
+  month: Int!
+  date: Int!
+  type: String!
+  exercise: Int!
+  cnt: Int!
+  hasDone: Int!
+  weights: String!
+  repeats: String!
+  weightUnit: String!
+}
+
+type Query {
+  getExerciseListByIds(ids: [Int!]): [ExerciseWithFitness!]
+  getExerciseById(id: Int): ExerciseWithFitness
+  getExerciseListByScheduleId(scheduleId: Int): [ExerciseWithFitness!]
+  getExerciseListByExercisePresetId(
+    exercisePresetId: Int
+  ): [ExerciseWithFitness!]
+  getExerciseFinishHistory(exerciseId: Int): [ExerciseHistoryData!]
+}
+
+input CreateExerciseByScheduleInput {
+  scheduleId: Int!
+  fitnessIds: [Int!]
+}
+input CreateExerciseByExercisePresetInput {
+  exercisePresetId: Int!
+  fitnessIds: [Int!]
+}
+
+input UpdateExerciseInput {
+  id: Int!
+  fitnessId: Int!
+}
+
+type Mutation {
+  createExerciseBySchedule(exercise: CreateExerciseByScheduleInput): [ExerciseWithFitness!]
+  
+  createExerciseByExercisePreset(
+    exercise: CreateExerciseByExercisePresetInput
+  ): [ExerciseWithFitness!]
+
+  updateExercise(exercise: UpdateExerciseInput): Exercise
+
+  deleteExerciseById(id: Int): String
+  deleteExerciseByIds(ids: [Int!]): String
+}

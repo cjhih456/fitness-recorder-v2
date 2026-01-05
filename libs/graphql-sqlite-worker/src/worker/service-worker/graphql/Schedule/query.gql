@@ -1,0 +1,60 @@
+scalar Timestamp
+
+enum ScheduleType {
+  BREAK
+  SCHEDULED
+  STARTED
+  PAUSED
+  FINISH
+}
+
+type ScheduleData {
+  id: Int!
+  year: Int!
+  month: Int!
+  date: Int!
+  beforeTime: Timestamp!
+  start: Timestamp!
+  breakTime: Int!
+  workoutTimes: Timestamp!
+  type: ScheduleType!
+}
+
+input CreateScheduleDataInput {
+  year: Int!
+  month: Int!
+  date: Int!
+  type: ScheduleType!
+}
+
+input UpdateScheduleDataInput {
+  id: Int!
+  year: Int!
+  month: Int!
+  date: Int!
+  beforeTime: Timestamp!
+  start: Timestamp!
+  breakTime: Int!
+  workoutTimes: Timestamp!
+  type: ScheduleType!
+}
+
+input TargetDateInput {
+  year: Int!
+  month: Int!
+  date: Int!
+}
+
+type Query {
+  getScheduleById(id: Int!): ScheduleData
+  getScheduleByDate(year: Int!, month: Int!, date: Int!): [ScheduleData!]
+  getScheduleStatusByMonth(year: Int!, month: Int!): [[String]]
+}
+
+type Mutation {
+  createSchedule(schedule: CreateScheduleDataInput): ScheduleData
+  updateSchedule(schedule: UpdateScheduleDataInput): ScheduleData
+  deleteSchedule(id: Int!): String
+  cloneSchedule(id: Int!, targetDate: TargetDateInput): ScheduleData
+  cloneScheduleFromPreset(presetId: Int!, targetDate: TargetDateInput): ScheduleData
+}
