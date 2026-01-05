@@ -7,7 +7,6 @@
     ".": {
       "import": "./index.mjs",
       "require": "./index.js"
-    },
-    "styles": "./src/styles.css"
+    }
   }
 }
