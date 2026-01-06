@@ -1,10 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import '@font-figtree/figtree';
+@import '@fontsource/figtree';
 
 :root {
-  font-family: 'Figtree', sans-serif;
+  --font-sans: 'Figtree', sans-serif;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
