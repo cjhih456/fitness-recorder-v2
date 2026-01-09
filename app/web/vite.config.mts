@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 import { vitePluginI18nextLanguagePackageLoader } from './src/vite-plugins/i18next-language-package';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
@@ -25,6 +26,7 @@ export default defineConfig(() => ({
       defaultNS: 'common',
       langs: ['ko', 'en'],
     }),
+    tailwindcss()
   ],
   // Uncomment this if you are using workers.
   // worker: {
