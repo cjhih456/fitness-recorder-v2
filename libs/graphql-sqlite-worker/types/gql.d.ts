@@ -15,7 +15,7 @@ declare type DBBus = {
   (<T = unknown>(type: 'insert' | 'update' | 'delete', sql: string, params: unknown[]) => Promise<T[]>)
 }
 
-declare type GraphqlContext = import('@apollo/server').BaseContext & {
+declare type GraphqlContext = {
   dbBus: DBBus
 }
 

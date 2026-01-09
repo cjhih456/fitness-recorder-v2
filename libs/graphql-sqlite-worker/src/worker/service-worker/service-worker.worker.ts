@@ -1,4 +1,4 @@
-import { ApolloServer, HeaderMap } from '@apollo/server';
+import { createYoga, type YogaServerInstance } from 'graphql-yoga';
 import { mergedSchema } from './graphql';
 
 declare const self: ServiceWorkerGlobalScope
@@ -6,7 +6,7 @@ export type Version = number
 
 export const version: Version = 1
 
-let apolloServer: ApolloServer<GraphqlContext> | null = null;
+let yogaServer: YogaServerInstance<GraphqlContext, GraphqlContext> | null = null;
 
 const relationWithClientTemp = new Map<string, DBBus>();
 const dbBus = new WeakMap<Client, DBBus>();
@@ -67,7 +67,7 @@ self.addEventListener('install', () => {
 
 self.addEventListener('activate', (event) => {
   // Service Worker 활성화
-  apolloServer = new ApolloServer({
+  yogaServer = createYoga<GraphqlContext, GraphqlContext>({
     schema: mergedSchema,
   });
   event.waitUntil(self.clients.claim());
@@ -100,28 +100,16 @@ self.addEventListener('fetch', async (event) => {
   
   // GraphQL 엔드포인트 확인
   if (url.pathname === '/api/graphql' && event.request.method === 'POST') {
-    if (!apolloServer) { return; }
+    if (!yogaServer) { return; }
     const dbBusWrapper = dbBus.get(client)
     if(!dbBusWrapper) { return }
 
-    const headers = new HeaderMap();
+    const headers = new Headers();
     event.request.headers.forEach((value, key) => {
       headers.set(key, value);
     });
-    const response = await apolloServer.executeHTTPGraphQLRequest({
-      httpGraphQLRequest: {
-        method: event.request.method,
-        body: event.request.body,
-        headers: headers,
-        search: url.search,
-      },
-      context: async () => {
-        return new Promise((resolve) => {
-          resolve({
-            dbBus: dbBusWrapper
-          })
-        })
-      }
+    const response = await yogaServer.handle(event.request, {
+      dbBus: dbBusWrapper
     })
     const responseHeader = new Headers();
     response.headers.forEach((value, key) => {
