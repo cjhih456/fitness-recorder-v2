@@ -9,14 +9,21 @@ export class GraphQLServiceWorker {
   constructor({
     onActive
   }: {
-    onActive: (worker: GraphQLServiceWorker) => void;
-  }) {
-    this.onActive = onActive;
+    onActive?: (worker: GraphQLServiceWorker) => void;
+  } = {}) {
+    this.onActive = onActive || (() => { /* do nothing */ });
     navigator.serviceWorker.register(GraphqlWorker, {
       type: 'module',
       updateViaCache: 'imports',
       scope: '/',
     }).then((registration) => {
+      if(registration.active && !navigator.serviceWorker.controller) {
+        window.location.reload();
+      }
+      registration.addEventListener('updatefound', () => {
+        this.registration?.update();
+        window.location.reload();
+      })
       this.registration = registration;
     })
     const intarval = setInterval(() => {
