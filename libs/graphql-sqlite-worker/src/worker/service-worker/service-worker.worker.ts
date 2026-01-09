@@ -7,9 +7,9 @@ export type Version = number
 export const version: Version = 1
 
 let yogaServer: YogaServerInstance<GraphqlContext, GraphqlContext> | null = null;
+const broadcastChannel = new BroadcastChannel('graphql-sqlite-worker');
+const dbBus = createDbBusWrapper(broadcastChannel)
 
-const relationWithClientTemp = new Map<string, DBBus>();
-const dbBus = new WeakMap<Client, DBBus>();
 /**
  * Service Worker에서 실행되는 GraphQL 서버
  * 실제 구현은 메인 스레드에서 초기화된 서버를 참조해야 합니다.
@@ -18,7 +18,7 @@ const dbBus = new WeakMap<Client, DBBus>();
 /**
  * MessagePort를 통해 DB Worker와 통신하는 dbBus 래퍼 객체를 생성합니다.
  */
-function createDbBusWrapper(port: MessagePort): DBBus {
+function createDbBusWrapper(port: BroadcastChannel): DBBus {
   return {
     sendTransaction: <T = unknown>(
       type: 'select' | 'selects' | 'insert' | 'update' | 'delete',
@@ -66,58 +66,24 @@ self.addEventListener('install', () => {
 });
 
 self.addEventListener('activate', (event) => {
-  // Service Worker 활성화
-  yogaServer = createYoga<GraphqlContext, GraphqlContext>({
-    schema: mergedSchema,
-  });
+  if(!yogaServer) {
+    yogaServer = createYoga<GraphqlContext, GraphqlContext>({
+      schema: mergedSchema,
+      batching: true,
+      healthCheckEndpoint: '/health'
+    });
+  }
   event.waitUntil(self.clients.claim());
 });
 
-// 메인 스레드로부터 MessagePort 수신
-self.addEventListener('message', (event) => {
-  
-  if (event.data?.type === 'connect-db-port' && event.ports && event.ports.length > 0) {
-    const port = event.ports[0];
-    relationWithClientTemp.set(event.data.clientId, createDbBusWrapper(port));
-  }
-});
-
-
 // GraphQL 요청 처리
 self.addEventListener('fetch', async (event) => {
-  const client = await self.clients.get(event.clientId)
-  if(!client) { return }
-
-  if(!dbBus.has(client)) {
-    const clientId = event.request.headers.get('x-client-id')
-    if(!clientId) { return }
-    const dbBusWrapper = relationWithClientTemp.get(clientId)
-    if(!dbBusWrapper) { return }
-    dbBus.set(client, dbBusWrapper);
-  }
-  
   const url = new URL(event.request.url);
   
   // GraphQL 엔드포인트 확인
-  if (url.pathname === '/api/graphql' && event.request.method === 'POST') {
-    if (!yogaServer) { return; }
-    const dbBusWrapper = dbBus.get(client)
-    if(!dbBusWrapper) { return }
-
-    const headers = new Headers();
-    event.request.headers.forEach((value, key) => {
-      headers.set(key, value);
-    });
-    const response = await yogaServer.handle(event.request, {
-      dbBus: dbBusWrapper
-    })
-    const responseHeader = new Headers();
-    response.headers.forEach((value, key) => {
-      responseHeader.set(key, value);
-    });
-    event.respondWith(new Response(JSON.stringify(response.body), {
-      status: response.status,
-      headers: responseHeader
-    }));
+  if (url.pathname.includes('/api/graphql') && yogaServer) {
+    return event.respondWith(yogaServer.handleRequest(event.request, {
+      dbBus
+    }))
   }
 });

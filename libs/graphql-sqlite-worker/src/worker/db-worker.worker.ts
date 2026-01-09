@@ -9,8 +9,7 @@ import Sqlite3InitModule from '@sqlite.org/sqlite-wasm';
 import type { BindingSpec, Database } from '@sqlite.org/sqlite-wasm';
 
 let db: Database | null = null;
-let serviceWorkerPort: MessagePort | null = null;
-
+const broadcastChannel = new BroadcastChannel('graphql-sqlite-worker');
 declare const self: Worker
 interface WorkerMessage {
   id: string;
@@ -52,27 +51,6 @@ async function handleMessage(
         await handleClose();
         postMessage({ id: message.id, success: true });
         break;
-      case 'connect-port': {
-        const port = (message.payload as { port?: MessagePort })?.port;
-        if (port) {
-          serviceWorkerPort = port;
-          serviceWorkerPort.onmessage = async (event: MessageEvent) => {
-            await handleMessage(event.data as WorkerMessage, (response) => {
-              if (serviceWorkerPort) {
-                serviceWorkerPort.postMessage(response);
-              }
-            });
-          };
-          postMessage({ id: message.id, success: true });
-        } else {
-          postMessage({
-            id: message.id,
-            success: false,
-            error: 'Port is required',
-          });
-        }
-        break;
-      }
       default:
         postMessage({
           id: message.id,
@@ -88,6 +66,12 @@ async function handleMessage(
     });
   }
 }
+
+broadcastChannel.onmessage = async (event: MessageEvent) => {
+  await handleMessage(event.data, (response) => {
+    broadcastChannel.postMessage(response);
+  });
+};
 
 self.onmessage = async (event: MessageEvent) => {
   await handleMessage(event.data, (response) => {

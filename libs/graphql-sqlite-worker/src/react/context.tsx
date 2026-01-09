@@ -83,24 +83,8 @@ export function GraphQLSQLiteWorkerProvider({
       await sqliteWorker.init();
       setWorker(sqliteWorker);
 
-      // MessageChannel 생성
-      const dbPort = await sqliteWorker.createMessageChannel();
-
       // GraphQL Server 생성 및 시작
-      const server = new GraphQLServiceWorker({
-        onActive: () => {
-          // Service Worker에 MessagePort 전달
-          if (navigator.serviceWorker.controller) {
-            navigator.serviceWorker.controller.postMessage(
-              {
-                type: 'connect-db-port',
-                clientId,
-              },
-              [dbPort]
-            );
-          }
-        }
-      });
+      const server = new GraphQLServiceWorker();
       setGraphQLServer(server);
 
       setInitialized(true);
