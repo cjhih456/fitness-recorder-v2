@@ -52,7 +52,6 @@ function App() {
     <GraphQLSQLiteWorkerProvider
       workerConfig={{
         dbName: 'fitness.db',
-        useOPFS: true, // OPFS 사용 (선택사항)
         initScript: `
           CREATE TABLE IF NOT EXISTS fitness (
             id INTEGER PRIMARY KEY AUTOINCREMENT,

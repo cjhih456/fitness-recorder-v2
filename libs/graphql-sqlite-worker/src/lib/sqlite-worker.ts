@@ -32,7 +32,6 @@ export class SQLiteWorker {
   private worker: Worker | null = null;
   private config: SQLiteWorkerConfig;
   private messageHandlers: Map<string, (response: SQLiteWorkerResponse) => void> = new Map();
-  private opfsSupport: OPFSSupport | null = null;
   private initialized = false;
 
   constructor(config: SQLiteWorkerConfig) {
@@ -46,10 +45,6 @@ export class SQLiteWorker {
     if (this.initialized) {
       return;
     }
-
-    // OPFS 지원 확인
-    this.opfsSupport = await checkOPFSSupport();
-    const useOPFS = this.config.useOPFS ?? this.opfsSupport.supported;
 
     this.worker = new DBWorker()
 
@@ -73,7 +68,6 @@ export class SQLiteWorker {
       type: 'init',
       payload: {
         dbName: this.config.dbName,
-        useOPFS,
         initScript: this.config.initScript,
       },
     });
@@ -124,13 +118,6 @@ export class SQLiteWorker {
       this.worker = null;
       this.initialized = false;
     }
-  }
-
-  /**
-   * OPFS 지원 여부를 반환합니다.
-   */
-  getOPFSSupport(): OPFSSupport | null {
-    return this.opfsSupport;
   }
 
   /**

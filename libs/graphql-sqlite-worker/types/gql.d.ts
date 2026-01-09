@@ -9,8 +9,6 @@ declare module '*.gql' {
   >;
 }
 
-type 
-
 declare type DBBus = {
   sendTransaction: (<T = unknown>(type: 'select', sql: string, params: unknown[]) => Promise<T[]>) & 
   (<T = unknown>(type: 'selects', sql: string, params: unknown[]) => Promise<T[]>) &

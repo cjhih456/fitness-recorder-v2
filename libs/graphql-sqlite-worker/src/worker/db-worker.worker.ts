@@ -7,10 +7,11 @@
 
 import Sqlite3InitModule from '@sqlite.org/sqlite-wasm';
 import type { BindingSpec, Database } from '@sqlite.org/sqlite-wasm';
+
 let db: Database | null = null;
-let useOPFS = false;
 let serviceWorkerPort: MessagePort | null = null;
 
+declare const self: Worker
 interface WorkerMessage {
   id: string;
   type: string;
@@ -34,7 +35,7 @@ async function handleMessage(
   try {
     switch (message.type) {
       case 'init':
-        await handleInit(message.payload as { dbName: string; useOPFS: boolean; initScript?: string });
+        await handleInit(message.payload as { dbName: string; initScript?: string });
         postMessage({ id: message.id, success: true });
         break;
       case 'query': {
@@ -96,20 +97,15 @@ self.onmessage = async (event: MessageEvent) => {
 
 async function handleInit(payload: {
   dbName: string;
-  useOPFS: boolean;
   initScript?: string;
 }) {
-  useOPFS = payload.useOPFS;
-  const sqlite3 = await Sqlite3InitModule();
-
-  if (useOPFS && 'getDirectory' in navigator.storage) {
-    // const directory = await navigator.storage.getDirectory();
-    // const dbFile = await directory.getFileHandle(payload.dbName, { create: true });
-    // const dbAccessHandle = await dbFile.createSyncAccessHandle();
-    db = new sqlite3.oo1.OpfsDb(payload.dbName);
-  } else {
-    db = new sqlite3.oo1.DB(payload.dbName);
-  }
+  const sqlite3Module = await Sqlite3InitModule({
+    print: console.log,
+    printErr: console.error
+  })
+  db = sqlite3Module.oo1.OpfsDb
+    ? new sqlite3Module.oo1.OpfsDb('worker.sqlite3')
+    : new sqlite3Module.oo1.DB('workout.sqlite3', 'c')
 
   if (payload.initScript) {
     db.exec(payload.initScript);
