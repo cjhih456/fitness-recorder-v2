@@ -1,0 +1,7 @@
+fragment Schedule on Schedule {
+  id
+  name
+  description
+  createdAt
+  updatedAt
+}
