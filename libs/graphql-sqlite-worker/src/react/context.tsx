@@ -1,16 +1,22 @@
-import { ApolloClient, InMemoryCache } from '@apollo/client';
-import { ApolloProvider } from '@apollo/client/react';
-import { BatchHttpLink } from '@apollo/client/link/batch-http';
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { SQLiteWorker, type SQLiteWorkerConfig } from '../lib/sqlite-worker';
 import { GraphQLServiceWorker } from '../lib/graphql-server';
-import { v4 as uuidv4 } from 'uuid';
+import { GraphQLClient } from 'graphql-request'
+import type { SetData } from '@fitness-recoder/structure';
+import { Batcher } from '@yornaath/batshit';
+import { useSetQueryBatcher } from './batchers';
+
 /**
  * GraphQL SQLite Worker Context의 값 타입
  */
 export interface GraphQLSQLiteWorkerContextValue {
-  /** Apollo Client */
-  client: ApolloClient;
+  /** Batchers */
+  batchers: { 
+    set: Batcher<SetData[], number, SetData>
+  };
+  /** QueryClient */
+  graphqlClient: GraphQLClient;
   /** SQLite Worker 인스턴스 */
   worker: SQLiteWorker | null;
   /** GraphQL Service Worker 인스턴스 */
@@ -36,6 +42,7 @@ export const GraphQLSQLiteWorkerContext = createContext<GraphQLSQLiteWorkerConte
  * Context Provider의 Props
  */
 export interface GraphQLSQLiteWorkerProviderProps {
+
   /** SQLite Worker 설정 */
   workerConfig: SQLiteWorkerConfig;
   /** 자동 초기화 여부 */
@@ -52,23 +59,21 @@ export function GraphQLSQLiteWorkerProvider({
   autoInit = true,
   children,
 }: GraphQLSQLiteWorkerProviderProps) {
-  const [clientId] = useState<string>(uuidv4());
-  const [client] = useState(() => new ApolloClient({
-    link: new BatchHttpLink({
-      uri: 'http://localhost:3000/api/graphql',
-      batchInterval: 10,
-      batchDebounce: true,
-      headers: {
-        'x-client-id': clientId,
+  const [queryClient] = useState(() => new QueryClient({
+    queryCache: new QueryCache(),
+    defaultOptions: {
+      queries: {
+        notifyOnChangeProps: ['data', 'error']
       }
-    }),
-    cache: new InMemoryCache(),
+    }
   }))
   const [worker, setWorker] = useState<SQLiteWorker | null>(null);
   const [graphQLServer, setGraphQLServer] = useState<GraphQLServiceWorker | null>(null);
   const [initialized, setInitialized] = useState(false);
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  
+  const [graphqlClient] = useState(() => new GraphQLClient('/api/graphql'));
 
   /**
    * Worker를 초기화합니다.
@@ -121,7 +126,10 @@ export function GraphQLSQLiteWorkerProvider({
   }, [worker]);
 
   const value: GraphQLSQLiteWorkerContextValue = {
-    client,
+    batchers: {
+      set: useSetQueryBatcher(graphqlClient),
+    },
+    graphqlClient,
     worker,
     graphQLServer,
     initialized,
@@ -132,9 +140,9 @@ export function GraphQLSQLiteWorkerProvider({
 
   return (
     <GraphQLSQLiteWorkerContext.Provider value={value}>
-      <ApolloProvider client={client}>
+      <QueryClientProvider client={queryClient}>
         {children}
-      </ApolloProvider>
+      </QueryClientProvider>
     </GraphQLSQLiteWorkerContext.Provider>
   );
 }
