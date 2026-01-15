@@ -1,0 +1,15 @@
+fragment Fitness on Fitness {
+  id
+  name
+  aliases
+  primaryMuscles
+  secondaryMuscles
+  force
+  level
+  mechanic
+  equipment
+  category
+  instructions
+  description
+  tips
+}

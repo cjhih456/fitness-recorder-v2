@@ -1,0 +1,8 @@
+fragment ExercisePreset on ExercisePresetWithList {
+  id
+  name
+  deps
+  exerciseList {
+    ...Exercise
+  }
+}

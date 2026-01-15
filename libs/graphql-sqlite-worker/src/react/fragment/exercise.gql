@@ -1,0 +1,8 @@
+fragment Exercise on ExerciseWithFitness {
+  id
+  fitnessId
+  deps
+  fitness {
+    ...Fitness
+  }
+}

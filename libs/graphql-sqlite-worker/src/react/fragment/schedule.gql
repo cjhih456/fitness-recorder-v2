@@ -1,7 +1,11 @@
-fragment Schedule on Schedule {
+fragment Schedule on ScheduleData {
   id
-  name
-  description
-  createdAt
-  updatedAt
+  year
+  month
+  date
+  beforeTime
+  start
+  breakTime
+  workoutTimes
+  type
 }
