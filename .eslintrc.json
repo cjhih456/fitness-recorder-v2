@@ -30,6 +30,37 @@
       "files": ["*.js", "*.jsx"],
       "extends": ["plugin:@nx/javascript"],
       "rules": {}
+    },
+    {
+      "extends": ["plugin:eslint-plugin-import/recommended"],
+      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "settings": {
+        "import/resolver": {
+          "typescript": true,
+          "node": true
+        }
+      },
+      "rules": {
+        "import/order": [
+          "error",
+          {
+            "groups": [
+              "type",
+              "builtin",
+              "external",
+              "internal",
+              "parent",
+              "sibling",
+              "index",
+              "unknown"
+            ],
+            "alphabetize": {
+              "order": "asc"
+            }
+          }
+        ],
+        "import/no-unresolved": "off"
+      }
     }
   ]
 }
