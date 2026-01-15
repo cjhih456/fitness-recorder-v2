@@ -1,11 +1,11 @@
+import type { SetData, ExerciseData, Fitness } from '@fitness-recoder/structure';
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { SQLiteWorker, type SQLiteWorkerConfig } from '../lib/sqlite-worker';
-import { GraphQLServiceWorker } from '../lib/graphql-server';
-import { GraphQLClient } from 'graphql-request'
-import type { SetData } from '@fitness-recoder/structure';
 import { Batcher } from '@yornaath/batshit';
-import { useSetQueryBatcher } from './batchers';
+import { GraphQLClient } from 'graphql-request'
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { GraphQLServiceWorker } from '../lib/graphql-server';
+import { SQLiteWorker, type SQLiteWorkerConfig } from '../lib/sqlite-worker';
+import { useSetQueryBatcher, useExerciseQueryBatcher, useFitnessQueryBatcher } from './batchers';
 
 /**
  * GraphQL SQLite Worker Context의 값 타입
@@ -14,6 +14,8 @@ export interface GraphQLSQLiteWorkerContextValue {
   /** Batchers */
   batchers: { 
     set: Batcher<SetData[], number, SetData>
+    exercise: Batcher<ExerciseData[], number, ExerciseData>
+    fitness: Batcher<Fitness[], number, Fitness>
   };
   /** QueryClient */
   graphqlClient: GraphQLClient;
@@ -128,6 +130,8 @@ export function GraphQLSQLiteWorkerProvider({
   const value: GraphQLSQLiteWorkerContextValue = {
     batchers: {
       set: useSetQueryBatcher(graphqlClient),
+      exercise: useExerciseQueryBatcher(graphqlClient),
+      fitness: useFitnessQueryBatcher(graphqlClient),
     },
     graphqlClient,
     worker,
