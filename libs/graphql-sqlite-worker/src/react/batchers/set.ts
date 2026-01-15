@@ -1,39 +1,35 @@
-import { create, windowedFiniteBatchScheduler, keyResolver } from "@yornaath/batshit";
 import { SetData } from "@fitness-recoder/structure";
 import { Set } from '../fragment';
 import { gql, GraphQLClient } from "graphql-request";
-import { useState } from "react";
+import { createBatcher, BatcherOptions } from "./createBatcher";
+import { Batcher } from "@yornaath/batshit";
 
-export interface SetBatcherOptions {
-  windowMs?: number;
-  maxBatchSize?: number;
-}
 
 const query = gql`
-  query getSetByIds($ids: [Int!]) {
-    getSetByIds(ids: $ids) {
-      ...Set
-    }
+query getSetByIds($ids: [Int!]) {
+  getSetByIds(ids: $ids) {
+    ...Set
   }
-  ${Set}
+}
 `
 
+/**
+ * Set 도메인용 배처 Hook
+ * 
+ * @param graphqlClient GraphQL Client 인스턴스
+ * @param options 배처 옵션
+ * @returns Set 배처 인스턴스
+ */
 export const useSetQueryBatcher = (
   graphqlClient: GraphQLClient,
-  options: SetBatcherOptions = {}
-) => {
-  const { windowMs = 50, maxBatchSize = 20 } = options;
-  const [setBatcher] = useState(() => create({
+  options: BatcherOptions = {}
+): Batcher<SetData[], number, SetData> => {
+  return createBatcher<SetData, number>({
     name: 'set',
-    fetcher: async (ids: number[]) => {
-      const response = await graphqlClient.request<{ getSetByIds: SetData[] }>(query, { ids })
-      return response.getSetByIds
-    },
-    resolver: keyResolver<SetData[], number>('id', { indexed: true}),
-    scheduler: windowedFiniteBatchScheduler({
-      windowMs,
-      maxBatchSize,
-    }),
-  }))
-  return setBatcher
+    query,
+    queryName: 'getSetByIds',
+    fragment: gql`${Set}`,
+    graphqlClient,
+    options,
+  });
 }
