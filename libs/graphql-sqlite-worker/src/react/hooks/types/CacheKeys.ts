@@ -1,1 +1,7 @@
 export type SetCacheKey = ['set', number]
+export type ExerciseCacheKey = ['exercise', number]
+export type FitnessCacheKey = ['fitness', number]
+export type ExercisePresetCacheKey = ['exercisePreset', number]
+export type ScheduleCacheKey = ['schedule', number]
+export type ScheduleByDateCacheKey = ['schedule', 'date', number, number, number]
+export type ScheduleStatusByMonthCacheKey = ['schedule', 'status', number, number]
