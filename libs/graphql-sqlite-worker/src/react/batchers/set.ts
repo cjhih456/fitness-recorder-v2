@@ -4,6 +4,11 @@ import { Set } from '../fragment';
 import { gql, GraphQLClient } from "graphql-request";
 import { useState } from "react";
 
+export interface SetBatcherOptions {
+  windowMs?: number;
+  maxBatchSize?: number;
+}
+
 const query = gql`
   query getSetByIds($ids: [Int!]) {
     getSetByIds(ids: $ids) {
@@ -13,17 +18,21 @@ const query = gql`
   ${Set}
 `
 
-export const useSetQueryBatcher = (graphqlClient: GraphQLClient) => {
+export const useSetQueryBatcher = (
+  graphqlClient: GraphQLClient,
+  options: SetBatcherOptions = {}
+) => {
+  const { windowMs = 50, maxBatchSize = 20 } = options;
   const [setBatcher] = useState(() => create({
     name: 'set',
     fetcher: async (ids: number[]) => {
-      const response = await graphqlClient.request<SetData[]>(query, { ids })
-      return response
+      const response = await graphqlClient.request<{ getSetByIds: SetData[] }>(query, { ids })
+      return response.getSetByIds
     },
     resolver: keyResolver<SetData[], number>('id', { indexed: true}),
     scheduler: windowedFiniteBatchScheduler({
-      windowMs: 1000,
-      maxBatchSize: 10,
+      windowMs,
+      maxBatchSize,
     }),
   }))
   return setBatcher
