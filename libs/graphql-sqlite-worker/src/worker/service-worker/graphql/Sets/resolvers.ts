@@ -2,7 +2,7 @@ import type { SetData, SetCreateType } from '@fitness-recoder/structure';
 import type { IResolvers } from '@graphql-tools/utils';
 import { getSetByIds, getSetById, getSetListByExerciseId, createSet, updateSet, deleteSetById } from './service';
 
-export default (): IResolvers<any, any> => {
+export default (): IResolvers<unknown, GraphqlContext> => {
   const getSetByIdsShell: ResponseResolver<{ ids: number[] }, SetData[]> = async (_, { ids }, context) => {
     return getSetByIds(context, { ids })
   }

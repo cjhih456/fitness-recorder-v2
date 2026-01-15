@@ -1,9 +1,9 @@
 import { mergeSchemas } from '@graphql-tools/schema';
-import Schedule from './Schedule'
 import Exercise from './Exercise'
 import ExercisePreset from './ExercisePreset'
-import Sets from './Sets'
 import Fitness from './Fitness'
+import Schedule from './Schedule'
+import Sets from './Sets'
 
 export const mergedSchema = mergeSchemas({
   schemas: [

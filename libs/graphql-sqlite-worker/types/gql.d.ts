@@ -19,7 +19,7 @@ declare type GraphqlContext = {
   dbBus: DBBus
 }
 
-declare type ResponseResolver<Args, Return> = import('@graphql-tools/utils').IFieldResolver<any, GraphqlContext, Args, Return | Promise<Return>>
+declare type ResponseResolver<Args, Return> = import('@graphql-tools/utils').IFieldResolver<unknown, GraphqlContext, Args, Return | Promise<Return>>
 
 declare type ResponseBuilder<Args, Return> = (
   context: GraphqlContext,

@@ -5,8 +5,8 @@
  */
 
 
-import Sqlite3InitModule from '@sqlite.org/sqlite-wasm';
 import type { BindingSpec, Database } from '@sqlite.org/sqlite-wasm';
+import Sqlite3InitModule from '@sqlite.org/sqlite-wasm';
 
 let db: Database | null = null;
 const broadcastChannel = new BroadcastChannel('graphql-sqlite-worker');

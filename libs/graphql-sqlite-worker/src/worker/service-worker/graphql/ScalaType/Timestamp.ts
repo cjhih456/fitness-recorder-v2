@@ -1,8 +1,8 @@
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { GraphQLScalarType } from 'graphql';
-import { Kind } from 'graphql/language';
+import { ASTNode, Kind } from 'graphql/language';
 
-function serializeDate(value: any) {
+function serializeDate(value: unknown) {
   if (value instanceof Date) {
     return value.getTime();
   } else if (typeof value === 'number') {
@@ -13,7 +13,7 @@ function serializeDate(value: any) {
   return null;
 }
 
-function parseDate(value: any) {
+function parseDate(value: unknown) {
   if (value === null) {
     return null;
   }
@@ -23,7 +23,7 @@ function parseDate(value: any) {
   return null
 }
 
-function parseDateFromLiteral(ast: any) {
+function parseDateFromLiteral(ast: ASTNode) {
   if (ast.kind === Kind.INT) {
     const num = parseInt(ast.value, 10);
     return new Date(num);

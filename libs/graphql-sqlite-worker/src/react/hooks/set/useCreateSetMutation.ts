@@ -2,8 +2,8 @@ import { SetCreateType, SetData } from "@fitness-recoder/structure";
 import { useMutation } from "@tanstack/react-query";
 import { gql } from "graphql-request";
 import { useGraphQLSQLiteWorker } from "../../context";
-import { CustomMutationOptions } from "../types/CustomQueryOptions";
 import { Set } from "../../fragment";
+import { CustomMutationOptions } from "../types/CustomQueryOptions";
 
 const createSetMutation = gql`
   mutation createSet($sets: CreateSetsInput!) {

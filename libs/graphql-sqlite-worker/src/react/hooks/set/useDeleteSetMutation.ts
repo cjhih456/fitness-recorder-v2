@@ -1,7 +1,7 @@
 import type { SetCacheKey } from "../types/CacheKeys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useGraphQLSQLiteWorker } from "../../context";
 import { gql } from "graphql-request";
+import { useGraphQLSQLiteWorker } from "../../context";
 import { CustomMutationOptions } from "../types/CustomQueryOptions";
 
 const deleteSetMutation = gql`

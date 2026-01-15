@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import { useGraphQLSQLiteWorker } from "../../context";
 import type { Fitness } from "@fitness-recoder/structure";
+import { useQuery } from "@tanstack/react-query";
 import { gql } from "graphql-request";
+import { useGraphQLSQLiteWorker } from "../../context";
 import { Fitness as FitnessFragment } from "../../fragment";
 import { CustomQueryOptions } from "../types/CustomQueryOptions";
 

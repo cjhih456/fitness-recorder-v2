@@ -1,10 +1,10 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useGraphQLSQLiteWorker } from "../../context";
+import type { ExercisePresetCacheKey } from "../types/CacheKeys";
 import type { ExercisePresetWithExerciseList, ExercisePresetData } from "@fitness-recoder/structure";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { gql } from "graphql-request";
+import { useGraphQLSQLiteWorker } from "../../context";
 import { ExercisePreset, Exercise, Fitness } from "../../fragment";
 import { CustomMutationOptions } from "../types/CustomQueryOptions";
-import type { ExercisePresetCacheKey } from "../types/CacheKeys";
 
 const mutation = gql`
   mutation updateExercisePreset($exercisePreset: UpdateExercisePresetInput) {

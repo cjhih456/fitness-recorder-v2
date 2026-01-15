@@ -11,7 +11,7 @@ import {
   updateSchedule
 } from './repository';
 
-export default (): IResolvers<any, any> => {
+export default (): IResolvers<unknown, GraphqlContext> => {
   const getScheduleByIdShell: ResponseResolver<{ id: number }, ScheduleData | null> = async (_, { id }, context) => {
     return getScheduleById(context, { id })
   }

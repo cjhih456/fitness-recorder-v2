@@ -1,8 +1,8 @@
 import { ExerciseData } from "@fitness-recoder/structure";
-import { Exercise, Fitness } from '../fragment';
-import { gql, GraphQLClient } from "graphql-request";
-import { createBatcher, BatcherOptions } from "./createBatcher";
 import { Batcher } from "@yornaath/batshit";
+import { gql, GraphQLClient } from "graphql-request";
+import { Exercise, Fitness } from '../fragment';
+import { createBatcher, BatcherOptions } from "./createBatcher";
 
 const query = gql`
 query getExerciseListByIds($ids: [Int!]) {

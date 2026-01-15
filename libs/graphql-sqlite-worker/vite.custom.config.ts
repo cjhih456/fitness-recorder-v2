@@ -1,9 +1,9 @@
+import * as path from 'path';
+import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import GraphqlLoader from 'vite-plugin-graphql-loader';
 import viteWasmPlugin from 'vite-plugin-wasm';
-import * as path from 'path';
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 
 export default defineConfig({
   plugins: [

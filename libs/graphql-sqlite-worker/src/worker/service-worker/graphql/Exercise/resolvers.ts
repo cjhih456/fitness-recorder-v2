@@ -16,7 +16,7 @@ import {
   loadFitnessByExercise,
 } from './service';
 
-export default (): IResolvers<any, any> => {
+export default (): IResolvers<unknown, GraphqlContext> => {
   const getExerciseByIdShell: ResponseResolver<{ id: number }, ExerciseData | null> = async (_, { id }, context) => {
     const data = await getExerciseByIds(context, { ids: id })
     if (!data) return null

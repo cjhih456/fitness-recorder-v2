@@ -16,7 +16,7 @@ import {
   copyExercisePresetFromSchedule
 } from './service';
 
-export default (): IResolvers<any, any> => {
+export default (): IResolvers<unknown, GraphqlContext> => {
   const getExercisePresetWithListByIdShell: ResponseResolver<{ id: number }, ExercisePresetWithExerciseList | null> = async (_, { id }, context) => {
     const result = await getExercisePresetWithListById(context, { id })
     if (!result) return null

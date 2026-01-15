@@ -1,8 +1,8 @@
 import { SetData } from "@fitness-recoder/structure";
-import { Set } from '../fragment';
-import { gql, GraphQLClient } from "graphql-request";
-import { createBatcher, BatcherOptions } from "./createBatcher";
 import { Batcher } from "@yornaath/batshit";
+import { gql, GraphQLClient } from "graphql-request";
+import { Set } from '../fragment';
+import { createBatcher, BatcherOptions } from "./createBatcher";
 
 
 const query = gql`

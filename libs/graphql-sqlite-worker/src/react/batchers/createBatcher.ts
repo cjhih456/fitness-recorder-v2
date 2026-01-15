@@ -14,7 +14,7 @@ export interface BatcherOptions {
 /**
  * 배처 설정 인터페이스
  */
-export interface BatcherConfig<TData, TKey = number> {
+export interface BatcherConfig {
   /** 배처 이름 */
   name: string;
   /** GraphQL 쿼리 DocumentNode */
@@ -54,7 +54,7 @@ export interface BatcherConfig<TData, TKey = number> {
  * ```
  */
 export function createBatcher<TData, TKey = number>(
-  config: BatcherConfig<TData, TKey>
+  config: BatcherConfig
 ): Batcher<TData[], TKey, TData> {
   const {
     name,
