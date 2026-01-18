@@ -42,7 +42,7 @@ export async function insertFitnessData(worker: SQLiteWorker): Promise<void> {
     return;
   }
 
-  const placeholders = Array(13).fill('(?,?,?,?,?,?,?,?,?,?,?,?,?)').join(',');
+  const placeholders = Array(fitnessData.length / 13).fill('(?,?,?,?,?,?,?,?,?,?,?,?,?)').join(',');
   const sql = `
     INSERT INTO fitness (
       name,
