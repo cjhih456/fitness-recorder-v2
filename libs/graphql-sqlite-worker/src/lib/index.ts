@@ -7,5 +7,9 @@ export * from './types';
 export * from './sqlite-worker';
 export * from './migration';
 export * from './graphql-server';
+export * from './version';
+export * from './init';
+export * from './schema';
+export * from './migrations';
 
 

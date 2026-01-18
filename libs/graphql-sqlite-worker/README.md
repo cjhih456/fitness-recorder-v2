@@ -52,12 +52,6 @@ function App() {
     <GraphQLSQLiteWorkerProvider
       workerConfig={{
         dbName: 'fitness.db',
-        initScript: `
-          CREATE TABLE IF NOT EXISTS fitness (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL
-          );
-        `,
       }}
       autoInit={true}
     >

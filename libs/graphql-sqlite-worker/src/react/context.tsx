@@ -2,7 +2,7 @@ import type { SetData, ExerciseData, Fitness } from '@fitness-recoder/structure'
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Batcher } from '@yornaath/batshit';
 import { GraphQLClient } from 'graphql-request'
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { GraphQLServiceWorker } from '../lib/graphql-server';
 import { SQLiteWorker, type SQLiteWorkerConfig } from '../lib/sqlite-worker';
 import { useSetQueryBatcher, useExerciseQueryBatcher, useFitnessQueryBatcher } from './batchers';
@@ -17,18 +17,6 @@ export interface GraphQLSQLiteWorkerContextValue {
     exercise: Batcher<ExerciseData[], number, ExerciseData>
     fitness: Batcher<Fitness[], number, Fitness>
   };
-  /** QueryClient */
-  graphqlClient: GraphQLClient;
-  /** SQLite Worker 인스턴스 */
-  worker: SQLiteWorker | null;
-  /** GraphQL Service Worker 인스턴스 */
-  graphQLServer: GraphQLServiceWorker | null;
-  /** 초기화 상태 */
-  initialized: boolean;
-  /** 연결 상태 */
-  connected: boolean;
-  /** 에러 상태 */
-  error: Error | null;
   /** Worker 초기화 함수 */
   initialize: () => Promise<void>;
 }
@@ -69,38 +57,26 @@ export function GraphQLSQLiteWorkerProvider({
       }
     }
   }))
-  const [worker, setWorker] = useState<SQLiteWorker | null>(null);
-  const [graphQLServer, setGraphQLServer] = useState<GraphQLServiceWorker | null>(null);
-  const [initialized, setInitialized] = useState(false);
-  const [connected, setConnected] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const worker = useRef<SQLiteWorker | null>(null);
+  const graphQLServer = useRef<GraphQLServiceWorker | null>(null);
   
-  const [graphqlClient] = useState(() => new GraphQLClient('/api/graphql'));
+  const graphqlClient = useRef<GraphQLClient>(new GraphQLClient('/api/graphql'));
 
   /**
    * Worker를 초기화합니다.
    */
   const initialize = useCallback(async () => {
     try {
-      setError(null);
-      setConnected(false);
-
-      // SQLite Worker 생성 및 초기화
-      const sqliteWorker = new SQLiteWorker(workerConfig);
-      await sqliteWorker.init();
-      setWorker(sqliteWorker);
-
-      // GraphQL Server 생성 및 시작
-      const server = new GraphQLServiceWorker();
-      setGraphQLServer(server);
-
-      setInitialized(true);
-      setConnected(true);
+      if (!worker.current) {
+        worker.current = new SQLiteWorker(workerConfig);
+        await worker.current.init();
+      }
+      if(!graphQLServer.current) {
+        const server = new GraphQLServiceWorker();
+        graphQLServer.current = server;
+      }
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err));
-      setError(error);
-      setConnected(false);
-      setInitialized(false);
       throw error;
     }
   }, [workerConfig]);
@@ -109,36 +85,19 @@ export function GraphQLSQLiteWorkerProvider({
    * 자동 초기화
    */
   useEffect(() => {
-    if (autoInit && !initialized) {
+    if (autoInit && !worker.current) {
       initialize().catch((err) => {
         console.error('Failed to initialize GraphQL SQLite Worker:', err);
       });
     }
-  }, [autoInit, initialized, initialize]);
-
-  /**
-   * 정리 함수
-   */
-  useEffect(() => {
-    return () => {
-      if (worker) {
-        worker.close().catch(console.error);
-      }
-    };
-  }, [worker]);
+  }, [autoInit, initialize]);
 
   const value: GraphQLSQLiteWorkerContextValue = {
     batchers: {
-      set: useSetQueryBatcher(graphqlClient),
-      exercise: useExerciseQueryBatcher(graphqlClient),
-      fitness: useFitnessQueryBatcher(graphqlClient),
+      set: useSetQueryBatcher(graphqlClient.current),
+      exercise: useExerciseQueryBatcher(graphqlClient.current),
+      fitness: useFitnessQueryBatcher(graphqlClient.current),
     },
-    graphqlClient,
-    worker,
-    graphQLServer,
-    initialized,
-    connected,
-    error,
     initialize,
   };
 

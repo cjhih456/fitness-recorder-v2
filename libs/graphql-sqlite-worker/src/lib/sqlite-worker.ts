@@ -1,29 +1,11 @@
-import type { SQLiteWorkerConfig, SQLiteWorkerMessage, SQLiteWorkerResponse, QueryResult, OPFSSupport } from './types';
+import type { SQLiteWorkerConfig, SQLiteWorkerMessage, SQLiteWorkerResponse, QueryResult } from './types';
 import DBWorker from '../worker/db-worker.worker.ts?worker';
+import { initializeDatabase } from './init';
 /**
  * OPFS 지원 여부를 확인합니다.
  */
 export type { SQLiteWorkerConfig } from './types';
 
-export async function checkOPFSSupport(): Promise<OPFSSupport> {
-  if (
-    typeof navigator !== 'undefined' &&
-    'storage' in navigator &&
-    'getDirectory' in navigator.storage
-  ) {
-    try {
-      const directory = await navigator.storage.getDirectory();
-      return {
-        supported: true,
-        directory,
-      };
-    } catch (error) {
-      console.warn('OPFS is not available:', error);
-      return { supported: false };
-    }
-  }
-  return { supported: false };
-}
 
 /**
  * SQLite Worker를 초기화하고 관리하는 클래스
@@ -45,9 +27,10 @@ export class SQLiteWorker {
     if (this.initialized) {
       return;
     }
+  
+    this.worker = new DBWorker({ name: 'db-worker' })
 
-    this.worker = new DBWorker()
-
+    const initMessageId = this.generateId();
     // 메시지 핸들러 설정
     this.worker.onmessage = (event: MessageEvent<SQLiteWorkerResponse>) => {
       const response = event.data;
@@ -61,27 +44,23 @@ export class SQLiteWorker {
     this.worker.onerror = (error) => {
       console.error('SQLite Worker error:', error);
     };
-
     // 초기화 메시지 전송
     await this.sendMessage({
-      id: this.generateId(),
+      id: initMessageId,
       type: 'init',
       payload: {
         dbName: this.config.dbName,
-        initScript: this.config.initScript,
       },
+    }).then(async () => {
+      await initializeDatabase(this, { appVersion: '1.3.0', insertInitialData: true })
+      this.initialized = true;
     });
-
-    this.initialized = true;
   }
 
   /**
    * SQL 쿼리를 실행합니다.
    */
   async query(sql: string, params: unknown[] = []): Promise<QueryResult> {
-    if (!this.initialized) {
-      await this.init();
-    }
 
     return this.sendMessage<QueryResult>({
       id: this.generateId(),
@@ -94,9 +73,6 @@ export class SQLiteWorker {
    * SQL 명령을 실행합니다 (INSERT, UPDATE, DELETE 등).
    */
   async exec(sql: string, params: unknown[] = []): Promise<void> {
-    if (!this.initialized) {
-      await this.init();
-    }
 
     await this.sendMessage({
       id: this.generateId(),
