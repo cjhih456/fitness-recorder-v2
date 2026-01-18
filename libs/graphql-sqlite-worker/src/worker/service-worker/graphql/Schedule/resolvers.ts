@@ -1,5 +1,5 @@
 import type { ScheduleCreateType, ScheduleData } from '@fitness-recoder/structure';
-import type { IResolvers } from '@graphql-tools/utils';
+import type { IResolvers, GraphQLResolveInfo } from '@graphql-tools/utils';
 import { getExerciseByScheduleId, createExerciseWithScheduleRelation, getExerciseByExercisePresetId } from '../Exercise/repository';
 import { cloneExerciseList } from '../Exercise/service';
 import {
@@ -11,7 +11,7 @@ import {
   updateSchedule
 } from './repository';
 
-export default (): IResolvers<unknown, GraphqlContext> => {
+export default (): IResolvers<unknown, GraphQLResolveInfo> => {
   const getScheduleByIdShell: ResponseResolver<{ id: number }, ScheduleData | null> = async (_, { id }, context) => {
     return getScheduleById(context, { id })
   }
