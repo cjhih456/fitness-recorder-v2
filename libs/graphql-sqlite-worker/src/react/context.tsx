@@ -17,6 +17,8 @@ export interface GraphQLSQLiteWorkerContextValue {
     exercise: Batcher<ExerciseData[], number, ExerciseData>
     fitness: Batcher<Fitness[], number, Fitness>
   };
+  /** GraphQL Client 설정 */
+  graphqlClient: GraphQLClient;
   /** Worker 초기화 함수 */
   initialize: () => Promise<void>;
 }
@@ -98,6 +100,7 @@ export function GraphQLSQLiteWorkerProvider({
       exercise: useExerciseQueryBatcher(graphqlClient.current),
       fitness: useFitnessQueryBatcher(graphqlClient.current),
     },
+    graphqlClient: graphqlClient.current,
     initialize,
   };
 

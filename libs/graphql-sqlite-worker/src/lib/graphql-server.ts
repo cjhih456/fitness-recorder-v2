@@ -1,4 +1,4 @@
-import GraphqlWorker from '../worker/service-worker/service-worker.worker?worker&url';
+
 
 /**
  * Apollo Server를 Service Worker로 설정하는 클래스
@@ -12,7 +12,7 @@ export class GraphQLServiceWorker {
     onActive?: (worker: GraphQLServiceWorker) => void;
   } = {}) {
     this.onActive = onActive || (() => { /* do nothing */ });
-    navigator.serviceWorker.register(GraphqlWorker, {
+    navigator.serviceWorker.register(new URL('../worker/service-worker/service-worker.worker.ts', import.meta.url).href, {
       type: 'module',
       updateViaCache: 'imports',
       scope: '/',

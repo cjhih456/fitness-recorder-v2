@@ -1,5 +1,4 @@
 import type { SQLiteWorkerConfig, SQLiteWorkerMessage, SQLiteWorkerResponse, QueryResult } from './types';
-import DBWorker from '../worker/db-worker.worker.ts?worker';
 import { initializeDatabase } from './init';
 /**
  * OPFS 지원 여부를 확인합니다.
@@ -28,7 +27,9 @@ export class SQLiteWorker {
       return;
     }
   
-    this.worker = new DBWorker({ name: 'db-worker' })
+    this.worker = new Worker(new URL('../worker/db-worker.worker.ts', import.meta.url).href, {
+      name: 'db-worker'
+    })
 
     const initMessageId = this.generateId();
     // 메시지 핸들러 설정

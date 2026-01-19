@@ -2,10 +2,24 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "outDir": "../../dist/out-tsc",
+    "baseUrl": ".",
+    "outDir": "dist",
+    "sourceMap": true,
     "declaration": true,
-    "types": ["node", "vite/client"]
+    "types": ["node", "vite/client"],
+    "lib": ["es2022", "dom"]
   },
-  "include": ["types/**/*.d.ts", "src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["src/**/*.worker.ts"]
+  "include": [
+    "types/**/*.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ],
+  "exclude": [
+    "src/worker/**/*.ts",
+  ],
+  "references": [
+    {
+      "path": "../structure/tsconfig.lib.json"
+    }
+  ]
 }
