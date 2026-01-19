@@ -36,8 +36,9 @@ export async function checkFitnessDataLength(worker: SQLiteWorker): Promise<numb
  * fitness 초기 데이터를 삽입합니다.
  */
 export async function insertFitnessData(worker: SQLiteWorker): Promise<void> {
-  const { fitnessData } = await import('../fitness-datas/fitness-flat-data');
-  
+  const dataLoader = () => import('../fitness-datas/fitness-flat-data.ts');
+  const loaded = await dataLoader();
+  const { fitnessData } = loaded;
   if (!fitnessData || fitnessData.length === 0) {
     return;
   }

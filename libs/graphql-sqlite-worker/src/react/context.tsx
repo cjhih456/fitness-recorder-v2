@@ -41,6 +41,8 @@ export interface GraphQLSQLiteWorkerProviderProps {
   autoInit?: boolean;
   /** 자식 컴포넌트 */
   children: React.ReactNode;
+  /** Service Worker URL */
+  serviceWorkerUrl: string;
 }
 
 /**
@@ -50,6 +52,7 @@ export function GraphQLSQLiteWorkerProvider({
   workerConfig,
   autoInit = true,
   children,
+  serviceWorkerUrl,
 }: GraphQLSQLiteWorkerProviderProps) {
   const [queryClient] = useState(() => new QueryClient({
     queryCache: new QueryCache(),
@@ -74,7 +77,9 @@ export function GraphQLSQLiteWorkerProvider({
         await worker.current.init();
       }
       if(!graphQLServer.current) {
-        const server = new GraphQLServiceWorker();
+        const server = new GraphQLServiceWorker({
+          serviceWorkerUrl: serviceWorkerUrl,
+        });
         graphQLServer.current = server;
       }
     } catch (err) {

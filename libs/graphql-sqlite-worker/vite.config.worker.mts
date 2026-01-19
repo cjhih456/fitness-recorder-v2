@@ -5,6 +5,7 @@ import * as path from 'path';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 import GraphqlLoader from 'vite-plugin-graphql-loader';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
   root: import.meta.dirname,
@@ -14,10 +15,22 @@ export default defineConfig({
     nxCopyAssetsPlugin(['*.md']),
     dts({
       entryRoot: 'src',
-      tsconfigPath: path.join(import.meta.dirname, 'tsconfig.lib.json'),
+      tsconfigPath: path.join(import.meta.dirname, 'tsconfig.worker.json'),
       pathsToAliases: false,
     }),
     GraphqlLoader(),
+    viteStaticCopy({
+      targets: [
+        {
+          src: '../../node_modules/@sqlite.org/sqlite-wasm/sqlite-wasm/jswasm/sqlite3.wasm',
+          dest: '.',
+        },
+        {
+          src: '../../node_modules/@sqlite.org/sqlite-wasm/sqlite-wasm/jswasm/sqlite3-opfs-async-proxy.js',
+          dest: '.',
+        }
+      ]
+    })
   ],
   // Uncomment this if you are using workers.
   // worker: {
@@ -26,28 +39,21 @@ export default defineConfig({
   // Configuration for building your library.
   // See: https://vite.dev/guide/build.html#library-mode
   build: {
-    outDir: './dist',
-    emptyOutDir: true,
-    assetsInlineLimit: 0,
+    outDir: './dist/worker',
+    reportCompressedSize: true,
     commonjsOptions: {
       transformMixedEsModules: true,
     },
     lib: {
       entry: {
-        index: 'src/index',
+        serviceWorker: 'src/worker/service-worker/index',
+        dbWorker: 'src/worker/db-worker.worker',
       },
       name: 'graphql-sqlite-worker',
       formats: ['es' as const],
     },
     rollupOptions: {
-      external: [
-        'react',
-        'react-dom',
-        'react/jsx-runtime',
-        '@fitness-recoder/structure',
-        '@tanstack/react-query',
-        'underscore'
-      ]
+      external: ['@fitness-recoder/structure'],
     },
   },
 })

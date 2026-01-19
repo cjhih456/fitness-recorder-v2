@@ -9,6 +9,8 @@ export interface SQLiteWorkerConfig {
   initScript?: string;
   /** 앱 버전 (예: '1.3.0') */
   appVersion?: string;
+  /** DB Worker URL */
+  dbWorkerUrl: string;
 }
 
 export interface SQLiteWorkerMessage {

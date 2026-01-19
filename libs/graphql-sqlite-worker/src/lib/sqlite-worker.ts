@@ -27,8 +27,9 @@ export class SQLiteWorker {
       return;
     }
   
-    this.worker = new Worker(new URL('../worker/db-worker.worker.ts', import.meta.url).href, {
-      name: 'db-worker'
+    this.worker = new Worker(this.config.dbWorkerUrl, {
+      name: 'db-worker',
+      type: 'module'
     })
 
     const initMessageId = this.generateId();

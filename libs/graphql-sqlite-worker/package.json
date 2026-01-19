@@ -11,8 +11,22 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./dbWorker": {
+      "types": "./dist/worker/dbWorker.d.ts",
+      "import": "./dist/worker/dbWorker.mjs",
+      "require": "./dist/worker/dbWorker.js"
+    },
+    "./serviceWorker": {
+      "types": "./dist/worker/serviceWorker.d.ts",
+      "import": "./dist/worker/serviceWorker.mjs",
+      "require": "./dist/worker/serviceWorker.js"
     }
   },
+  "files": [
+    "./dist/worker/sqlite3.wasm",
+    "./dist/worker/sqlite3-opfs-async-proxy.js"
+  ],
   "dependencies": {
     "@fitness-recoder/structure": "workspace:*",
     "@graphql-tools/merge": "^9.1.7",
@@ -30,5 +44,33 @@
     "vite-plugin-dts": "~4.5.0",
     "vite-plugin-graphql-loader": "^4.0.4",
     "vite-plugin-wasm": "^3.5.0"
+  },
+  "nx": {
+    "targets": {
+      "build-lib": {
+        "executor": "@nx/vite:build",
+        "options": {
+          "configFile": "libs/graphql-sqlite-worker/vite.config.mts",
+          "outputPath": "libs/graphql-sqlite-worker/dist"
+        }
+      },
+      "build-worker": {
+        "dependsOn": [
+          "build-lib"
+        ],
+        "executor": "@nx/vite:build",
+        "options": {
+          "configFile": "libs/graphql-sqlite-worker/vite.config.worker.mts",
+          "outputPath": "libs/graphql-sqlite-worker/dist/worker"
+        }
+      },
+      "build": {
+        "dependsOn": [
+          "build-worker",
+          "build-lib"
+        ],
+        "executor": "nx:noop"
+      }
+    }
   }
 }

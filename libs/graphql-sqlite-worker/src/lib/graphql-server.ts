@@ -7,12 +7,14 @@ export class GraphQLServiceWorker {
   registration: ServiceWorkerRegistration | null = null;
   onActive: (worker: GraphQLServiceWorker) => void;
   constructor({
+    serviceWorkerUrl,
     onActive
   }: {
+    serviceWorkerUrl: string;
     onActive?: (worker: GraphQLServiceWorker) => void;
-  } = {}) {
+    } = { serviceWorkerUrl: '' }) {
     this.onActive = onActive || (() => { /* do nothing */ });
-    navigator.serviceWorker.register(new URL('../worker/service-worker/service-worker.worker.ts', import.meta.url).href, {
+    navigator.serviceWorker.register(serviceWorkerUrl, {
       type: 'module',
       updateViaCache: 'imports',
       scope: '/',
