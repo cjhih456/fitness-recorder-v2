@@ -1,0 +1,23 @@
+{
+  "name": "@fitness-recoder/web",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@fitness-recoder/graphql-sqlite-worker": "workspace:*",
+    "@fitness-recoder/structure": "workspace:*",
+    "@fitness-recoder/ui": "workspace:*",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "6.29.0"
+  }
+}
