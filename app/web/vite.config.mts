@@ -6,7 +6,6 @@ import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 import { vitePluginI18nextLanguagePackageLoader } from './src/vite-plugins/i18next-language-package';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
-import GraphqlPlugin from 'vite-plugin-graphql-loader'
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
@@ -40,7 +39,6 @@ export default defineConfig(() => ({
       defaultNS: 'common',
       langs: ['ko', 'en'],
     }),
-    GraphqlPlugin(),
     tailwindcss(),
   ],
   // Uncomment this if you are using workers.
