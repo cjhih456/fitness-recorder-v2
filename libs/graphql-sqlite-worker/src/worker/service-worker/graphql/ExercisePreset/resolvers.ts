@@ -1,5 +1,5 @@
 import type { ExercisePresetWithExerciseList, ExercisePresetCreateType, ExercisePresetData } from '@fitness-recoder/structure';
-import type { IResolvers } from '@graphql-tools/utils';
+import type { IResolvers, GraphQLResolveInfo } from '@graphql-tools/utils';
 import {
   getExerciseByExercisePresetId
 } from '../Exercise/repository';
@@ -16,7 +16,7 @@ import {
   copyExercisePresetFromSchedule
 } from './service';
 
-export default (): IResolvers<any, any> => {
+export default (): IResolvers<unknown, GraphQLResolveInfo> => {
   const getExercisePresetWithListByIdShell: ResponseResolver<{ id: number }, ExercisePresetWithExerciseList | null> = async (_, { id }, context) => {
     const result = await getExercisePresetWithListById(context, { id })
     if (!result) return null

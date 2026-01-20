@@ -1,26 +1,25 @@
-import { ApolloClient, InMemoryCache } from '@apollo/client';
-import { ApolloProvider } from '@apollo/client/react';
-import { BatchHttpLink } from '@apollo/client/link/batch-http';
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { SQLiteWorker, type SQLiteWorkerConfig } from '../lib/sqlite-worker';
+import type { SetData, ExerciseData, Fitness } from '@fitness-recoder/structure';
+import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Batcher } from '@yornaath/batshit';
+import { GraphQLClient } from 'graphql-request'
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { GraphQLServiceWorker } from '../lib/graphql-server';
-import { v4 as uuidv4 } from 'uuid';
+import { initializeDatabase, insertInitialFitnessData } from '../lib/init';
+import { SQLiteWorker, type SQLiteWorkerConfig } from '../lib/sqlite-worker';
+import { createSetQueryBatcher, createExerciseQueryBatcher, createFitnessQueryBatcher } from './batchers';
+
 /**
  * GraphQL SQLite Worker Context의 값 타입
  */
 export interface GraphQLSQLiteWorkerContextValue {
-  /** Apollo Client */
-  client: ApolloClient;
-  /** SQLite Worker 인스턴스 */
-  worker: SQLiteWorker | null;
-  /** GraphQL Service Worker 인스턴스 */
-  graphQLServer: GraphQLServiceWorker | null;
-  /** 초기화 상태 */
-  initialized: boolean;
-  /** 연결 상태 */
-  connected: boolean;
-  /** 에러 상태 */
-  error: Error | null;
+  /** Batchers */
+  batchers: { 
+    set: Batcher<SetData[], number, SetData>
+    exercise: Batcher<ExerciseData[], number, ExerciseData>
+    fitness: Batcher<Fitness[], number, Fitness>
+  };
+  /** GraphQL Client 설정 */
+  graphqlClient: GraphQLClient;
   /** Worker 초기화 함수 */
   initialize: () => Promise<void>;
 }
@@ -36,12 +35,15 @@ export const GraphQLSQLiteWorkerContext = createContext<GraphQLSQLiteWorkerConte
  * Context Provider의 Props
  */
 export interface GraphQLSQLiteWorkerProviderProps {
+
   /** SQLite Worker 설정 */
   workerConfig: SQLiteWorkerConfig;
   /** 자동 초기화 여부 */
   autoInit?: boolean;
   /** 자식 컴포넌트 */
   children: React.ReactNode;
+  /** Service Worker URL */
+  serviceWorkerUrl: string;
 }
 
 /**
@@ -51,106 +53,72 @@ export function GraphQLSQLiteWorkerProvider({
   workerConfig,
   autoInit = true,
   children,
+  serviceWorkerUrl,
 }: GraphQLSQLiteWorkerProviderProps) {
-  const [clientId] = useState<string>(uuidv4());
-  const [client] = useState(() => new ApolloClient({
-    link: new BatchHttpLink({
-      uri: 'http://localhost:3000/api/graphql',
-      batchInterval: 10,
-      batchDebounce: true,
-      headers: {
-        'x-client-id': clientId,
+  const [queryClient] = useState(() => new QueryClient({
+    queryCache: new QueryCache(),
+    defaultOptions: {
+      queries: {
+        notifyOnChangeProps: ['data', 'error']
       }
-    }),
-    cache: new InMemoryCache(),
+    }
   }))
-  const [worker, setWorker] = useState<SQLiteWorker | null>(null);
-  const [graphQLServer, setGraphQLServer] = useState<GraphQLServiceWorker | null>(null);
-  const [initialized, setInitialized] = useState(false);
-  const [connected, setConnected] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const worker = useRef<SQLiteWorker | null>(null);
+  const graphQLServer = useRef<GraphQLServiceWorker | null>(null);
+  
+  const graphqlClient = useRef<GraphQLClient>(new GraphQLClient('/api/graphql'));
+
+  const batchers = useRef({
+    set: createSetQueryBatcher(graphqlClient.current),
+    exercise: createExerciseQueryBatcher(graphqlClient.current),
+    fitness: createFitnessQueryBatcher(graphqlClient.current),
+  })
 
   /**
    * Worker를 초기화합니다.
    */
   const initialize = useCallback(async () => {
     try {
-      setError(null);
-      setConnected(false);
-
-      // SQLite Worker 생성 및 초기화
-      const sqliteWorker = new SQLiteWorker(workerConfig);
-      await sqliteWorker.init();
-      setWorker(sqliteWorker);
-
-      // MessageChannel 생성
-      const dbPort = await sqliteWorker.createMessageChannel();
-
-      // GraphQL Server 생성 및 시작
-      const server = new GraphQLServiceWorker({
-        onActive: () => {
-          // Service Worker에 MessagePort 전달
-          if (navigator.serviceWorker.controller) {
-            navigator.serviceWorker.controller.postMessage(
-              {
-                type: 'connect-db-port',
-                clientId,
-              },
-              [dbPort]
-            );
-          }
-        }
-      });
-      setGraphQLServer(server);
-
-      setInitialized(true);
-      setConnected(true);
+      if (!worker.current) {
+        worker.current = new SQLiteWorker(workerConfig);
+        await worker.current.init();
+        await initializeDatabase(worker.current, workerConfig)
+        await insertInitialFitnessData(worker.current);
+      }
+      if(!graphQLServer.current) {
+        const server = new GraphQLServiceWorker({
+          serviceWorkerUrl: serviceWorkerUrl,
+        });
+        graphQLServer.current = server;
+      }
     } catch (err) {
-      const error = err instanceof Error ? err : new Error(String(err));
-      setError(error);
-      setConnected(false);
-      setInitialized(false);
-      throw error;
+      if(err instanceof Error) {
+        throw err;
+      }
+      throw new Error('Failed to initialize GraphQL SQLite Worker:' + String(err));
     }
-  }, [workerConfig]);
+  }, [workerConfig, serviceWorkerUrl]);
 
   /**
    * 자동 초기화
    */
   useEffect(() => {
-    if (autoInit && !initialized) {
-      initialize().catch((err) => {
-        console.error('Failed to initialize GraphQL SQLite Worker:', err);
-      });
+    if (autoInit && !worker.current) {
+      initialize()
     }
-  }, [autoInit, initialized, initialize]);
-
-  /**
-   * 정리 함수
-   */
-  useEffect(() => {
-    return () => {
-      if (worker) {
-        worker.close().catch(console.error);
-      }
-    };
-  }, [worker]);
+  }, [autoInit, initialize]);
 
   const value: GraphQLSQLiteWorkerContextValue = {
-    client,
-    worker,
-    graphQLServer,
-    initialized,
-    connected,
-    error,
+    batchers: batchers.current,
+    graphqlClient: graphqlClient.current,
     initialize,
   };
 
   return (
     <GraphQLSQLiteWorkerContext.Provider value={value}>
-      <ApolloProvider client={client}>
+      <QueryClientProvider client={queryClient}>
         {children}
-      </ApolloProvider>
+      </QueryClientProvider>
     </GraphQLSQLiteWorkerContext.Provider>
   );
 }

@@ -1,5 +1,5 @@
 import type { ExerciseData, ExerciseHistoryData } from '@fitness-recoder/structure'
-import type { IResolvers,  } from '@graphql-tools/utils';
+import type { IResolvers, GraphQLResolveInfo } from '@graphql-tools/utils';
 import {
   getExerciseByIds,
   getExerciseByScheduleId,
@@ -16,7 +16,7 @@ import {
   loadFitnessByExercise,
 } from './service';
 
-export default (): IResolvers<any, any> => {
+export default (): IResolvers<unknown, GraphQLResolveInfo> => {
   const getExerciseByIdShell: ResponseResolver<{ id: number }, ExerciseData | null> = async (_, { id }, context) => {
     const data = await getExerciseByIds(context, { ids: id })
     if (!data) return null

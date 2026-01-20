@@ -1,0 +1,9 @@
+fragment Set on Sets {
+  id
+  exerciseId
+  repeat
+  isDone
+  weightUnit
+  weight
+  duration
+}

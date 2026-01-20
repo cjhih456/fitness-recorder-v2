@@ -4,8 +4,9 @@ import dts from 'vite-plugin-dts';
 import * as path from 'path';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
+import GraphqlLoader from 'vite-plugin-graphql-loader';
 
-export default defineConfig(() => ({
+export default defineConfig({
   root: import.meta.dirname,
   cacheDir: '../../node_modules/.vite/libs/graphql-sqlite-worker',
   plugins: [
@@ -16,11 +17,7 @@ export default defineConfig(() => ({
       tsconfigPath: path.join(import.meta.dirname, 'tsconfig.lib.json'),
       pathsToAliases: false,
     }),
-    dts({
-      entryRoot: 'src',
-      tsconfigPath: path.join(import.meta.dirname, 'tsconfig.worker.json'),
-      pathsToAliases: false,
-    }),
+    GraphqlLoader(),
   ],
   // Uncomment this if you are using workers.
   // worker: {
@@ -29,24 +26,28 @@ export default defineConfig(() => ({
   // Configuration for building your library.
   // See: https://vite.dev/guide/build.html#library-mode
   build: {
-    outDir: '../../dist/libs/graphql-sqlite-worker',
+    outDir: './dist',
     emptyOutDir: true,
-    reportCompressedSize: true,
+    assetsInlineLimit: 0,
     commonjsOptions: {
       transformMixedEsModules: true,
     },
     lib: {
-      // Could also be a dictionary or array of multiple entry points.
-      entry: 'src/index.ts',
+      entry: {
+        index: 'src/index',
+      },
       name: 'graphql-sqlite-worker',
-      fileName: 'index',
-      // Change this to the formats you want to support.
-      // Don't forget to update your package.json as well.
-      formats: ['es' as const],
+      formats: ['es' as const, 'cjs' as const],
     },
     rollupOptions: {
-      // External packages that should not be bundled into your library.
-      external: [],
+      external: [
+        'react',
+        'react-dom',
+        'react/jsx-runtime',
+        '@fitness-recoder/structure',
+        '@tanstack/react-query',
+        'underscore'
+      ]
     },
   },
-}));
+})

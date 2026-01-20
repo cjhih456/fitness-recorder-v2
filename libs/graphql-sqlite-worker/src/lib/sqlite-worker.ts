@@ -1,30 +1,11 @@
-import type { SQLiteWorkerConfig, SQLiteWorkerMessage, SQLiteWorkerResponse, QueryResult, OPFSSupport } from './types';
-import DBWorker from '../worker/db-worker.worker.ts?worker';
+import type { SQLiteWorkerConfig, SQLiteWorkerMessage, SQLiteWorkerResponse, QueryResult } from './types';
+import { initializeDatabase, insertInitialFitnessData } from './init';
 /**
  * OPFS 지원 여부를 확인합니다.
  */
 export type { SQLiteWorkerConfig } from './types';
 
-export async function checkOPFSSupport(): Promise<OPFSSupport> {
-  if (
-    typeof navigator !== 'undefined' &&
-    'storage' in navigator &&
-    'getDirectory' in navigator.storage
-  ) {
-    try {
-      const directory = await navigator.storage.getDirectory();
-      return {
-        supported: true,
-        directory,
-      };
-    } catch (error) {
-      console.warn('OPFS is not available:', error);
-      return { supported: false };
-    }
-  }
-  return { supported: false };
-}
-
+const SQLITE_MESSAGE_TIMEOUT_MS = 30_000
 /**
  * SQLite Worker를 초기화하고 관리하는 클래스
  */
@@ -32,7 +13,6 @@ export class SQLiteWorker {
   private worker: Worker | null = null;
   private config: SQLiteWorkerConfig;
   private messageHandlers: Map<string, (response: SQLiteWorkerResponse) => void> = new Map();
-  private opfsSupport: OPFSSupport | null = null;
   private initialized = false;
 
   constructor(config: SQLiteWorkerConfig) {
@@ -46,13 +26,13 @@ export class SQLiteWorker {
     if (this.initialized) {
       return;
     }
+  
+    this.worker = new Worker(this.config.dbWorkerUrl, {
+      name: 'db-worker',
+      type: 'module'
+    })
 
-    // OPFS 지원 확인
-    this.opfsSupport = await checkOPFSSupport();
-    const useOPFS = this.config.useOPFS ?? this.opfsSupport.supported;
-
-    this.worker = new DBWorker()
-
+    const initMessageId = this.generateId();
     // 메시지 핸들러 설정
     this.worker.onmessage = (event: MessageEvent<SQLiteWorkerResponse>) => {
       const response = event.data;
@@ -64,30 +44,24 @@ export class SQLiteWorker {
     };
 
     this.worker.onerror = (error) => {
-      console.error('SQLite Worker error:', error);
+      throw new Error('SQLite Worker error:' + error.message);
     };
-
     // 초기화 메시지 전송
     await this.sendMessage({
-      id: this.generateId(),
+      id: initMessageId,
       type: 'init',
       payload: {
         dbName: this.config.dbName,
-        useOPFS,
-        initScript: this.config.initScript,
       },
+    }).then(async () => {
+      this.initialized = true;
     });
-
-    this.initialized = true;
   }
 
   /**
    * SQL 쿼리를 실행합니다.
    */
   async query(sql: string, params: unknown[] = []): Promise<QueryResult> {
-    if (!this.initialized) {
-      await this.init();
-    }
 
     return this.sendMessage<QueryResult>({
       id: this.generateId(),
@@ -100,9 +74,6 @@ export class SQLiteWorker {
    * SQL 명령을 실행합니다 (INSERT, UPDATE, DELETE 등).
    */
   async exec(sql: string, params: unknown[] = []): Promise<void> {
-    if (!this.initialized) {
-      await this.init();
-    }
 
     await this.sendMessage({
       id: this.generateId(),
@@ -124,43 +95,6 @@ export class SQLiteWorker {
       this.worker = null;
       this.initialized = false;
     }
-  }
-
-  /**
-   * OPFS 지원 여부를 반환합니다.
-   */
-  getOPFSSupport(): OPFSSupport | null {
-    return this.opfsSupport;
-  }
-
-  /**
-   * Service Worker와 DB Worker 간 통신을 위한 MessageChannel을 생성합니다.
-   * @returns Service Worker에 전달할 MessagePort
-   */
-  async createMessageChannel(): Promise<MessagePort> {
-    if (!this.initialized) {
-      await this.init();
-    }
-
-    if (!this.worker) {
-      throw new Error('Worker is not initialized');
-    }
-
-    const channel = new MessageChannel();
-    const port1 = channel.port1;
-    const port2 = channel.port2;
-
-    // DB Worker에 port2 전달
-    this.worker.postMessage(
-      {
-        id: this.generateId(),
-        type: 'connect-port',
-        payload: { port: port2 },
-      },
-      [port2]
-    );
-
-    return port1;
   }
 
   /**
@@ -190,7 +124,7 @@ export class SQLiteWorker {
           this.messageHandlers.delete(message.id);
           reject(new Error('Worker message timeout'));
         }
-      }, 30000);
+      }, SQLITE_MESSAGE_TIMEOUT_MS);
     });
   }
 

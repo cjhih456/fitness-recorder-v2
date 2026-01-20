@@ -7,7 +7,8 @@
       "@nx/react/typings/cssmodule.d.ts",
       "@nx/react/typings/image.d.ts",
       "vite/client"
-    ]
+    ],
+    "lib": ["es2022", "dom"]
   },
   "exclude": [
     "src/**/*.spec.ts",
@@ -23,5 +24,16 @@
     "vitest.config.ts",
     "vitest.config.mts"
   ],
-  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
+  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
+  "references": [
+    {
+      "path": "../../libs/ui/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/structure/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/graphql-sqlite-worker/tsconfig.lib.json"
+    }
+  ]
 }

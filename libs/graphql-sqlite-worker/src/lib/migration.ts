@@ -5,8 +5,8 @@ import type { SQLiteWorker } from './sqlite-worker';
  */
 export interface MigrationScript {
   version: number;
-  up?: string; // 마이그레이션 SQL
-  down?: string; // 롤백 SQL (선택사항)
+  up?: string | ((worker: SQLiteWorker) => Promise<void>); // 마이그레이션 SQL 또는 함수
+  down?: string | ((worker: SQLiteWorker) => Promise<void>); // 롤백 SQL 또는 함수 (선택사항)
   description?: string;
 }
 
@@ -94,7 +94,11 @@ export class MigrationManager {
         await this.worker.exec('BEGIN TRANSACTION');
         // 마이그레이션 실행
         if (migration.up) {
-          await this.worker.exec(migration.up);
+          if (typeof migration.up === 'string') {
+            await this.worker.exec(migration.up);
+          } else {
+            await migration.up(this.worker);
+          }
         }
         // 마이그레이션 히스토리 기록
         await this.worker.exec(
@@ -169,7 +173,11 @@ export class MigrationManager {
 
     try {
       await this.worker.exec('BEGIN TRANSACTION');
-      await this.worker.exec(migration.down);
+      if (typeof migration.down === 'string') {
+        await this.worker.exec(migration.down);
+      } else if (migration.down) {
+        await migration.down(this.worker);
+      }
       await this.worker.exec(`DELETE FROM ${this.migrationsTable} WHERE version = ?`, [
         migration.version,
       ]);

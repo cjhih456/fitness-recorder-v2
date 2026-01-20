@@ -5,16 +5,21 @@
  */
 
 
-import Sqlite3InitModule from '@sqlite.org/sqlite-wasm';
 import type { BindingSpec, Database } from '@sqlite.org/sqlite-wasm';
-let db: Database | null = null;
-let useOPFS = false;
-let serviceWorkerPort: MessagePort | null = null;
+import Sqlite3InitModule from '@sqlite.org/sqlite-wasm';
 
+let db: Database | null = null;
+const broadcastChannel = new BroadcastChannel('graphql-sqlite-worker');
+declare const self: Worker
 interface WorkerMessage {
   id: string;
   type: string;
-  payload?: unknown;
+  payload?: {
+    dbName?: string;
+    initScript?: string;
+    sql?: string;
+    params?: BindingSpec;
+  };
 }
 
 interface WorkerResponse {
@@ -34,7 +39,7 @@ async function handleMessage(
   try {
     switch (message.type) {
       case 'init':
-        await handleInit(message.payload as { dbName: string; useOPFS: boolean; initScript?: string });
+        await handleInit(message.payload as { dbName: string; });
         postMessage({ id: message.id, success: true });
         break;
       case 'query': {
@@ -47,31 +52,30 @@ async function handleMessage(
         postMessage({ id: message.id, success: true, data: execResult });
         break;
       }
+      case 'insert':
+      case 'update':
+      case 'delete': {
+        const execResult = await handleExec(message.payload as { sql: string; params: BindingSpec });
+        // RETURNING * 결과 반환
+        postMessage({ id: message.id, success: true, data: execResult });
+        break;
+      }
+      case 'select': {
+        const queryResult = await handleQuery(message.payload as { sql: string; params: BindingSpec });
+        // 단일 결과 반환
+        postMessage({ id: message.id, success: true, data: queryResult && queryResult.length > 0 ? queryResult[0] : null });
+        break;
+      }
+      case 'selects': {
+        const queryResult = await handleQuery(message.payload as { sql: string; params: BindingSpec });
+        // 배열 결과 반환
+        postMessage({ id: message.id, success: true, data: queryResult || [] });
+        break;
+      }
       case 'close':
         await handleClose();
         postMessage({ id: message.id, success: true });
         break;
-      case 'connect-port': {
-        const port = (message.payload as { port?: MessagePort })?.port;
-        if (port) {
-          serviceWorkerPort = port;
-          serviceWorkerPort.onmessage = async (event: MessageEvent) => {
-            await handleMessage(event.data as WorkerMessage, (response) => {
-              if (serviceWorkerPort) {
-                serviceWorkerPort.postMessage(response);
-              }
-            });
-          };
-          postMessage({ id: message.id, success: true });
-        } else {
-          postMessage({
-            id: message.id,
-            success: false,
-            error: 'Port is required',
-          });
-        }
-        break;
-      }
       default:
         postMessage({
           id: message.id,
@@ -88,6 +92,12 @@ async function handleMessage(
   }
 }
 
+broadcastChannel.onmessage = async (event: MessageEvent) => {
+  await handleMessage(event.data, (response) => {
+    broadcastChannel.postMessage(response);
+  });
+};
+
 self.onmessage = async (event: MessageEvent) => {
   await handleMessage(event.data, (response) => {
     self.postMessage(response);
@@ -96,24 +106,15 @@ self.onmessage = async (event: MessageEvent) => {
 
 async function handleInit(payload: {
   dbName: string;
-  useOPFS: boolean;
-  initScript?: string;
 }) {
-  useOPFS = payload.useOPFS;
-  const sqlite3 = await Sqlite3InitModule();
-
-  if (useOPFS && 'getDirectory' in navigator.storage) {
-    // const directory = await navigator.storage.getDirectory();
-    // const dbFile = await directory.getFileHandle(payload.dbName, { create: true });
-    // const dbAccessHandle = await dbFile.createSyncAccessHandle();
-    db = new sqlite3.oo1.OpfsDb(payload.dbName);
-  } else {
-    db = new sqlite3.oo1.DB(payload.dbName);
-  }
-
-  if (payload.initScript) {
-    db.exec(payload.initScript);
-  }
+  const sqlite3Module = await Sqlite3InitModule({
+    print: console.log,
+    printErr: console.error
+  })
+  const dbName = payload.dbName || 'worker.sqlite3'
+  db = sqlite3Module.oo1.OpfsDb
+    ? new sqlite3Module.oo1.OpfsDb(dbName)
+    : new sqlite3Module.oo1.DB(dbName, 'c')
 }
 
 async function handleQuery(payload: { sql: string; params: BindingSpec }) {

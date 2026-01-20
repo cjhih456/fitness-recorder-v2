@@ -5,10 +5,12 @@ import type { SqlValue } from '@sqlite.org/sqlite-wasm';
 export interface SQLiteWorkerConfig {
   /** 데이터베이스 파일 이름 */
   dbName: string;
-  /** OPFS 사용 여부 (자동 감지되지만 강제 설정 가능) */
-  useOPFS?: boolean;
   /** 초기화 시 실행할 SQL 스크립트 */
   initScript?: string;
+  /** 앱 버전 (예: '1.3.0') */
+  appVersion: string;
+  /** DB Worker URL */
+  dbWorkerUrl: string;
 }
 
 export interface SQLiteWorkerMessage {
@@ -25,10 +27,4 @@ export interface SQLiteWorkerResponse {
 }
 
 export type QueryResult = Record<string, SqlValue>[];
-
-export interface OPFSSupport {
-  supported: boolean;
-  directory?: FileSystemDirectoryHandle;
-}
-
 

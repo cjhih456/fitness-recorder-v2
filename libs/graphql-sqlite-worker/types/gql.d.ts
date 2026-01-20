@@ -9,19 +9,17 @@ declare module '*.gql' {
   >;
 }
 
-type 
-
 declare type DBBus = {
   sendTransaction: (<T = unknown>(type: 'select', sql: string, params: unknown[]) => Promise<T[]>) & 
   (<T = unknown>(type: 'selects', sql: string, params: unknown[]) => Promise<T[]>) &
   (<T = unknown>(type: 'insert' | 'update' | 'delete', sql: string, params: unknown[]) => Promise<T[]>)
 }
 
-declare type GraphqlContext = import('@apollo/server').BaseContext & {
+declare type GraphqlContext = {
   dbBus: DBBus
 }
 
-declare type ResponseResolver<Args, Return> = import('@graphql-tools/utils').IFieldResolver<any, GraphqlContext, Args, Return | Promise<Return>>
+declare type ResponseResolver<Args, Return> = import('@graphql-tools/utils').IFieldResolver<unknown, GraphqlContext, Args, Return | Promise<Return>>
 
 declare type ResponseBuilder<Args, Return> = (
   context: GraphqlContext,

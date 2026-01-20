@@ -1,6 +1,6 @@
-import type { IResolvers } from '@graphql-tools/utils';
+import type { Fitness } from '@fitness-recoder/structure';
+import type { IResolvers, GraphQLResolveInfo } from '@graphql-tools/utils';
 import { getFitnessById, getFitnessByIds, getFitnessListByKeywords } from './service';
-import { Fitness } from '@fitness-recoder/structure';
 interface GetFitnessByIdArgs { id: number }
 interface GetFitnessByIdsArgs { ids: number[] }
 interface GetFitnessListByKeywordsArgs {
@@ -11,7 +11,7 @@ interface GetFitnessListByKeywordsArgs {
   offset: number
 }
 
-const fitnessResolver = (): IResolvers<any, { client: string }> => {
+const fitnessResolver = (): IResolvers<unknown, GraphQLResolveInfo> => {
   const getFitnessByIdShell: ResponseResolver<GetFitnessByIdArgs, Fitness | null> = async (_, { id }, context) => {
     return getFitnessById(context, { id })
   }

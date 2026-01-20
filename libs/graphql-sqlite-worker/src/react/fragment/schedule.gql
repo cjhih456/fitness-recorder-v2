@@ -1,0 +1,11 @@
+fragment Schedule on ScheduleData {
+  id
+  year
+  month
+  date
+  beforeTime
+  start
+  breakTime
+  workoutTimes
+  type
+}
