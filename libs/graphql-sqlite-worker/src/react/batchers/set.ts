@@ -20,7 +20,7 @@ query getSetByIds($ids: [Int!]) {
  * @param options 배처 옵션
  * @returns Set 배처 인스턴스
  */
-export const useSetQueryBatcher = (
+export const createSetQueryBatcher = (
   graphqlClient: GraphQLClient,
   options: BatcherOptions = {}
 ): Batcher<SetData[], number, SetData> => {

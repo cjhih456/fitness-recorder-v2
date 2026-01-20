@@ -2,10 +2,10 @@ import type { SetData, ExerciseData, Fitness } from '@fitness-recoder/structure'
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Batcher } from '@yornaath/batshit';
 import { GraphQLClient } from 'graphql-request'
-import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { GraphQLServiceWorker } from '../lib/graphql-server';
 import { SQLiteWorker, type SQLiteWorkerConfig } from '../lib/sqlite-worker';
-import { useSetQueryBatcher, useExerciseQueryBatcher, useFitnessQueryBatcher } from './batchers';
+import { createSetQueryBatcher, createExerciseQueryBatcher, createFitnessQueryBatcher } from './batchers';
 
 /**
  * GraphQL SQLite Worker Context의 값 타입
@@ -67,6 +67,12 @@ export function GraphQLSQLiteWorkerProvider({
   
   const graphqlClient = useRef<GraphQLClient>(new GraphQLClient('/api/graphql'));
 
+  const batchers = useRef({
+    set: createSetQueryBatcher(graphqlClient.current),
+    exercise: createExerciseQueryBatcher(graphqlClient.current),
+    fitness: createFitnessQueryBatcher(graphqlClient.current),
+  })
+
   /**
    * Worker를 초기화합니다.
    */
@@ -86,7 +92,7 @@ export function GraphQLSQLiteWorkerProvider({
       const error = err instanceof Error ? err : new Error(String(err));
       throw error;
     }
-  }, [workerConfig]);
+  }, [workerConfig, serviceWorkerUrl]);
 
   /**
    * 자동 초기화
@@ -100,11 +106,7 @@ export function GraphQLSQLiteWorkerProvider({
   }, [autoInit, initialize]);
 
   const value: GraphQLSQLiteWorkerContextValue = {
-    batchers: {
-      set: useSetQueryBatcher(graphqlClient.current),
-      exercise: useExerciseQueryBatcher(graphqlClient.current),
-      fitness: useFitnessQueryBatcher(graphqlClient.current),
-    },
+    batchers: batchers.current,
     graphqlClient: graphqlClient.current,
     initialize,
   };

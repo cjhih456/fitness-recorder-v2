@@ -1,11 +1,11 @@
 import type { SQLiteWorkerConfig, SQLiteWorkerMessage, SQLiteWorkerResponse, QueryResult } from './types';
-import { initializeDatabase } from './init';
+import { initializeDatabase, insertInitialFitnessData } from './init';
 /**
  * OPFS 지원 여부를 확인합니다.
  */
 export type { SQLiteWorkerConfig } from './types';
 
-
+const SQLITE_MESSAGE_TIMEOUT_MS = 30_000
 /**
  * SQLite Worker를 초기화하고 관리하는 클래스
  */
@@ -54,7 +54,8 @@ export class SQLiteWorker {
         dbName: this.config.dbName,
       },
     }).then(async () => {
-      await initializeDatabase(this, { appVersion: '1.3.0', insertInitialData: true })
+      await initializeDatabase(this, this.config)
+      await insertInitialFitnessData(this);
       this.initialized = true;
     });
   }
@@ -125,7 +126,7 @@ export class SQLiteWorker {
           this.messageHandlers.delete(message.id);
           reject(new Error('Worker message timeout'));
         }
-      }, 30000);
+      }, SQLITE_MESSAGE_TIMEOUT_MS);
     });
   }
 

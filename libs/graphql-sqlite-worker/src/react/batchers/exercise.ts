@@ -19,7 +19,7 @@ query getExerciseListByIds($ids: [Int!]) {
  * @param options 배처 옵션
  * @returns Exercise 배처 인스턴스
  */
-export const useExerciseQueryBatcher = (
+export const createExerciseQueryBatcher = (
   graphqlClient: GraphQLClient,
   options: BatcherOptions = {}
 ): Batcher<ExerciseData[], number, ExerciseData> => {

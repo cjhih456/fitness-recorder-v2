@@ -19,7 +19,7 @@ query getFitnessListByIds($ids: [Int!]) {
  * @param options 배처 옵션
  * @returns Fitness 배처 인스턴스
  */
-export const useFitnessQueryBatcher = (
+export const createFitnessQueryBatcher = (
   graphqlClient: GraphQLClient,
   options: BatcherOptions = {}
 ): Batcher<Fitness[], number, Fitness> => {

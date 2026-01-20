@@ -21,8 +21,6 @@ import { isNewVersion } from './version';
 export interface DatabaseInitOptions {
   /** 앱 버전 (예: '1.3.0') */
   appVersion: string;
-  /** 초기 데이터 삽입 여부 (기본값: true) */
-  insertInitialData?: boolean;
 }
 
 /**
@@ -35,7 +33,7 @@ export async function initializeDatabase(
   worker: SQLiteWorker,
   options: DatabaseInitOptions
 ): Promise<void> {
-  const { appVersion, insertInitialData = true } = options;
+  const { appVersion } = options;
 
   // 1. Version 테이블 생성
   await createVersionTable(worker);
@@ -72,12 +70,15 @@ export async function initializeDatabase(
       await updateVersion(worker, appVersion);
     }
   }
+}
 
-  // 6. Fitness 초기 데이터 삽입 (데이터가 없을 경우)
-  if (insertInitialData) {
-    const fitnessDataCount = await checkFitnessDataLength(worker);
-    if (fitnessDataCount === 0) {
-      await insertFitnessData(worker);
-    }
+/**
+ * Fitness 초기 데이터를 삽입합니다. 자동으로 실행됩니다.
+ * @param worker SQLiteWorker
+ */
+export async function insertInitialFitnessData(worker: SQLiteWorker): Promise<void> {
+  const fitnessDataCount = await checkFitnessDataLength(worker);
+  if (fitnessDataCount === 0) {
+    await insertFitnessData(worker);
   }
 }
