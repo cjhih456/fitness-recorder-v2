@@ -2,7 +2,7 @@ import type { SetData, ExerciseData, Fitness } from '@fitness-recoder/structure'
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Batcher } from '@yornaath/batshit';
 import { GraphQLClient } from 'graphql-request'
-import { createContext, useContext, useEffect, useState, useCallback, useRef, useMemo } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { GraphQLServiceWorker } from '../lib/graphql-server';
 import { SQLiteWorker, type SQLiteWorkerConfig } from '../lib/sqlite-worker';
 import { createSetQueryBatcher, createExerciseQueryBatcher, createFitnessQueryBatcher } from './batchers';
