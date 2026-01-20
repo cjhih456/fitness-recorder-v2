@@ -85,14 +85,26 @@ self.addEventListener('fetch', async (event) => {
     return event.respondWith(yogaServer.handleRequest(event.request, {
       dbBus
     }))
-  } else if(event.request.url.includes('.wasm') || event.request.url.includes('.js')){
-    return event.respondWith(caches.match(event.request).then((response) => {
-      return response || fetch(event.request).then((response) => {
-        caches.open('fitness-recorder-caches').then((cache) => {
-          cache.put(event.request, response.clone());
-        });
-        return response;
-      });
-    }));
+  } else if (event.request.url.includes('.wasm') || event.request.url.includes('.js')){
+    if (!(event.request.url.startsWith('https://') || event.request.url.startsWith('http://'))) {
+      return
+    }
+    const cache = await caches.open('fitness-recorder-caches');
+    const matched = await cache.match(event.request)
+    if (matched) {
+      try {
+        return event.respondWith(matched);
+      } catch {
+        await cache.delete(event.request)
+      }
+    }
+    const response = await fetch(event.request)
+    const clonedResponse = response.clone()
+    try {
+      cache.put(event.request, clonedResponse)
+      return event.respondWith(response)
+    } catch {
+      await cache.delete(event.request)
+    }
   }
 });
