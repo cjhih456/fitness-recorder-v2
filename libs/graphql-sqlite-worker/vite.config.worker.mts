@@ -12,7 +12,6 @@ export default defineConfig({
   cacheDir: '../../node_modules/.vite/libs/graphql-sqlite-worker',
   plugins: [
     nxViteTsPaths(),
-    nxCopyAssetsPlugin(['*.md']),
     dts({
       entryRoot: 'src',
       tsconfigPath: path.join(import.meta.dirname, 'tsconfig.worker.json'),

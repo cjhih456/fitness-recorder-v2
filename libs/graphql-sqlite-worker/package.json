@@ -60,6 +60,7 @@
         ],
         "executor": "@nx/vite:build",
         "options": {
+          "generatePackageJson": false,
           "configFile": "libs/graphql-sqlite-worker/vite.config.worker.mts",
           "outputPath": "libs/graphql-sqlite-worker/dist/worker"
         }
