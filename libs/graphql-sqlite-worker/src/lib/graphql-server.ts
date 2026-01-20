@@ -11,12 +11,12 @@ export interface GraphQLServiceWorkerOptions {
 }
 export class GraphQLServiceWorker {
   registration: ServiceWorkerRegistration | null = null;
-  onActive: (worker: GraphQLServiceWorker) => void;
+  onActive?: (worker: GraphQLServiceWorker) => void;
   constructor({
     serviceWorkerUrl,
     onActive
   }: GraphQLServiceWorkerOptions = { serviceWorkerUrl: '' }) {
-    this.onActive = onActive || (() => { /* do nothing */ });
+    this.onActive = onActive
     navigator.serviceWorker.register(serviceWorkerUrl, {
       type: 'module',
       updateViaCache: 'imports',
@@ -26,13 +26,15 @@ export class GraphQLServiceWorker {
       if(registration.active && !navigator.serviceWorker.controller) {
         window.location.reload();
       } else {
-        this.onActive(this);
+        this.onActive?.(this);
       }
       this.registration.addEventListener('updatefound', () => {
         this.registration?.update().then(() => {
           window.location.reload();
         })
       })
+    }).catch((err) => {
+      throw new Error('Failed to register Service Worker:' + err.message + err.stack);
     })
   }
   get worker() {

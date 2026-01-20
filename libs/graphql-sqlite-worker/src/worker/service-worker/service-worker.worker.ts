@@ -6,6 +6,8 @@ export type Version = number
 
 export const version: Version = 1
 
+const SQLITE_MESSAGE_TIMEOUT_MS = 30_000
+
 let yogaServer: YogaServerInstance<GraphqlContext, GraphqlContext> | null = null;
 const broadcastChannel = new BroadcastChannel('graphql-sqlite-worker');
 const dbBus = createDbBusWrapper(broadcastChannel)
@@ -53,7 +55,7 @@ function createDbBusWrapper(port: BroadcastChannel): DBBus {
         setTimeout(() => {
           port.removeEventListener('message', handler);
           reject(new Error('DB Worker message timeout'));
-        }, 30000);
+        }, SQLITE_MESSAGE_TIMEOUT_MS);
       });
     },
   };

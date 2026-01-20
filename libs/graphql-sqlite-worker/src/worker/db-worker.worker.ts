@@ -111,9 +111,10 @@ async function handleInit(payload: {
     print: console.log,
     printErr: console.error
   })
+  const dbName = payload.dbName || 'worker.sqlite3'
   db = sqlite3Module.oo1.OpfsDb
-    ? new sqlite3Module.oo1.OpfsDb(payload.dbName || 'worker.sqlite3')
-    : new sqlite3Module.oo1.DB(payload.dbName || 'workout.sqlite3', 'c')
+    ? new sqlite3Module.oo1.OpfsDb(dbName)
+    : new sqlite3Module.oo1.DB(dbName, 'c')
 }
 
 async function handleQuery(payload: { sql: string; params: BindingSpec }) {

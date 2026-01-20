@@ -44,7 +44,7 @@ export class SQLiteWorker {
     };
 
     this.worker.onerror = (error) => {
-      console.error('SQLite Worker error:', error);
+      throw new Error('SQLite Worker error:' + error.message);
     };
     // 초기화 메시지 전송
     await this.sendMessage({
@@ -54,8 +54,6 @@ export class SQLiteWorker {
         dbName: this.config.dbName,
       },
     }).then(async () => {
-      await initializeDatabase(this, this.config)
-      await insertInitialFitnessData(this);
       this.initialized = true;
     });
   }

@@ -4,6 +4,7 @@ import { Batcher } from '@yornaath/batshit';
 import { GraphQLClient } from 'graphql-request'
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { GraphQLServiceWorker } from '../lib/graphql-server';
+import { initializeDatabase, insertInitialFitnessData } from '../lib/init';
 import { SQLiteWorker, type SQLiteWorkerConfig } from '../lib/sqlite-worker';
 import { createSetQueryBatcher, createExerciseQueryBatcher, createFitnessQueryBatcher } from './batchers';
 
@@ -81,6 +82,8 @@ export function GraphQLSQLiteWorkerProvider({
       if (!worker.current) {
         worker.current = new SQLiteWorker(workerConfig);
         await worker.current.init();
+        await initializeDatabase(worker.current, workerConfig)
+        await insertInitialFitnessData(worker.current);
       }
       if(!graphQLServer.current) {
         const server = new GraphQLServiceWorker({
@@ -89,8 +92,10 @@ export function GraphQLSQLiteWorkerProvider({
         graphQLServer.current = server;
       }
     } catch (err) {
-      const error = err instanceof Error ? err : new Error(String(err));
-      throw error;
+      if(err instanceof Error) {
+        throw err;
+      }
+      throw new Error('Failed to initialize GraphQL SQLite Worker:' + String(err));
     }
   }, [workerConfig, serviceWorkerUrl]);
 
@@ -99,9 +104,7 @@ export function GraphQLSQLiteWorkerProvider({
    */
   useEffect(() => {
     if (autoInit && !worker.current) {
-      initialize().catch((err) => {
-        console.error('Failed to initialize GraphQL SQLite Worker:', err);
-      });
+      initialize()
     }
   }, [autoInit, initialize]);
 
