@@ -85,5 +85,14 @@ self.addEventListener('fetch', async (event) => {
     return event.respondWith(yogaServer.handleRequest(event.request, {
       dbBus
     }))
+  } else if(event.request.url.includes('.wasm') || event.request.url.includes('.js')){
+    return event.respondWith(caches.match(event.request).then((response) => {
+      return response || fetch(event.request).then((response) => {
+        caches.open('fitness-recorder-caches').then((cache) => {
+          cache.put(event.request, response.clone());
+        });
+        return response;
+      });
+    }));
   }
 });
