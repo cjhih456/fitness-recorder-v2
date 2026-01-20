@@ -49,7 +49,7 @@ export default defineConfig({
         dbWorker: 'src/worker/db-worker.worker',
       },
       name: 'graphql-sqlite-worker',
-      formats: ['es' as const],
+      formats: ['es' as const, 'cjs' as const],
     },
     rollupOptions: {
       external: ['@fitness-recoder/structure'],

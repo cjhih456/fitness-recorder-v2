@@ -37,7 +37,7 @@ export default defineConfig({
         index: 'src/index',
       },
       name: 'graphql-sqlite-worker',
-      formats: ['es' as const],
+      formats: ['es' as const, 'cjs' as const],
     },
     rollupOptions: {
       external: [
