@@ -7,12 +7,8 @@ import { vitePluginI18nextLanguagePackageLoader } from './src/vite-plugins/i18ne
 import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 
-export default defineConfig(() => ({
-  root: import.meta.dirname,
-  cacheDir: '../../node_modules/.vite/app/web',
-  server: {
-    port: 3000,
-    host: 'localhost',
+export default defineConfig(() => {
+  const corsObj = {
     cors: true,
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',
@@ -20,46 +16,56 @@ export default defineConfig(() => ({
       'Cross-Origin-Embedder-Policy': 'require-corp',
       'Service-Worker-Allowed': '/'
     }
-  },
-  preview: {
-    port: 3000,
-    host: 'localhost',
-  },
-  plugins: [
-    react(),
-    nxViteTsPaths(),
-    nxCopyAssetsPlugin([
-      '*.md',
-    ]),
-    vitePluginI18nextLanguagePackageLoader({
-      excelFilePath: path.join(import.meta.dirname, './src/assets/i18n/languages.xlsx'),
-      outputDir: path.join(import.meta.dirname, 'src/assets/i18n/languages'),
-      typeDir: path.join(import.meta.dirname, 'src/assets/i18n/languages'),
-      useDts: true,
-      defaultNS: 'common',
-      langs: ['ko', 'en'],
-    }),
-    tailwindcss(),
-  ],
-  // Uncomment this if you are using workers.
-  build: {
-    outDir: '../../dist/app/web',
-    emptyOutDir: true,
-    reportCompressedSize: true,
-    commonjsOptions: {
-      transformMixedEsModules: true,
-    }
-  },
-  test: {
-    name: 'web',
-    watch: false,
-    globals: true,
-    environment: 'jsdom',
-    include: ['{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-    reporters: ['default'],
-    coverage: {
-      reportsDirectory: '../../coverage/app/web',
-      provider: 'v8' as const,
+  }
+  return {
+    root: import.meta.dirname,
+    cacheDir: '../../node_modules/.vite/app/web',
+    server: {
+      port: 3000,
+      host: 'localhost',
+      ...corsObj
     },
-  },
-}));
+    preview: {
+      port: 3000,
+      host: 'localhost',
+      ...corsObj
+    },
+    plugins: [
+      react(),
+      nxViteTsPaths(),
+      nxCopyAssetsPlugin([
+        '*.md',
+      ]),
+      vitePluginI18nextLanguagePackageLoader({
+        excelFilePath: path.join(import.meta.dirname, './src/assets/i18n/languages.xlsx'),
+        outputDir: path.join(import.meta.dirname, 'src/assets/i18n/languages'),
+        typeDir: path.join(import.meta.dirname, 'src/assets/i18n/languages'),
+        useDts: true,
+        defaultNS: 'common',
+        langs: ['ko', 'en'],
+      }),
+      tailwindcss(),
+    ],
+    // Uncomment this if you are using workers.
+    build: {
+      outDir: '../../dist/app/web',
+      emptyOutDir: true,
+      reportCompressedSize: true,
+      commonjsOptions: {
+        transformMixedEsModules: true,
+      }
+    },
+    test: {
+      name: 'web',
+      watch: false,
+      globals: true,
+      environment: 'jsdom',
+      include: ['{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+      reporters: ['default'],
+      coverage: {
+        reportsDirectory: '../../coverage/app/web',
+        provider: 'v8' as const,
+      },
+    },
+  }
+});
