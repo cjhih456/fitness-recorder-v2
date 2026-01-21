@@ -1,51 +1,32 @@
 // Uncomment this line to use CSS modules
 // import styles from './app.module.css';
-import NxWelcome from './nx-welcome';
-
-import { Route, Routes, Link } from 'react-router-dom';
+import { GraphQLSQLiteWorkerProvider } from '@fitness-recoder/graphql-sqlite-worker';
+import DbWorkerUrl from '@fitness-recoder/graphql-sqlite-worker/dbWorker?worker&url';
+import ServiceWorkerUrl from '@fitness-recoder/graphql-sqlite-worker/serviceWorker?worker&url';
+import { ThemeProvider } from 'next-themes';
+import { Route, Routes } from 'react-router-dom';
+import DefaultLayout from '../components/layout/DefaultLayout';
+import Dashboard from './pages/Dashboard';
+import History from './pages/History';
+import Routines from './pages/Routines';
 
 export function App() {
   return (
-    <div>
-      <NxWelcome title="web" />
-
-      {/* START: routes */}
-      {/* These routes and navigation have been generated for you */}
-      {/* Feel free to move and update them to fit your needs */}
-      <br />
-      <hr />
-      <br />
-      <div role="navigation">
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/page-2">Page 2</Link>
-          </li>
-        </ul>
-      </div>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <div>
-              This is the generated root route.{' '}
-              <Link to="/page-2">Click here for page 2.</Link>
-            </div>
-          }
-        />
-        <Route
-          path="/page-2"
-          element={
-            <div>
-              <Link to="/">Click here to go back to root page.</Link>
-            </div>
-          }
-        />
-      </Routes>
-      {/* END: routes */}
-    </div>
+    <GraphQLSQLiteWorkerProvider
+      workerConfig={{ dbName: 'fitness.db', appVersion: '1.3.0', dbWorkerUrl: DbWorkerUrl }}
+      autoInit={true}
+      serviceWorkerUrl={ServiceWorkerUrl}
+    >
+      <ThemeProvider defaultTheme="light" enableSystem={false} attribute="class">
+        <DefaultLayout>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/history" element={<History />} />
+            <Route path="/routines" element={<Routines />} />
+          </Routes>
+        </DefaultLayout>
+      </ThemeProvider>
+    </GraphQLSQLiteWorkerProvider>
   );
 }
 
