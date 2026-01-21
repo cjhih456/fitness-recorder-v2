@@ -3,6 +3,8 @@
 @import 'tw-animate-css';
 @import '@fontsource/figtree';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --font-sans: 'Figtree', sans-serif;
   --radius: 0.625rem;
