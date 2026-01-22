@@ -6,27 +6,30 @@ import ServiceWorkerUrl from '@fitness-recoder/graphql-sqlite-worker/serviceWork
 import { ThemeProvider } from 'next-themes';
 import { Route, Routes } from 'react-router-dom';
 import DefaultLayout from '../components/layout/DefaultLayout';
+import SuspenseBoundary from '../components/utils/SuspenseBoundary';
 import Dashboard from './pages/Dashboard';
 import History from './pages/History';
 import Routines from './pages/Routines';
 
 export function App() {
   return (
-    <GraphQLSQLiteWorkerProvider
-      workerConfig={{ dbName: 'fitness.db', appVersion: '1.3.0', dbWorkerUrl: DbWorkerUrl }}
-      autoInit={true}
-      serviceWorkerUrl={ServiceWorkerUrl}
-    >
-      <ThemeProvider defaultTheme="light" enableSystem={false} attribute="class">
-        <DefaultLayout>
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/history" element={<History />} />
-            <Route path="/routines" element={<Routines />} />
-          </Routes>
-        </DefaultLayout>
-      </ThemeProvider>
-    </GraphQLSQLiteWorkerProvider>
+    <ThemeProvider defaultTheme="light" enableSystem={false} attribute="class">
+      <DefaultLayout>
+        <SuspenseBoundary>
+          <GraphQLSQLiteWorkerProvider
+            workerConfig={{ dbName: 'fitness.db', appVersion: '1.3.0', dbWorkerUrl: DbWorkerUrl }}
+            autoInit={true}
+            serviceWorkerUrl={ServiceWorkerUrl}
+          >
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/history" element={<History />} />
+              <Route path="/routines" element={<Routines />} />
+            </Routes>
+          </GraphQLSQLiteWorkerProvider>
+        </SuspenseBoundary>
+      </DefaultLayout>
+    </ThemeProvider>
   );
 }
 
