@@ -20,22 +20,31 @@ export default function FitnessSearchDrawer({
   // TODO: Graphql 조회 후 데이터 바인딩
   const scrollRef = useRef<HTMLDivElement>(null);
   const {
-    data: { pages },
+    data,
     isLoading,
     fetchNextPage,
-    hasNextPage
+    hasNextPage,
+    refetch,
   } = hooks.useFitnessListByKeywordsQuery({
     name: searchQuery,
   });
-  const fitnessList = pages.flat()
+  
+
+  useEffect(() => {
+    if(!open) return;
+    setSearchQuery('')
+    refetch()
+  }, [open, refetch])
+
+  const fitnessList = open ? data?.pages.flat() ?? [] : []
   const { getVirtualItems, getTotalSize } = useVirtualizer({
     count: fitnessList.length ?? 0,
     getScrollElement: () => scrollRef.current,
     estimateSize: () => 68,
+    gap: 8,
     useScrollendEvent: true
   });
   useEffect(() => {
-    if(!fitnessList.length) return;
     const virtualItems = getVirtualItems()
     if (!virtualItems.length) return
     const lastVirtualItem = virtualItems[virtualItems.length - 1]
@@ -45,8 +54,7 @@ export default function FitnessSearchDrawer({
   }, [
     getVirtualItems,
     hasNextPage,
-    fetchNextPage,
-    fitnessList
+    fetchNextPage
   ])
   const handleOnSelect = useCallback((fitness: Fitness) => {
     onSelect?.(fitness);
