@@ -10,7 +10,7 @@ export default function LayoutFooter() {
   const historyHref = useHref("/history");
   const routinesHref = useHref("/routines");
   const photoHref = useHref("/photo");
-  const workoutHref = useHref("/workout");
+  const workoutHref = useHref("/workout/1");
 
   const gotoHome = useCallback(() => {
     navigate(homeHref);

@@ -10,22 +10,25 @@ import SuspenseBoundary from '../components/utils/SuspenseBoundary';
 import Dashboard from './pages/Dashboard';
 import History from './pages/History';
 import Routines from './pages/Routines';
+import Workout from './pages/Workout';
 
 export function App() {
   return (
     <ThemeProvider defaultTheme="light" enableSystem={false} attribute="class">
       <DefaultLayout>
-        <SuspenseBoundary>
+        <SuspenseBoundary fallback={<div>Loading...</div>}>
           <GraphQLSQLiteWorkerProvider
             workerConfig={{ dbName: 'fitness.db', appVersion: '1.3.0', dbWorkerUrl: DbWorkerUrl }}
-            autoInit={true}
             serviceWorkerUrl={ServiceWorkerUrl}
           >
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/history" element={<History />} />
-              <Route path="/routines" element={<Routines />} />
-            </Routes>
+            <SuspenseBoundary fallback={<div>Loading Data...</div>}>
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/history" element={<History />} />
+                <Route path="/routines" element={<Routines />} />
+                <Route path="/workout/:scheduleId" element={<Workout />} />
+              </Routes>
+            </SuspenseBoundary>
           </GraphQLSQLiteWorkerProvider>
         </SuspenseBoundary>
       </DefaultLayout>
