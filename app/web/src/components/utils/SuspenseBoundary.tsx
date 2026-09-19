@@ -1,5 +1,8 @@
-import { Suspense, useCallback } from "react";
-import { ErrorBoundary } from 'react-error-boundary'
+import { Button } from '@fitness-recoder/ui';
+import { CircleAlert } from 'lucide-react';
+import { Suspense, useCallback } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import PageLoadingSkeleton from './PageLoadingSkeleton';
 
 interface SuspenseBoundaryProps {
   fallback?: React.ReactNode;
@@ -8,31 +11,49 @@ interface SuspenseBoundaryProps {
 }
 
 export default function SuspenseBoundary({
-  fallback, children, onError
+  fallback,
+  children,
+  onError,
 }: SuspenseBoundaryProps) {
-  const getErrorMessage = useCallback((error: unknown) => {
-    if (error instanceof Error) {
-      return error.message;
-    }
-    return String(error);
-  }, [])
-  const handleError = useCallback((error: unknown) => {
-    // TODO: 오류 트래커 추가시 여기 진행
-    onError?.(error);
-  }, [onError])
+  const handleError = useCallback(
+    (error: unknown) => {
+      onError?.(error);
+    },
+    [onError],
+  );
+
   return (
     <ErrorBoundary
       onError={handleError}
-      fallbackRender={({ error, resetErrorBoundary }) => (
-        <div className="flex flex-col items-center justify-center h-screen">
-          <div className="text-2xl font-bold">Error: {getErrorMessage(error)}</div>
-          <button onClick={resetErrorBoundary} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md">Retry</button>
+      fallbackRender={({ resetErrorBoundary }) => (
+        <div
+          className="mx-auto flex min-h-[50vh] max-w-md flex-col items-center justify-center gap-4 px-4 py-10"
+          role="alert"
+        >
+          <CircleAlert
+            className="size-9 text-destructive"
+            aria-hidden
+            strokeWidth={2}
+          />
+          <h2 className="text-base font-semibold tracking-tight text-foreground">
+            문제가 발생했습니다
+          </h2>
+          <p className="text-center text-[13px] text-muted-foreground">
+            잠시 후 다시 시도해 주세요
+          </p>
+          <Button
+            type="button"
+            onClick={resetErrorBoundary}
+            className="rounded-full bg-blue-600 px-6 text-white hover:bg-blue-600"
+          >
+            다시 시도
+          </Button>
         </div>
       )}
     >
-      <Suspense fallback={fallback || <div>Loading...</div>}>
+      <Suspense fallback={fallback ?? <PageLoadingSkeleton />}>
         {children}
       </Suspense>
     </ErrorBoundary>
-  )
+  );
 }
