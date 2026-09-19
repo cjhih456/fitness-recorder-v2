@@ -1,6 +1,6 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as XLSX from 'xlsx';
+import fs from 'fs';
+import path from 'path';
+import XLSX from 'xlsx';
 
 /**
  * Excel 파일을 읽어서 Workbook 객체를 반환합니다.
