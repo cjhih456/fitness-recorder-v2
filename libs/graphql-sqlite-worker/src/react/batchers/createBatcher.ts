@@ -75,7 +75,12 @@ export function createBatcher<TData, TKey = number>(
       const response = await graphqlClient.request<Record<string, TData[]>>(
         query + fragment,
         { ids: keys }
-      );
+      ).catch(e => {
+        console.error(e)
+        return {
+          [responseField]: []
+        } as Record<string, TData[]>
+      });
       return response[responseField];
     },
     resolver: keyResolver<TData[], TKey>(keyField as keyof TData, { indexed: true }),

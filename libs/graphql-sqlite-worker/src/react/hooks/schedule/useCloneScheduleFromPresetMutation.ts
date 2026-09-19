@@ -26,7 +26,10 @@ export const useCloneScheduleFromPresetMutation = (
   return useMutation({
     ...options,
     mutationFn: async (input: CloneScheduleFromPresetInput) => {
-      const result = await graphqlClient.request<{ cloneScheduleFromPreset: ScheduleData }>(mutation, input);
+      const result = await graphqlClient.request<{ cloneScheduleFromPreset: ScheduleData }>(mutation, input).catch(e => {
+        console.error(e)
+        throw e
+      });
       return result.cloneScheduleFromPreset;
     },
     onSuccess: (data, variables, ...rest) => {

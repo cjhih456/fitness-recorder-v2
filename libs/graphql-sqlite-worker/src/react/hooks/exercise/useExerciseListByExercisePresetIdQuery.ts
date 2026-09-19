@@ -25,7 +25,12 @@ export const useExerciseListByExercisePresetIdQuery = (
     queryKey: ['exercise', 'byExercisePresetId', exercisePresetId],
     queryFn: async () => {
       if (exercisePresetId === undefined) return [];
-      const result = await graphqlClient.request<{ getExerciseListByExercisePresetId: ExerciseData[] }>(query, { exercisePresetId });
+      const result = await graphqlClient.request<{ getExerciseListByExercisePresetId: ExerciseData[] }>(query, { exercisePresetId }).catch(e => {
+        console.error(e)
+        return {
+          getExerciseListByExercisePresetId: []
+        }
+      });
       return result.getExerciseListByExercisePresetId;
     },
     enabled: exercisePresetId !== undefined,

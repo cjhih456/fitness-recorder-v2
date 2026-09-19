@@ -34,8 +34,8 @@ export default (): IResolvers<unknown, GraphQLResolveInfo> => {
     const result = await getExerciseByExercisePresetId(context, { exercisePresetId })
     return await loadFitnessByExerciseList(context, { exerciseList: result })
   }
-  const getExerciseFinishHistoryShell: ResponseResolver<{ exerciseId: number }, ExerciseHistoryData[]> = async (_, { exerciseId }, context) => {
-    return await getExerciseFinishHistory(context, { exerciseId })
+  const getExerciseFinishHistoryShell: ResponseResolver<{ fitnessId: number }, ExerciseHistoryData[]> = async (_, { fitnessId }, context) => {
+    return await getExerciseFinishHistory(context, { fitnessId })
   }
   const createExerciseByScheduleShell: ResponseResolver<{
     exercise: {

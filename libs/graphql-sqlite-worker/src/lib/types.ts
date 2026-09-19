@@ -7,7 +7,7 @@ export interface SQLiteWorkerConfig {
   dbName: string;
   /** 초기화 시 실행할 SQL 스크립트 */
   initScript?: string;
-  /** 앱 버전 (예: '1.3.0') */
+  /** 앱 버전 (예: '1.5.0') */
   appVersion: string;
   /** DB Worker URL */
   dbWorkerUrl: string;

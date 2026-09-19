@@ -1,10 +1,6 @@
 import type { SQLiteWorker } from '../sqlite-worker';
 
-/**
- * fitness 테이블을 생성합니다.
- */
-export async function createFitnessTable(worker: SQLiteWorker): Promise<void> {
-  await worker.exec(`
+const createFitnessTableSql = `
     CREATE TABLE IF NOT EXISTS fitness (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -15,14 +11,25 @@ export async function createFitnessTable(worker: SQLiteWorker): Promise<void> {
       force TEXT CHECK( force IN (NULL, 'pull','push','static') ),
       level TEXT CHECK( level IN ('beginner','intermediate','expert') ) NOT NULL,
       mechanic TEXT CHECK( mechanic IN (NULL, 'compound','isolation') ),
-      equipment TEXT CHECK( equipment IN (NULL, 'body_only','machine','kettlebells','dumbbell','cable','barbell','bands','medicine_ball','exercise_ball','e-z_curl_bar','foam_roll') ),
+      equipment TEXT CHECK( equipment IN (NULL, 'body_only','machine','kettlebells','dumbbell','cable','barbell','bands','medicine_ball','exercise_ball','e-z_curl_bar','foam_roll','other') ),
       category TEXT CHECK( category IN ('strength','stretching','plyometrics','strongman','powerlifting','cardio','olympic_weightlifting','crossfit','weighted_bodyweight','assisted_bodyweight') ) NOT NULL,
       instructions TEXT CHECK( json_valid(instructions) AND json_type(instructions) = 'array' ) NOT NULL,
       description TEXT,
       tips TEXT CHECK( json_valid(tips) AND json_type(tips) = 'array' )
     )
-  `);
+`;
+
+/**
+ * fitness 테이블을 생성합니다.
+ */
+export async function createFitnessTable(worker: SQLiteWorker): Promise<void> {
+  await worker.exec(createFitnessTableSql);
 }
+
+/**
+ * fitness 테이블 재생성을 위한 SQL (마이그레이션용)
+ */
+export const recreateFitnessTableSql = createFitnessTableSql;
 
 /**
  * fitness 테이블의 데이터 개수를 확인합니다.

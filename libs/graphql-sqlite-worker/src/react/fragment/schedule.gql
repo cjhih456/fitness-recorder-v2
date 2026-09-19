@@ -3,6 +3,7 @@ fragment Schedule on ScheduleData {
   year
   month
   date
+  title
   beforeTime
   start
   breakTime

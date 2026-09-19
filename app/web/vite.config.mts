@@ -46,6 +46,9 @@ export default defineConfig(() => {
       }),
       tailwindcss(),
     ],
+    optimizeDeps: {
+      exclude: ['@fitness-recoder/graphql-sqlite-worker'],
+    },
     // Uncomment this if you are using workers.
     build: {
       outDir: '../../dist/app/web',

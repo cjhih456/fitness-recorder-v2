@@ -22,7 +22,10 @@ export const useUpdateScheduleMutation = (
   return useMutation({
     ...options,
     mutationFn: async (input: ScheduleData) => {
-      const result = await graphqlClient.request<{ updateSchedule: ScheduleData }>(mutation, { schedule: input });
+      const result = await graphqlClient.request<{ updateSchedule: ScheduleData }>(mutation, { schedule: input }).catch(e => {
+        console.error(e)
+        throw e
+      });
       return result.updateSchedule;
     },
     onSuccess: (data, variables, ...rest) => {

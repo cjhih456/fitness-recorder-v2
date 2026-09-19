@@ -16,11 +16,15 @@ export const useDeleteSetMutation = (options: CustomMutationOptions<number, stri
   return useMutation({
     ...options,
     mutationFn: async (id: number) => {
-      const result = await graphqlClient.request<{ deleteSetById: string }>(deleteSetMutation, { id })
+      const result = await graphqlClient.request<{ deleteSetById: string }>(deleteSetMutation, { id }).catch(e => {
+        console.error(e)
+        throw e
+      })
       return result.deleteSetById
     },
     onSuccess: (data, variables, ...rest) => {
       queryClient.invalidateQueries<SetCacheKey>({ queryKey: ['set', variables] })
+      queryClient.invalidateQueries({ queryKey: ['set', 'byExerciseId'] })
       options.onSuccess?.(data, variables, ...rest)
     }
   })

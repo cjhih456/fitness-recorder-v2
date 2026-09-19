@@ -3,7 +3,6 @@ import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import * as path from 'path';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
-import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 import GraphqlLoader from 'vite-plugin-graphql-loader';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 
@@ -37,9 +36,11 @@ export default defineConfig({
   // },
   // Configuration for building your library.
   // See: https://vite.dev/guide/build.html#library-mode
+  assetsInclude: ['**/*.wasm'],
   build: {
     outDir: './dist/worker',
     reportCompressedSize: true,
+    assetsInlineLimit: 0,
     commonjsOptions: {
       transformMixedEsModules: true,
     },

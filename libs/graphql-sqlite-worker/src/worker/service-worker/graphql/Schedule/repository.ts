@@ -1,11 +1,16 @@
 import type { ScheduleData, ScheduleCreateType } from '@fitness-recoder/structure'
+import { IScheduleSchema } from '@fitness-recoder/structure'
+
+function parseSchedule(row: unknown): ScheduleData {
+  return IScheduleSchema.parse(row)
+}
 
 export const getScheduleById: ResponseBuilder<{ id: number }, ScheduleData | null> = async ({ dbBus }, { id }) => {
   const schedule = await dbBus?.sendTransaction<ScheduleData>(
     'select', 'select * from schedule where id=?',
     [id]
   )
-  return schedule[0] ?? null
+  return schedule?.[0] ? parseSchedule(schedule[0]) : null
 }
 
 export const getScheduleByDate: ResponseBuilder<{ year: number, month: number, date: number }, ScheduleData[] | null> = async ({ dbBus }, { year, month, date }) => {
@@ -13,11 +18,11 @@ export const getScheduleByDate: ResponseBuilder<{ year: number, month: number, d
     'selects', 'select * from schedule where year=? and month=? and date=?',
     [year, month, date]
   )
-  return scheduleList ?? []
+  return (scheduleList ?? []).map(parseSchedule)
 }
 
 export const getScheduleStatusByMonth: ResponseBuilder<{ year: number, month: number }, string[][] | null> = async ({ dbBus }, { year, month }) => {
-  const scheduleList = await dbBus?.sendTransaction<ScheduleData>(
+  const scheduleList = await dbBus?.sendTransaction<{ date: number, type: string }>(
     'selects', 'select year, month, date, group_concat(type) as type from schedule where year=? and month=? group by year, month, date',
     [year, month]
   )
@@ -29,17 +34,17 @@ export const getScheduleStatusByMonth: ResponseBuilder<{ year: number, month: nu
 
 export const createSchedule: ResponseBuilder<{ schedule: ScheduleCreateType }, ScheduleData | null> = async ({ dbBus }, { schedule }) => {
   const result = await dbBus?.sendTransaction<ScheduleData>(
-    'insert', 'insert into schedule (year, month, date, type, start, beforeTime, breakTime, workoutTimes) values (?,?,?,?,?,?,?,?)',
-    [schedule.year, schedule.month, schedule.date, schedule.type, 0, 0, 0, 0]
+    'insert', 'insert into schedule (year, month, date, title, type, start, beforeTime, breakTime, workoutTimes) values (?,?,?,?,?,?,?,?,?) RETURNING *',
+    [schedule.year, schedule.month, schedule.date, schedule.title, schedule.type, 0, 0, 0, 0]
   )
-  return result && result[0] ? result[0] : null
+  return result?.[0] ? parseSchedule(result[0]) : null
 }
 export const updateSchedule: ResponseBuilder<{ schedule: ScheduleData }, ScheduleData | null> = async ({ dbBus }, { schedule }) => {
   const result = await dbBus?.sendTransaction<ScheduleData>(
-    'update', 'update schedule set year=?, month=?, date=?, beforeTime=?, start=?, breakTime=?, workoutTimes=?, type=? where id=?',
-    [schedule.year, schedule.month, schedule.date, schedule.beforeTime, schedule.start, schedule.breakTime, schedule.workoutTimes, schedule.type, schedule.id]
+    'update', 'update schedule set year=?, month=?, date=?, title=?, beforeTime=?, start=?, breakTime=?, workoutTimes=?, type=? where id=? RETURNING *',
+    [schedule.year, schedule.month, schedule.date, schedule.title, schedule.beforeTime, schedule.start, schedule.breakTime, schedule.workoutTimes, schedule.type, schedule.id]
   )
-  return result && result[0] ? result[0] : null
+  return result?.[0] ? parseSchedule(result[0]) : null
 }
 export const deleteSchedule: ResponseBuilder<{ id: number }, string | null> = async ({ dbBus }, { id }) => {
   const result = await dbBus?.sendTransaction<ScheduleData>(

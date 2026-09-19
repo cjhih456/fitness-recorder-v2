@@ -15,17 +15,21 @@ const updateSetMutation = gql`
   }
   ${Set}
 `
-export const useUpdateSetMutation = (options: CustomMutationOptions<SetData, SetData>) => {
+export const useUpdateSetMutation = (options: CustomMutationOptions<SetData, SetData> = {}) => {
   const { graphqlClient } = useGraphQLSQLiteWorker();
   const queryClient = useQueryClient()
   return useMutation({
     ...options,
     mutationFn: async (set: SetData) => {
-      const result = await graphqlClient.request<{ updateSet: SetData }>(updateSetMutation, { sets: set })
+      const result = await graphqlClient.request<{ updateSet: SetData }>(updateSetMutation, { sets: set }).catch(e => {
+        console.error(e)
+        throw e
+      })
       return result.updateSet
     },
     onSuccess: (data, variables, ...rest) => {
       queryClient.invalidateQueries<SetCacheKey>({ queryKey: ['set', variables.id] })
+      queryClient.invalidateQueries({ queryKey: ['set', 'byExerciseId', variables.exerciseId] })
       options.onSuccess?.(data, variables, ...rest)
     }
   })

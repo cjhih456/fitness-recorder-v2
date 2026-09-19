@@ -1,5 +1,5 @@
 import type { SQLiteWorkerConfig, SQLiteWorkerMessage, SQLiteWorkerResponse, QueryResult } from './types';
-import { initializeDatabase, insertInitialFitnessData } from './init';
+// import { initializeDatabase, insertInitialFitnessData } from './init';
 /**
  * OPFS 지원 여부를 확인합니다.
  */

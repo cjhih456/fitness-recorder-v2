@@ -23,7 +23,12 @@ export const useScheduleStatusByMonthQuery = (
     ...options,
     queryKey: ['schedule', 'status', params.year, params.month] as ScheduleStatusByMonthCacheKey,
     queryFn: async () => {
-      const result = await graphqlClient.request<{ getScheduleStatusByMonth: string[][] }>(query, params);
+      const result = await graphqlClient.request<{ getScheduleStatusByMonth: string[][] }>(query, params).catch(e => {
+        console.error(e)
+        return {
+          getScheduleStatusByMonth: []
+        }
+      });
       return result.getScheduleStatusByMonth;
     },
   })

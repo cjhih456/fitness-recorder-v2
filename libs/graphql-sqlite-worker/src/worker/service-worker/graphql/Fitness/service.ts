@@ -17,8 +17,8 @@ export const getFitnessById: ResponseBuilder<GetFitnessByIdArgs, Fitness | null>
     'select * from fitness where id=?',
     [id]
   )
-  if (!result) return null
-  return IFitnessSchema.parse(result)
+  if (!result?.[0]) return null
+  return IFitnessSchema.parse(result[0])
 }
 
 export const getFitnessByIds: ResponseBuilder<GetFitnessByIdsArgs, Fitness[] | null> = async ({ dbBus}, { ids }) => {

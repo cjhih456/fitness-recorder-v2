@@ -24,7 +24,10 @@ export const useFitnessByIdQuery = (
     queryKey: ['fitness', 'byId', id],
     queryFn: async () => {
       if (id === undefined) return null;
-      const result = await graphqlClient.request<{ getFitnessById: Fitness | null }>(query, { id });
+      const result = await graphqlClient.request<{ getFitnessById: Fitness | null }>(query, { id }).catch(e => {
+        console.error(e)
+        throw e
+      });
       return result.getFitnessById;
     },
     enabled: id !== undefined,

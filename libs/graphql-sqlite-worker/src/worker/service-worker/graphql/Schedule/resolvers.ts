@@ -2,6 +2,7 @@ import type { ScheduleCreateType, ScheduleData } from '@fitness-recoder/structur
 import type { IResolvers, GraphQLResolveInfo } from '@graphql-tools/utils';
 import { getExerciseByScheduleId, createExerciseWithScheduleRelation, getExerciseByExercisePresetId } from '../Exercise/repository';
 import { cloneExerciseList } from '../Exercise/service';
+import { getExercisePresetWithListById } from '../ExercisePreset/repository';
 import {
   createSchedule,
   deleteSchedule,
@@ -10,6 +11,29 @@ import {
   getScheduleStatusByMonth,
   updateSchedule
 } from './repository';
+
+interface TargetDateInput {
+  year: number;
+  month: number;
+  date: number;
+}
+
+async function markScheduleStarted(
+  context: GraphqlContext,
+  schedule: ScheduleData,
+): Promise<ScheduleData> {
+  const started = await updateSchedule(context, {
+    schedule: {
+      ...schedule,
+      type: 'STARTED',
+      start: Date.now(),
+    },
+  })
+  if (!started) {
+    throw new Error('Cannot start Schedule')
+  }
+  return started
+}
 
 export default (): IResolvers<unknown, GraphQLResolveInfo> => {
   const getScheduleByIdShell: ResponseResolver<{ id: number }, ScheduleData | null> = async (_, { id }, context) => {
@@ -21,7 +45,7 @@ export default (): IResolvers<unknown, GraphQLResolveInfo> => {
   const getScheduleStatusByMonthShell: ResponseResolver<{ year: number, month: number }, string[][] | null> = async (_, { year, month }, context) => {
     return getScheduleStatusByMonth(context, { year, month })
   }
-  const createScheduleShell: ResponseResolver<{ schedule: ScheduleCreateType }, ScheduleCreateType | null> = async (_, { schedule }, context) => {
+  const createScheduleShell: ResponseResolver<{ schedule: ScheduleCreateType }, ScheduleData | null> = async (_, { schedule }, context) => {
     return createSchedule(context, { schedule })
   }
   const updateScheduleShell: ResponseResolver<{ schedule: ScheduleData }, ScheduleData | null> = async (_, { schedule }, context) => {
@@ -30,7 +54,7 @@ export default (): IResolvers<unknown, GraphQLResolveInfo> => {
   const deleteScheduleShell: ResponseResolver<{ id: number }, string | null> = async (_, { id }, context) => {
     return deleteSchedule(context, { id })
   }
-  const cloneScheduleShell: ResponseResolver<{ id: number, targetDate: ScheduleCreateType }, ScheduleData | null> = async (_, { id, targetDate }, context) => {
+  const cloneScheduleShell: ResponseResolver<{ id: number, targetDate: TargetDateInput }, ScheduleData | null> = async (_, { id, targetDate }, context) => {
     const originalSchedule = await getScheduleById(context, { id })
     if (!originalSchedule) {
       throw new Error('Cannot find Schedule')
@@ -40,6 +64,7 @@ export default (): IResolvers<unknown, GraphQLResolveInfo> => {
         year: targetDate.year,
         month: targetDate.month,
         date: targetDate.date,
+        title: originalSchedule.title,
         type: 'SCHEDULED'
       }
     })
@@ -60,14 +85,16 @@ export default (): IResolvers<unknown, GraphQLResolveInfo> => {
         }
       )
     }
-    return newSchedule
+    return markScheduleStarted(context, newSchedule)
   }
-  const cloneScheduleFromPresetShell: ResponseResolver<{ presetId: number, targetDate: ScheduleCreateType }, ScheduleData | null> = async (_, { presetId, targetDate }, context) => {
+  const cloneScheduleFromPresetShell: ResponseResolver<{ presetId: number, targetDate: TargetDateInput }, ScheduleData | null> = async (_, { presetId, targetDate }, context) => {
+    const preset = await getExercisePresetWithListById(context, { id: presetId })
     const newSchedule = await createSchedule(context, {
       schedule: {
         year: targetDate.year,
         month: targetDate.month,
         date: targetDate.date,
+        title: preset?.name ?? '',
         type: 'SCHEDULED'
       }
     })
@@ -85,7 +112,7 @@ export default (): IResolvers<unknown, GraphQLResolveInfo> => {
         }
       )
     }
-    return newSchedule
+    return markScheduleStarted(context, newSchedule)
   }
   return {
     Query: {

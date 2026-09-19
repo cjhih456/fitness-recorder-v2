@@ -29,7 +29,10 @@ export const useCopyExercisePresetFromScheduleMutation = (
   return useMutation({
     ...options,
     mutationFn: async (input: CopyExercisePresetFromScheduleInput) => {
-      const result = await graphqlClient.request<{ copyExercisePresetFromSchedule: ExercisePresetWithExerciseList }>(mutation, input);
+      const result = await graphqlClient.request<{ copyExercisePresetFromSchedule: ExercisePresetWithExerciseList }>(mutation, input).catch(e => {
+        console.error(e)
+        throw e
+      });
       return result.copyExercisePresetFromSchedule;
     },
     onSuccess: (data, variables, ...rest) => {

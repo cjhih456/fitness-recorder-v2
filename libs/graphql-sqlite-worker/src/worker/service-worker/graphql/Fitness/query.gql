@@ -86,7 +86,7 @@ type Query {
     name: String,
     category: [ICategory],
     muscle: [IMuscle],
-    limit: Int,
-    offset: Int
+    limit: Int!,
+    offset: Int!
   ): [Fitness!]
 }

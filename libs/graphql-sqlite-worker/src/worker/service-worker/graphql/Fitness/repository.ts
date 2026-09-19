@@ -7,7 +7,7 @@ export const getFitnessById: ResponseBuilder<{ id: number }, Fitness | null> = a
     'select * from fitness where id=?',
     [id]
   )
-  if (!result) return null
-  return IFitnessSchema.parse(result)
+  if (!result?.[0]) return null
+  return IFitnessSchema.parse(result[0])
 }
 

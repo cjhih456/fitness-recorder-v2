@@ -25,7 +25,10 @@ export const useUpdateExercisePresetMutation = (
   return useMutation({
     ...options,
     mutationFn: async (input: ExercisePresetData) => {
-      const result = await graphqlClient.request<{ updateExercisePreset: ExercisePresetWithExerciseList }>(mutation, { exercisePreset: input });
+      const result = await graphqlClient.request<{ updateExercisePreset: ExercisePresetWithExerciseList }>(mutation, { exercisePreset: input }).catch(e => {
+        console.error(e)
+        throw e
+      });
       return result.updateExercisePreset;
     },
     onSuccess: (data, variables, ...rest) => {

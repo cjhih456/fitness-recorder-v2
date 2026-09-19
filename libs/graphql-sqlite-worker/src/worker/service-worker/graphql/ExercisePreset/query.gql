@@ -12,13 +12,14 @@ type ExercisePresetWithList implements ExercisePreset {
 }
 
 type Query {
-  getExercisePresetWithListByIds(ids: Int): [ExercisePresetWithList!]
-  getExercisePresetWithListById(id: Int): ExercisePresetWithList
-  getExercisePresetWithListByOffset(offset: Int, size: Int): [ExercisePresetWithList!]
+  getExercisePresetWithListByIds(ids: [Int!]!): [ExercisePresetWithList!]
+  getExercisePresetWithListById(id: Int!): ExercisePresetWithList
+  getExercisePresetWithListByOffset(offset: Int!, size: Int!): [ExercisePresetWithList!]
 }
 
 input CreateExercisePresetInput {
   name: String!
+  deps: Int!
 }
 
 input UpdateExercisePresetInput {

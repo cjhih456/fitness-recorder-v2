@@ -28,7 +28,12 @@ export const useCreateExerciseByExercisePresetMutation = (
   return useMutation({
     ...options,
     mutationFn: async (input: CreateExerciseByExercisePresetInput) => {
-      const result = await graphqlClient.request<{ createExerciseByExercisePreset: ExerciseData[] }>(mutation, { exercise: input });
+      const result = await graphqlClient.request<{ createExerciseByExercisePreset: ExerciseData[] }>(mutation, { exercise: input }).catch(e => {
+        console.error(e)
+        return {
+          createExerciseByExercisePreset: []
+        }
+      });
       return result.createExerciseByExercisePreset;
     },
     onSuccess: (data, variables, ...rest) => {
