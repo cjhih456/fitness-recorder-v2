@@ -1,33 +1,47 @@
-import type { ScheduleHistoryData } from '@fitness-recoder/structure'
-import { Button } from "@fitness-recoder/ui";
-import { Calendar } from "lucide-react";
-import { useCallback } from "react";
-import SectionSkeleton from "../../SectionSkeleton";
-import History from "./History";
+import type { HistoryListItem } from './types';
+import SectionSkeleton from '../../SectionSkeleton';
+import HistoryDayGroup from './HistoryDayGroup';
+import HistoryEmpty from './HistoryEmpty';
 
 interface HistorySectionProps {
-  data: ScheduleHistoryData[];
-  onClickHistory?: (workout: ScheduleHistoryData) => void;
+  year: number;
+  month: number;
+  finishDates: number[];
+  isLoading?: boolean;
+  onClickHistory?: (workout: HistoryListItem) => void;
+  onClickHome?: () => void;
 }
 
 export default function HistorySection({
-  data,
-  onClickHistory
+  year,
+  month,
+  finishDates,
+  isLoading = false,
+  onClickHistory,
+  onClickHome,
 }: HistorySectionProps) {
-  const handleClickHistory = useCallback((workout: ScheduleHistoryData) => {
-    onClickHistory?.(workout);
-  }, [onClickHistory]);
+  const isEmpty = !isLoading && finishDates.length === 0;
+
   return (
     <SectionSkeleton title="운동 히스토리" useCard={false}>
       {{
-        subtitle: <Button variant="ghost" size="icon" className="p-2">
-          <Calendar size={20} />
-        </Button>,
-        default: <div className="flex flex-col gap-4">
-          {data.map(workout => (
-            <History key={workout.id} data={workout} onClickHistory={handleClickHistory} />
-          ))}
-        </div>,
+        default: (
+          <div className="flex flex-col gap-4">
+            {isEmpty ? (
+              <HistoryEmpty onClickHome={onClickHome} />
+            ) : (
+              finishDates.map((date) => (
+                <HistoryDayGroup
+                  key={`${year}-${month}-${date}`}
+                  year={year}
+                  month={month}
+                  date={date}
+                  onClickHistory={onClickHistory}
+                />
+              ))
+            )}
+          </div>
+        ),
       }}
     </SectionSkeleton>
   );
