@@ -9,6 +9,24 @@ import { viteStaticCopy } from 'vite-plugin-static-copy';
 export default defineConfig({
   root: import.meta.dirname,
   cacheDir: '../../node_modules/.vite/libs/graphql-sqlite-worker',
+  /**
+   * 패키지 엔트리(`index.mjs`)는 sqlite3-worker1-promiser를 side-effect로 끌어옵니다.
+   * 그 파일이 `new Worker(new URL('sqlite3-worker1.js', import.meta.url))`를 포함해
+   * 라이브러리 빌드가 `/assets/sqlite3-worker1-*.js`를 심고, 앱의 `?worker&url`
+   * 재번들이 `public/assets/sqlite3-worker1-*.js`를 찾지 못해 실패합니다.
+   * DB Worker는 InitModule/OpfsDb만 쓰므로 sqlite3.mjs만 묶습니다.
+   */
+  resolve: {
+    alias: [
+      {
+        find: /^@sqlite\.org\/sqlite-wasm$/,
+        replacement: path.resolve(
+          import.meta.dirname,
+          '../../node_modules/@sqlite.org/sqlite-wasm/sqlite-wasm/jswasm/sqlite3.mjs',
+        ),
+      },
+    ],
+  },
   plugins: [
     nxViteTsPaths(),
     dts({
