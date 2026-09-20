@@ -13,7 +13,7 @@ type ExercisePresetWithList implements ExercisePreset {
 
 type Query {
   getExercisePresetWithListByIds(ids: [Int!]!): [ExercisePresetWithList!]
-  getExercisePresetWithListById(id: Int!): ExercisePresetWithList
+  getExercisePresetWithListById(id: Int): ExercisePresetWithList
   getExercisePresetWithListByOffset(offset: Int!, size: Int!): [ExercisePresetWithList!]
 }
 
