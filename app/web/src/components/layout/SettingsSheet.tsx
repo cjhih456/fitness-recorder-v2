@@ -1,10 +1,10 @@
+import { APP_VERSION } from '@fitness-recoder/graphql-sqlite-worker';
 import { Button } from '@fitness-recoder/ui';
 import { X } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useCallback, useEffect, useState } from 'react';
 
-/** Matches GraphQLSQLiteWorkerProvider workerConfig.appVersion in App. */
-export const APP_VERSION = '1.5.0';
+export { APP_VERSION };
 
 type Language = 'ko' | 'en';
 

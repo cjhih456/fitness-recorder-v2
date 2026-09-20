@@ -44,7 +44,11 @@ export default defineConfig({
         {
           src: '../../node_modules/@sqlite.org/sqlite-wasm/sqlite-wasm/jswasm/sqlite3-opfs-async-proxy.js',
           dest: '.',
-        }
+        },
+        {
+          src: 'src/assets/seed.db',
+          dest: '.',
+        },
       ]
     })
   ],

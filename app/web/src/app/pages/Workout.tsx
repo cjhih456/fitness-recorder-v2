@@ -244,7 +244,7 @@ export default function Workout() {
 
   return (
     <div className="relative mx-auto max-w-md p-4 pb-24">
-      <div className="sticky top-[60px] z-20 mb-6 flex items-start justify-between gap-3 bg-background/80 py-2 backdrop-blur-sm">
+      <div className="sticky top-15 z-20 mb-6 flex items-start justify-between gap-3 bg-background/80 py-2 backdrop-blur-sm">
         <div className="min-w-0 flex-1">
           {isPaused ? (
             <>

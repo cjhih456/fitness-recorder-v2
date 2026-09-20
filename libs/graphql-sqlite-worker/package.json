@@ -21,11 +21,14 @@
       "types": "./dist/worker/serviceWorker.d.ts",
       "import": "./dist/worker/serviceWorker.mjs",
       "require": "./dist/worker/serviceWorker.js"
-    }
+    },
+    "./seedDb": "./src/assets/seed.db"
   },
   "files": [
     "./dist/worker/sqlite3.wasm",
-    "./dist/worker/sqlite3-opfs-async-proxy.js"
+    "./dist/worker/sqlite3-opfs-async-proxy.js",
+    "./dist/worker/seed.db",
+    "./src/assets/seed.db"
   ],
   "dependencies": {
     "@fitness-recoder/structure": "workspace:*",
@@ -48,6 +51,21 @@
   },
   "nx": {
     "targets": {
+      "generate-seed-db": {
+        "executor": "nx:run-commands",
+        "cache": true,
+        "inputs": [
+          "{projectRoot}/src/lib/**/*",
+          "{projectRoot}/scripts/**/*",
+          "{projectRoot}/src/lib/fitness-datas/**/*"
+        ],
+        "outputs": [
+          "{projectRoot}/src/assets/seed.db"
+        ],
+        "options": {
+          "command": "yarn tsx libs/graphql-sqlite-worker/scripts/generate-seed-db.ts"
+        }
+      },
       "typecheck": {
         "dependsOn": [
           "^typecheck",
@@ -66,6 +84,7 @@
           "outputPath": "libs/graphql-sqlite-worker/dist"
         },
         "dependsOn": [
+          "generate-seed-db",
           {
             "projects": [
               "@fitness-recoder/structure"
@@ -76,7 +95,8 @@
       },
       "build-worker": {
         "dependsOn": [
-          "build-lib"
+          "build-lib",
+          "generate-seed-db"
         ],
         "executor": "@nx/vite:build",
         "options": {

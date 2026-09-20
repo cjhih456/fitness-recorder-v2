@@ -9,3 +9,5 @@ storybook-static
 node_modules
 vitest.config.*.timestamp*
 dist
+# Generated SQLite seed for cold start (created by generate-seed-db)
+libs/graphql-sqlite-worker/src/assets/seed.db

@@ -50,6 +50,7 @@ export default defineConfig(() => {
     optimizeDeps: {
       exclude: ['@fitness-recoder/graphql-sqlite-worker'],
     },
+    assetsInclude: ['**/*.db'],
     // Uncomment this if you are using workers.
     build: {
       outDir: '../../dist/app/web',

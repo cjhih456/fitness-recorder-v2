@@ -1,5 +1,4 @@
 import type { MigrationScript } from '../migration';
-import sort from 'version-sort';
 import { migration_0_1_0 } from './0.1.0';
 import { migration_1_3_0 } from './1.3.0';
 import { migration_1_4_0 } from './1.4.0';
@@ -10,6 +9,5 @@ import { migration_1_5_0 } from './1.5.0';
  */
 export function getAllMigrations(): MigrationScript[] {
   const migrations = [migration_0_1_0, migration_1_3_0, migration_1_4_0, migration_1_5_0];
-  // 버전별로 정렬 (version 숫자 기준)
-  return sort(migrations, { ignore_stages: true, nested: false });
+  return [...migrations].sort((a, b) => a.version - b.version);
 }

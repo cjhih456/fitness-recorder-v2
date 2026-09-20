@@ -1,4 +1,4 @@
-import type { SQLiteWorker } from '../sqlite-worker';
+import type { SqlExecutor } from '../types';
 
 const createSetsTableSql = `
   CREATE TABLE IF NOT EXISTS sets (
@@ -15,8 +15,8 @@ const createSetsTableSql = `
 /**
  * sets 테이블을 생성합니다.
  */
-export async function createSetTable(worker: SQLiteWorker): Promise<void> {
-  await worker.exec(createSetsTableSql);
+export async function createSetTable(executor: SqlExecutor): Promise<void> {
+  await executor.exec(createSetsTableSql);
 }
 
 /**

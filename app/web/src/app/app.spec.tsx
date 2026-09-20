@@ -25,6 +25,7 @@ vi.mock('@fitness-recoder/graphql-sqlite-worker', () => ({
   }: {
     children: React.ReactNode;
   }) => children,
+  APP_VERSION: '1.5.0',
   hooks: {
     useScheduleByDateQuery: () => ({ data: [], isLoading: false }),
     useCreateScheduleMutation: () => ({
@@ -105,6 +106,10 @@ vi.mock(
 );
 vi.mock(
   '@fitness-recoder/graphql-sqlite-worker/serviceWorker?worker&url',
+  () => ({ default: '' }),
+);
+vi.mock(
+  '@fitness-recoder/graphql-sqlite-worker/seedDb?url',
   () => ({ default: '' }),
 );
 

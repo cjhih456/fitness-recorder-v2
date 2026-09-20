@@ -22,6 +22,16 @@
   },
   "nx": {
     "targets": {
+      "dev": {
+        "dependsOn": [
+          "@fitness-recoder/graphql-sqlite-worker:generate-seed-db"
+        ]
+      },
+      "serve": {
+        "dependsOn": [
+          "@fitness-recoder/graphql-sqlite-worker:generate-seed-db"
+        ]
+      },
       "typecheck": {
         "dependsOn": [
           "^typecheck",

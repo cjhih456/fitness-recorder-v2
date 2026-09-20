@@ -1,10 +1,10 @@
-import type { SQLiteWorker } from '../sqlite-worker';
+import type { SqlExecutor } from '../types';
 
 /**
  * version 테이블을 생성합니다.
  */
-export async function createVersionTable(worker: SQLiteWorker): Promise<void> {
-  await worker.exec(`
+export async function createVersionTable(executor: SqlExecutor): Promise<void> {
+  await executor.exec(`
     CREATE TABLE IF NOT EXISTS version (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       version TEXT NOT NULL
@@ -15,8 +15,8 @@ export async function createVersionTable(worker: SQLiteWorker): Promise<void> {
 /**
  * 현재 데이터베이스 버전을 조회합니다.
  */
-export async function getVersion(worker: SQLiteWorker): Promise<string | undefined> {
-  const result = await worker.query(
+export async function getVersion(executor: SqlExecutor): Promise<string | undefined> {
+  const result = await executor.query(
     'SELECT version FROM version ORDER BY id DESC LIMIT 1'
   );
   if (result.length === 0) {
@@ -28,6 +28,6 @@ export async function getVersion(worker: SQLiteWorker): Promise<string | undefin
 /**
  * 새로운 버전을 데이터베이스에 추가합니다.
  */
-export async function updateVersion(worker: SQLiteWorker, version: string): Promise<void> {
-  await worker.exec('INSERT INTO version (version) VALUES (?)', [version]);
+export async function updateVersion(executor: SqlExecutor, version: string): Promise<void> {
+  await executor.exec('INSERT INTO version (version) VALUES (?)', [version]);
 }
