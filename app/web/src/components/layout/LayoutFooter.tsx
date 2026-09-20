@@ -3,7 +3,7 @@ import { hooks } from '@fitness-recoder/graphql-sqlite-worker';
 import { Button } from '@fitness-recoder/ui';
 import { LayoutDashboard, History, Plus, Camera, Play } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
-import { useHref, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import dayjs from '../../libs/dayjs';
 import NavButton from './NavButton';
 
@@ -32,10 +32,6 @@ function findResumableSchedule(
 export default function LayoutFooter() {
   const navigate = useNavigate();
   const location = useLocation();
-  const homeHref = useHref('/');
-  const historyHref = useHref('/history');
-  const routinesHref = useHref('/routines');
-  const photoHref = useHref('/photo');
   const today = useMemo(() => getTodayParts(), []);
   const { data: schedules, isLoading } = hooks.useScheduleByDateQuery(today);
   const createSchedule = hooks.useCreateScheduleMutation();
@@ -44,20 +40,20 @@ export default function LayoutFooter() {
   const hideTabBar = isEditorRoute(location.pathname);
 
   const gotoHome = useCallback(() => {
-    navigate(homeHref);
-  }, [navigate, homeHref]);
+    navigate('/');
+  }, [navigate]);
 
   const gotoHistory = useCallback(() => {
-    navigate(historyHref);
-  }, [navigate, historyHref]);
+    navigate('/history');
+  }, [navigate]);
 
   const gotoRoutines = useCallback(() => {
-    navigate(routinesHref);
-  }, [navigate, routinesHref]);
+    navigate('/routines');
+  }, [navigate]);
 
   const gotoPhoto = useCallback(() => {
-    navigate(photoHref);
-  }, [navigate, photoHref]);
+    navigate('/photo');
+  }, [navigate]);
 
   const gotoWorkout = useCallback(async () => {
     if (isLoading || isStarting) return;

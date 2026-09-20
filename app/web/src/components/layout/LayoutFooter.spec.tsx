@@ -147,4 +147,31 @@ describe('LayoutFooter FAB', () => {
     renderFooter('/routines/7/edit');
     expect(screen.queryByText('홈')).toBeNull();
   });
+
+  it('navigates tab routes once when a basename is set', async () => {
+    const user = userEvent.setup();
+    useScheduleByDateQuery.mockReturnValue({
+      data: [],
+      isLoading: false,
+    });
+
+    render(
+      <MemoryRouter
+        basename="/fitness-recoder-v2"
+        initialEntries={['/fitness-recoder-v2/']}
+      >
+        <Routes>
+          <Route path="/" element={<LayoutFooter />} />
+          <Route
+            path="/routines"
+            element={<div data-testid="routines-page">Routines</div>}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByText('루틴'));
+
+    expect(await screen.findByTestId('routines-page')).toBeTruthy();
+  });
 });
