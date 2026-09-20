@@ -10,43 +10,114 @@ export function readExcelFile(filePath: string): XLSX.WorkBook {
   return workbook;
 }
 
+function cellText(value: unknown): string {
+  if (value === undefined || value === null) return '';
+  return value.toString().trim();
+}
+
+/**
+ * `namespace.code` 평탄 키를 중첩 객체로 변환합니다.
+ */
+export function unflatten(
+  flat: Record<string, string>
+): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(flat)) {
+    const parts = key.split('.').filter(Boolean);
+    if (parts.length === 0) continue;
+
+    let current: Record<string, unknown> = result;
+    for (let i = 0; i < parts.length - 1; i++) {
+      const part = parts[i];
+      const next = current[part];
+      if (typeof next !== 'object' || next === null) {
+        current[part] = {};
+      }
+      current = current[part] as Record<string, unknown>;
+    }
+    current[parts[parts.length - 1]] = value;
+  }
+
+  return result;
+}
+
+function excelNamespaceCodeToJson(
+  data: unknown[][]
+): Record<string, Record<string, string>> {
+  const header = (data[0] ?? []).map(cellText);
+  const langCodes = header.slice(2).filter(Boolean);
+  const languages: Record<string, Record<string, string>> = {};
+
+  for (const lang of langCodes) {
+    languages[lang] = {};
+  }
+
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    if (!row || row.length === 0) continue;
+
+    const namespace = cellText(row[0]);
+    const code = cellText(row[1]);
+    if (!namespace || !code) continue;
+
+    const key = `${namespace}.${code}`;
+    langCodes.forEach((lang, index) => {
+      languages[lang][key] = cellText(row[index + 2]);
+    });
+  }
+
+  return languages;
+}
+
+function excelLanguageRowToJson(
+  data: unknown[][]
+): Record<string, Record<string, string>> {
+  const keys = (data[0] ?? []).slice(1).map(cellText);
+  const languages: Record<string, Record<string, string>> = {};
+
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    if (!row || row.length === 0) continue;
+
+    const langCode = cellText(row[0]);
+    if (!langCode) continue;
+
+    const langData: Record<string, string> = {};
+    for (let j = 1; j < row.length; j++) {
+      const key = keys[j - 1];
+      if (key) {
+        langData[key] = cellText(row[j]);
+      }
+    }
+    languages[langCode] = langData;
+  }
+
+  return languages;
+}
+
 /**
  * Excel Workbook을 언어별 JSON 객체로 변환합니다.
- * 첫 번째 행은 키, 첫 번째 열은 언어 코드로 가정합니다.
+ * - `namespace | code | en | ko` 형식
+ * - 또는 첫 행이 키, 첫 열이 언어 코드인 레거시 형식
  */
-export function excelToJson(workbook: XLSX.WorkBook): Record<string, Record<string, string>> {
+export function excelToJson(
+  workbook: XLSX.WorkBook
+): Record<string, Record<string, string>> {
   const sheetName = workbook.SheetNames[0];
   const worksheet = workbook.Sheets[sheetName];
-  const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as string[][];
+  const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as unknown[][];
 
   if (data.length === 0) {
     return {};
   }
 
-  // 첫 번째 행은 키 (첫 번째 셀은 빈 값이거나 헤더)
-  const keys = data[0].slice(1); // 첫 번째 열 제외
-  const languages: Record<string, Record<string, string>> = {};
-
-  // 첫 번째 열은 언어 코드
-  for (let i = 1; i < data.length; i++) {
-    const row = data[i];
-    if (!row || row.length === 0) continue;
-
-    const langCode = row[0]?.toString().trim();
-    if (!langCode) continue;
-
-    const langData: Record<string, string> = {};
-    for (let j = 1; j < row.length; j++) {
-      const key = keys[j - 1]?.toString().trim();
-      if (key) {
-        langData[key] = row[j]?.toString() || '';
-      }
-    }
-
-    languages[langCode] = langData;
+  const header = (data[0] ?? []).map(cellText);
+  if (header[0] === 'namespace' && header[1] === 'code') {
+    return excelNamespaceCodeToJson(data);
   }
 
-  return languages;
+  return excelLanguageRowToJson(data);
 }
 
 /**
@@ -69,13 +140,16 @@ export function writeJsonFile(
 ): void {
   ensureDirectoryExists(outputDir);
   const filePath = path.join(outputDir, `${language}.json`);
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+  fs.writeFileSync(
+    filePath,
+    `${JSON.stringify(unflatten(data), null, 2)}\n`,
+    'utf-8'
+  );
 }
 
 /**
  * TypeScript 타입 정의 파일을 생성합니다.
- * 형식: {outputDir}/{language}.d.ts
- * i18next를 확장하여 JSON 파일의 타입을 import합니다.
+ * 기본 언어(첫 번째 langs) JSON을 i18next namespace 타입으로 연결합니다.
  */
 export function writeDtsFile(
   outputDir: string,
@@ -84,21 +158,20 @@ export function writeDtsFile(
 ): void {
   ensureDirectoryExists(outputDir);
   const filePath = path.join(outputDir, `index.d.ts`);
-
-  // JSON 파일 경로 (상대 경로)
-  const importPaths = languages.map(language => `import type ${language} from './${language}.json';`);
-  const resourcePaths = languages.map(language => `${language}: typeof ${language};`);
+  const defaultLang = languages[0] ?? 'ko';
 
   const dtsContent = `import 'i18next';
-${importPaths.join('\n')}
+import type ${defaultLang} from './${defaultLang}.json';
 
 declare module 'i18next' {
-interface CustomTypeOptions {
-defaultNS: '${defaultNS}';
-resources: {
-${resourcePaths.join('\n')}
-};
-}}`;
+  interface CustomTypeOptions {
+    defaultNS: '${defaultNS}';
+    resources: {
+      ${defaultNS}: typeof ${defaultLang};
+    };
+  }
+}
+`;
 
   fs.writeFileSync(filePath, dtsContent, 'utf-8');
 }

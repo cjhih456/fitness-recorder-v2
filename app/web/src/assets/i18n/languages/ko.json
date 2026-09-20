@@ -1,1 +1,284 @@
-{}
+{
+  "title": {
+    "home": "홈",
+    "calender": "달력",
+    "exercise": "운동 목록",
+    "preset": "프리셋 목록"
+  },
+  "bottom": {
+    "home": "홈",
+    "calender": "달력",
+    "exercise": "운동",
+    "preset": "프리셋"
+  },
+  "common": {
+    "close": "닫기",
+    "modify": "수정",
+    "detail": "상세보기",
+    "save": "저장",
+    "addExercise": "운동 추가",
+    "savePreset": "저장",
+    "delete": "삭제",
+    "retry": "재시도",
+    "tryAgain": "다시 시도",
+    "cancel": "취소",
+    "continue": "계속하기",
+    "done": "완료",
+    "incomplete": "미완료",
+    "back": "뒤로",
+    "home": "홈으로",
+    "loading": "로딩 중"
+  },
+  "error": {
+    "wrong": {
+      "schedule": "잘못된 접근입니다. 스케줄을 확인해주세요."
+    },
+    "boundary": {
+      "title": "문제가 발생했습니다",
+      "message": "잠시 후 다시 시도해 주세요"
+    },
+    "db": {
+      "init": "데이터베이스를 초기화하지 못했습니다"
+    },
+    "history": {
+      "notFound": "운동 기록을 찾을 수 없습니다",
+      "back": "← 기록으로"
+    }
+  },
+  "alert": {
+    "modal": {
+      "title": "알림"
+    }
+  },
+  "exerciseDataInfo": {
+    "history": "최근 이력",
+    "instructions": "설명"
+  },
+  "scheduleList": {
+    "schedule": {
+      "row": {
+        "title": "스케줄 {{n}}"
+      },
+      "actionBtn": {
+        "start": "운동 시작"
+      },
+      "bottomBtn": {
+        "addSchedule": "스케줄 추가",
+        "setBreakDay": "휴일 지정"
+      }
+    }
+  },
+  "main": {
+    "todaySchedule": "오늘의 운동 스케줄",
+    "empty": {
+      "schedule": {
+        "l1": "등록된 스케줄이 없습니다.",
+        "l2": "스케줄을 생성하거나 프리셋을 불러오십시오.",
+        "actionBtn": {
+          "createSchedule": "스케줄 생성",
+          "checkPreset": "프리셋 목록 확인"
+        }
+      }
+    }
+  },
+  "preset": {
+    "actionBtn": {
+      "create": "프리셋 생성",
+      "save": "저장"
+    },
+    "menu": {
+      "startWorkoutWithPreset": "운동 시작",
+      "deletePreset": "프리셋 삭제"
+    }
+  },
+  "workout": {
+    "actionBtn": {
+      "start": "시작하기",
+      "pause": "일시정지",
+      "finish": "종료",
+      "share": "공유하기",
+      "clone": "스케줄 복사",
+      "make": "프리셋으로 저장"
+    },
+    "todayTitle": "오늘의 운동",
+    "pausedHint": "휴식 중 · 언제든 다시 시작할 수 있어요",
+    "setsProgress": "{{done}}/{{total}} 세트",
+    "complete": "운동 완료",
+    "resume": "재개하기",
+    "pause": "일시 정지",
+    "emptyTitle": "아직 추가된 운동이 없습니다",
+    "emptyHint": "아래에서 종목을 검색해 추가하세요",
+    "addExercise": "새로운 운동 종목 추가",
+    "exerciseFallback": "운동",
+    "checkRecords": "기록 확인",
+    "set": "세트",
+    "weightKg": "무게 (kg)",
+    "reps": "횟수",
+    "addSet": "세트 추가",
+    "setWeightAria": "{{name}} {{index}}세트 무게",
+    "setRepsAria": "{{name}} {{index}}세트 횟수",
+    "setDoneAria": "{{name}} {{index}}세트 완료",
+    "setDeleteAria": "{{name}} {{index}}세트 삭제",
+    "historyDate": "{{month}}월 {{date}}일"
+  },
+  "app": {
+    "name": "FITLOG"
+  },
+  "nav": {
+    "home": "홈",
+    "history": "기록",
+    "routines": "루틴",
+    "photo": "인증",
+    "startWorkout": "운동 시작"
+  },
+  "settings": {
+    "title": "설정",
+    "theme": "테마",
+    "light": "라이트",
+    "dark": "다크",
+    "language": "언어",
+    "appVersion": "앱 버전"
+  },
+  "recent": {
+    "title": "{{name}} · 최근 기록",
+    "empty": "아직 이 운동의 기록이 없습니다",
+    "setSummary": "{{weight}} kg · {{reps}}회"
+  },
+  "finish": {
+    "incompleteTitle": "운동을 종료할까요?",
+    "incompleteBody": "아직 끝내지 않은 세트가 있습니다.",
+    "keepGoing": "계속하기",
+    "end": "종료",
+    "doneTitle": "운동을 마쳤습니다",
+    "summary": "{{duration}} · 총 볼륨 {{volume}}",
+    "createPhoto": "인증 만들기",
+    "viewHistory": "기록 보기",
+    "saveAsRoutine": "루틴으로 저장"
+  },
+  "routines": {
+    "mine": "나의 루틴",
+    "create": "루틴 생성",
+    "edit": "루틴 편집",
+    "emptyTitle": "나만의 루틴을 만들어 보세요",
+    "emptyHint": "자주 하는 운동을 저장해 두면 한 번에 시작할 수 있어요",
+    "none": "없음",
+    "moreTargets": "{{targets}} 외 {{count}}부위",
+    "startWithThis": "이 루틴으로 시작",
+    "editAction": "편집하기",
+    "deleteAria": "{{name}} 삭제",
+    "deleteTitle": "루틴을 삭제할까요?",
+    "deleteBody": "삭제하면 되돌릴 수 없습니다.",
+    "deleteRoutine": "루틴 삭제",
+    "name": "루틴 이름",
+    "namePlaceholder": "예: 상체 위주 루틴",
+    "nameRequired": "루틴 이름을 입력해 주세요",
+    "exerciseCount": "{{count}}개",
+    "exerciseSection": "운동 종목",
+    "addExercise": "운동 종목 추가",
+    "saving": "저장 중...",
+    "save": "저장하기",
+    "completeDisabled": "루틴 편집에서는 완료를 사용할 수 없습니다",
+    "completeInactive": "완료 (비활성)",
+    "discardTitle": "수정을 취소할까요?",
+    "discardBody": "저장하지 않은 내용이 사라집니다.",
+    "keepEditing": "계속 편집",
+    "leave": "나가기",
+    "pickerTitle": "운동 선택",
+    "searchAria": "운동 이름 검색",
+    "searchPlaceholder": "운동 이름을 검색하세요...",
+    "searchEmptyTitle": "검색 결과가 없습니다",
+    "searchEmptyHint": "다른 키워드로 검색해 보세요"
+  },
+  "photo": {
+    "createTitle": "운동 인증 사진 만들기",
+    "choosePhoto": "사진을 선택해 주세요",
+    "bestRecord": "오늘의 최고 기록",
+    "addCaption": "문구 추가",
+    "captionPlaceholder": "오늘의 운동을 한 줄로 남겨보세요",
+    "changePhoto": "사진 변경",
+    "saveImage": "이미지 저장",
+    "emptyTitle": "완료한 운동이 없습니다",
+    "emptyHint": "운동을 마치면 인증 사진을 만들 수 있어요",
+    "startWorkout": "운동 시작",
+    "highlight": "{{name}} {{weight}}kg 성공",
+    "date": "{{date}} {{weekday}}"
+  },
+  "history": {
+    "title": "운동 히스토리",
+    "recordTitle": "운동 기록",
+    "emptyTitle": "아직 운동 기록이 없습니다",
+    "emptyHint": "홈이나 루틴에서 운동을 시작해 보세요",
+    "goHome": "홈으로 →",
+    "month": "{{month}}월",
+    "summary": "시간: {{minutes}}분 · 총 볼륨: {{volume}}",
+    "dateLabel": "{{month}}월 {{date}}일 {{weekday}}요일",
+    "noExercises": "기록된 운동 없음",
+    "moreExercises": "{{name}} 외 {{count}}종",
+    "minutes": "{{minutes}}분",
+    "totalVolume": "총 볼륨 {{volume}} kg",
+    "sessionEmpty": "이 세션에 기록된 운동이 없습니다",
+    "noSets": "기록된 세트가 없습니다",
+    "detailAria": "{{title}} 상세 보기",
+    "setAria": "{{name}} {{index}}세트",
+    "setDoneAria": "{{name}} {{index}}세트 {{status}}",
+    "saveAsRoutine": "루틴으로 저장"
+  },
+  "dashboard": {
+    "volumeTitle": "총 볼륨 변화 (kg)",
+    "last7days": "최근 7일",
+    "last7daysSparse": "최근 7일 · 데이터 부족",
+    "todayRoutine": "오늘의 루틴",
+    "emptyRoutine": "오늘 시작할 루틴이 없습니다",
+    "emptyRoutineHint": "루틴 탭에서 만들어 보세요",
+    "createRoutine": "루틴 만들기",
+    "startRoutineAria": "{{name}} 시작",
+    "routineMeta": "{{target}} • {{count}}개 종목",
+    "noTarget": "부위 없음",
+    "moreTargets": "{{labels}} 외 {{count}}",
+    "volumeSummaryAria": "최근 7일 부위별 총 볼륨 요약",
+    "volumeTrendAria": "최근 7일 가슴, 등, 하체 총 볼륨 추이",
+    "todayLabel": "{{month}}월 {{date}}일 {{weekday}}"
+  },
+  "group": {
+    "chest": "가슴",
+    "back": "등",
+    "legs": "하체"
+  },
+  "weekday": {
+    "0": "일",
+    "1": "월",
+    "2": "화",
+    "3": "수",
+    "4": "목",
+    "5": "금",
+    "6": "토"
+  },
+  "weekdayLong": {
+    "0": "일요일",
+    "1": "월요일",
+    "2": "화요일",
+    "3": "수요일",
+    "4": "목요일",
+    "5": "금요일",
+    "6": "토요일"
+  },
+  "muscle": {
+    "chest": "가슴",
+    "shoulders": "어깨",
+    "triceps": "삼두",
+    "biceps": "이두",
+    "lats": "광배",
+    "middle_back": "등",
+    "lower_back": "하부 등",
+    "traps": "승모",
+    "abdominals": "복근",
+    "quadriceps": "대퇴",
+    "hamstrings": "햄스트링",
+    "glutes": "둔근",
+    "calves": "종아리",
+    "adductors": "내전근",
+    "abductors": "외전근",
+    "forearms": "전완",
+    "neck": "목"
+  }
+}
