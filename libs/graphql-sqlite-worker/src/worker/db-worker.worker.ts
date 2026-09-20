@@ -6,6 +6,11 @@
 import type { BindingSpec, Database } from '@sqlite.org/sqlite-wasm';
 import Sqlite3InitModule from '@sqlite.org/sqlite-wasm';
 import sqlite3WasmUrl from '@sqlite.org/sqlite-wasm/sqlite3.wasm?url';
+import {
+  DB_WORKER_PING_READY_TYPE,
+  DB_WORKER_READY_TYPE,
+} from '../lib/create-db-bus';
+import { createInitGatedHandler } from '../lib/init-message-queue';
 import { maybeImportSeedDatabase } from '../lib/seed-import';
 
 type Sqlite3InitModuleState = {
@@ -28,7 +33,8 @@ if (sqlite3InitModuleState) {
 
 let db: Database | null = null;
 const broadcastChannel = new BroadcastChannel('graphql-sqlite-worker');
-declare const self: Worker
+declare const self: Worker;
+
 interface WorkerMessage {
   id: string;
   type: string;
@@ -48,44 +54,69 @@ interface WorkerResponse {
   error?: string;
 }
 
+function broadcastReady() {
+  broadcastChannel.postMessage({ type: DB_WORKER_READY_TYPE });
+}
+
 /**
  * 메시지를 처리하고 응답을 전송합니다.
  */
-async function handleMessage(
+async function processMessage(
   message: WorkerMessage,
   postMessage: (response: WorkerResponse) => void
 ): Promise<void> {
   try {
     switch (message.type) {
       case 'init':
-        await handleInit(message.payload as { dbName: string; seedDbUrl?: string });
+        await handleInit(
+          message.payload as { dbName: string; seedDbUrl?: string }
+        );
         postMessage({ id: message.id, success: true });
         break;
       case 'query': {
-        const queryResult = await handleQuery(message.payload as { sql: string; params: BindingSpec });
+        const queryResult = await handleQuery(
+          message.payload as { sql: string; params: BindingSpec }
+        );
         postMessage({ id: message.id, success: true, data: queryResult });
         break;
       }
       case 'exec': {
-        const execResult = await handleExec(message.payload as { sql: string; params: BindingSpec });
+        const execResult = await handleExec(
+          message.payload as { sql: string; params: BindingSpec }
+        );
         postMessage({ id: message.id, success: true, data: execResult });
         break;
       }
       case 'insert':
       case 'update':
       case 'delete': {
-        const execResult = await handleExec(message.payload as { sql: string; params: BindingSpec });
+        const execResult = await handleExec(
+          message.payload as { sql: string; params: BindingSpec }
+        );
         postMessage({ id: message.id, success: true, data: execResult });
         break;
       }
       case 'select': {
-        const queryResult = await handleQuery(message.payload as { sql: string; params: BindingSpec });
-        postMessage({ id: message.id, success: true, data: queryResult && queryResult.length > 0 ? queryResult[0] : null });
+        const queryResult = await handleQuery(
+          message.payload as { sql: string; params: BindingSpec }
+        );
+        postMessage({
+          id: message.id,
+          success: true,
+          data:
+            queryResult && queryResult.length > 0 ? queryResult[0] : null,
+        });
         break;
       }
       case 'selects': {
-        const queryResult = await handleQuery(message.payload as { sql: string; params: BindingSpec });
-        postMessage({ id: message.id, success: true, data: queryResult || [] });
+        const queryResult = await handleQuery(
+          message.payload as { sql: string; params: BindingSpec }
+        );
+        postMessage({
+          id: message.id,
+          success: true,
+          data: queryResult || [],
+        });
         break;
       }
       case 'close':
@@ -108,14 +139,33 @@ async function handleMessage(
   }
 }
 
-broadcastChannel.onmessage = async (event: MessageEvent) => {
-  await handleMessage(event.data, (response) => {
+const gatedHandler = createInitGatedHandler<WorkerMessage, WorkerResponse>({
+  isInitMessage: (message) => message.type === 'init',
+  isInitialized: () => db !== null,
+  process: processMessage,
+  onReady: broadcastReady,
+});
+
+broadcastChannel.onmessage = (event: MessageEvent) => {
+  if (event.data?.type === DB_WORKER_PING_READY_TYPE) {
+    if (db) {
+      broadcastReady();
+    }
+    return;
+  }
+  void gatedHandler.handle(event.data, (response) => {
     broadcastChannel.postMessage(response);
   });
 };
 
-self.onmessage = async (event: MessageEvent) => {
-  await handleMessage(event.data, (response) => {
+self.onmessage = (event: MessageEvent) => {
+  if (event.data?.type === DB_WORKER_PING_READY_TYPE) {
+    if (db) {
+      broadcastReady();
+    }
+    return;
+  }
+  void gatedHandler.handle(event.data, (response) => {
     self.postMessage(response);
   });
 };
@@ -135,9 +185,9 @@ async function handleInit(payload: {
 
   const sqlite3Module = await Sqlite3InitModule({
     print: console.log,
-    printErr: console.error
-  })
-  const dbName = payload.dbName || 'worker.sqlite3'
+    printErr: console.error,
+  });
+  const dbName = payload.dbName || 'worker.sqlite3';
 
   if (sqlite3Module.oo1.OpfsDb) {
     await maybeImportSeedDatabase(
@@ -147,13 +197,15 @@ async function handleInit(payload: {
     );
     db = new sqlite3Module.oo1.OpfsDb(dbName);
   } else {
-    console.warn('[db-worker] OpfsDb unavailable; using transient DB (seed import skipped)');
+    console.warn(
+      '[db-worker] OpfsDb unavailable; using transient DB (seed import skipped)'
+    );
     db = new sqlite3Module.oo1.DB(dbName, 'c');
   }
 }
 
 async function handleQuery(payload: { sql: string; params: BindingSpec }) {
-  if(!db) {
+  if (!db) {
     throw new Error('Database not initialized');
   }
   const stmt = db.selectObjects(payload.sql, payload.params);
@@ -162,10 +214,14 @@ async function handleQuery(payload: { sql: string; params: BindingSpec }) {
 }
 
 async function handleExec(payload: { sql: string; params: BindingSpec }) {
-  if(!db) {
+  if (!db) {
     throw new Error('Database not initialized');
   }
-  return db.exec(payload.sql, { bind: payload.params, returnValue: 'resultRows', rowMode: 'object'});
+  return db.exec(payload.sql, {
+    bind: payload.params,
+    returnValue: 'resultRows',
+    rowMode: 'object',
+  });
 }
 
 async function handleClose() {

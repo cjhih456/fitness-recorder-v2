@@ -12,6 +12,10 @@
     "types/**/*.d.ts",
     "src/**/*.worker.ts",
     "src/worker/**/*.ts",
-    "src/lib/seed-import.ts"
+    "src/lib/seed-import.ts",
+    "src/lib/create-db-bus.ts",
+    "src/lib/init-message-queue.ts",
+    "src/lib/types.ts",
+    "src/lib/sqlite-worker.ts"
   ]
 }
