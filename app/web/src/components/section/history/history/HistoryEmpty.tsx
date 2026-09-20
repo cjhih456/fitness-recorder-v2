@@ -18,7 +18,7 @@ export default function HistoryEmpty({ onClickHome }: HistoryEmptyProps) {
     <Card
       role="button"
       tabIndex={0}
-      className="cursor-pointer border border-zinc-200 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900/50"
+      className="cursor-pointer border border-border transition-colors hover:bg-muted/60"
       onClick={handleHome}
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {
@@ -29,7 +29,7 @@ export default function HistoryEmpty({ onClickHome }: HistoryEmptyProps) {
       aria-label={t('common.home')}
     >
       <CardContent className="flex items-center gap-4 p-4">
-        <div className="flex min-w-[64px] flex-col items-center rounded-2xl bg-blue-50 p-3 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+        <div className="flex min-w-[64px] flex-col items-center rounded-2xl bg-brand-soft p-3 text-brand-text">
           <span className="text-[10px] font-black uppercase leading-tight">
             —
           </span>
@@ -46,9 +46,9 @@ export default function HistoryEmpty({ onClickHome }: HistoryEmptyProps) {
             <MuscleChip label={t('group.chest')} muted />
             <MuscleChip label={t('group.back')} muted />
           </div>
-          <p className="text-xs font-medium text-primary">{t('history.goHome')}</p>
+          <p className="text-xs font-medium text-brand-text">{t('history.goHome')}</p>
         </div>
-        <ChevronRight size={18} className="shrink-0 text-zinc-300" />
+        <ChevronRight size={18} className="shrink-0 text-muted-foreground/50" />
       </CardContent>
     </Card>
   );

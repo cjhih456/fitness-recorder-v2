@@ -28,20 +28,20 @@ export default function History({ data, onClickHistory }: HistoryProps) {
         }
       }}
       aria-label={t('history.detailAria', { title: data.title })}
-      className="cursor-pointer border border-zinc-200 transition-all hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900/50"
+      className="cursor-pointer border border-border transition-all hover:bg-muted/60"
     >
       <CardContent className="flex items-center gap-4 p-4">
-        <div className="flex min-w-[64px] flex-col items-center rounded-2xl bg-blue-50 p-3 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+        <div className="flex min-w-[64px] flex-col items-center rounded-2xl bg-brand-soft p-3 text-brand-text">
           <span className="text-[10px] font-black uppercase leading-tight">
             {t('history.month', { month: data.month })}
           </span>
           <span className="text-xl font-black">{data.date}</span>
         </div>
         <div className="min-w-0 flex-1 space-y-1.5">
-          <h3 className="font-bold text-zinc-800 dark:text-zinc-100">
+          <h3 className="font-bold text-foreground">
             {data.title}
           </h3>
-          <p className="text-xs font-medium text-zinc-400">
+          <p className="text-xs font-medium text-muted-foreground">
             {t('history.summary', {
               minutes: data.workoutTimes,
               volume: data.totalVolume,
@@ -54,11 +54,11 @@ export default function History({ data, onClickHistory }: HistoryProps) {
               ))}
             </div>
           ) : null}
-          <p className="text-xs font-medium text-zinc-500">
+          <p className="text-xs font-medium text-muted-foreground">
             {data.exerciseSummary}
           </p>
         </div>
-        <ChevronRight size={18} className="shrink-0 text-zinc-300" />
+        <ChevronRight size={18} className="shrink-0 text-muted-foreground/50" />
       </CardContent>
     </Card>
   );

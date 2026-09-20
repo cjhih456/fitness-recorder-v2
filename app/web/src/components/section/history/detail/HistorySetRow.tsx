@@ -18,15 +18,15 @@ export default function HistorySetRow({
     <div
       className={`grid grid-cols-12 gap-2 rounded-xl border p-2 ${
         set.isDone
-          ? 'border-green-200 bg-green-50 opacity-90 dark:border-green-800 dark:bg-green-900/20'
-          : 'border-transparent bg-zinc-50 dark:bg-zinc-900/50'
+          ? 'border-success/30 bg-success-soft opacity-90'
+          : 'border-transparent bg-muted'
       }`}
       aria-label={t('history.setAria', {
         name: exerciseName,
         index: index + 1,
       })}
     >
-      <div className="col-span-2 flex items-center justify-center font-bold text-zinc-500">
+      <div className="col-span-2 flex items-center justify-center font-bold text-muted-foreground">
         {index + 1}
       </div>
       <div className="col-span-4 flex items-center justify-center">
@@ -48,8 +48,8 @@ export default function HistorySetRow({
           })}
           className={`flex h-9 w-9 items-center justify-center rounded-full ${
             set.isDone
-              ? 'bg-green-500 text-white shadow-md'
-              : 'border-2 border-zinc-200 bg-background text-transparent dark:border-zinc-700'
+              ? 'bg-success text-success-foreground shadow-md'
+              : 'border-2 border-border bg-background text-transparent'
           }`}
         >
           <CheckCircle2 size={20} aria-hidden />

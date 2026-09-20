@@ -92,7 +92,7 @@ export default function HistoryDetailSection({
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center gap-1 text-sm font-medium text-zinc-600"
+          className="flex items-center gap-1 text-sm font-medium text-muted-foreground"
           aria-label={t('common.back')}
         >
           <ChevronLeft size={20} />
@@ -103,7 +103,7 @@ export default function HistoryDetailSection({
             type="button"
             variant="ghost"
             size="sm"
-            className="shrink-0 text-blue-600"
+            className="shrink-0 text-brand-text"
             onClick={onSaveAsRoutine}
             disabled={isSavingRoutine}
           >
@@ -130,7 +130,7 @@ export default function HistoryDetailSection({
       </div>
 
       {exercises.length === 0 ? (
-        <p className="text-sm text-zinc-400">
+        <p className="text-sm text-muted-foreground">
           {t('history.sessionEmpty')}
         </p>
       ) : (
