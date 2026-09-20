@@ -1,65 +1,20 @@
 import { createYoga, type YogaServerInstance } from 'graphql-yoga';
+import { createDbBusWrapper } from '../../lib/create-db-bus';
 import { mergedSchema } from './graphql';
 
-declare const self: ServiceWorkerGlobalScope
-export type Version = number
+declare const self: ServiceWorkerGlobalScope;
+export type Version = number;
 
-export const version: Version = 1
+export const version: Version = 1;
 
-const SQLITE_MESSAGE_TIMEOUT_MS = 30_000
-
-let yogaServer: YogaServerInstance<GraphqlContext, GraphqlContext> | null = null;
+let yogaServer: YogaServerInstance<GraphqlContext, GraphqlContext> | null =
+  null;
 const broadcastChannel = new BroadcastChannel('graphql-sqlite-worker');
-const dbBus = createDbBusWrapper(broadcastChannel)
+const dbBus = createDbBusWrapper(broadcastChannel);
 
 /**
  * Service Worker에서 실행되는 GraphQL 서버
- * 실제 구현은 메인 스레드에서 초기화된 서버를 참조해야 합니다.
  */
-
-/**
- * MessagePort를 통해 DB Worker와 통신하는 dbBus 래퍼 객체를 생성합니다.
- */
-function createDbBusWrapper(port: BroadcastChannel): DBBus {
-  return {
-    sendTransaction: <T = unknown>(
-      type: 'select' | 'selects' | 'insert' | 'update' | 'delete',
-      sql: string,
-      params: unknown[]
-    ): Promise<T[]> => {
-      return new Promise((resolve, reject) => {
-        const id = `${Date.now()}-${Math.random().toString(36)}`;
-        
-        const messageType = type === 'select' || type === 'selects' ? 'query' : 'exec';
-        
-        const handler = (event: MessageEvent) => {
-          const response = event.data;
-          if (response.id === id) {
-            port.removeEventListener('message', handler);
-            if (response.success) {
-              resolve(response.data as T[]);
-            } else {
-              reject(new Error(response.error || 'Unknown error'));
-            }
-          }
-        };
-
-        port.addEventListener('message', handler);
-        port.postMessage({
-          id,
-          type: messageType,
-          payload: { sql, params },
-        });
-
-        // 타임아웃 설정 (30초)
-        setTimeout(() => {
-          port.removeEventListener('message', handler);
-          reject(new Error('DB Worker message timeout'));
-        }, SQLITE_MESSAGE_TIMEOUT_MS);
-      });
-    },
-  };
-}
 
 // Service Worker 등록 및 GraphQL 요청 처리
 self.addEventListener('install', () => {
@@ -68,25 +23,27 @@ self.addEventListener('install', () => {
 });
 
 self.addEventListener('activate', (event) => {
-  if(!yogaServer) {
+  if (!yogaServer) {
     yogaServer = createYoga<GraphqlContext, GraphqlContext>({
       schema: mergedSchema,
       batching: true,
-      healthCheckEndpoint: '/health'
+      healthCheckEndpoint: '/health',
     });
   }
   event.waitUntil(self.clients.claim());
 });
 
 // GraphQL 요청 처리
-self.addEventListener('fetch', async (event) => {
+self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
-  
+
   // GraphQL 엔드포인트 확인
   if (url.pathname.includes('/api/graphql') && yogaServer) {
-    return event.respondWith(yogaServer.handleRequest(event.request, {
-      dbBus
-    }))
+    event.respondWith(
+      yogaServer.handleRequest(event.request, {
+        dbBus,
+      })
+    );
   } else if (url.pathname.endsWith('.wasm')) {
     event.respondWith(respondWithWasm(event.request));
   }
@@ -102,7 +59,10 @@ async function respondWithWasm(request: Request): Promise<Response> {
     await cache.delete(request);
   }
   const response = await fetch(request);
-  if (response.ok && response.headers.get('content-type')?.includes('application/wasm')) {
+  if (
+    response.ok &&
+    response.headers.get('content-type')?.includes('application/wasm')
+  ) {
     await cache.put(request, response.clone());
   }
   return response;
