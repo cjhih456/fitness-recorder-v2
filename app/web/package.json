@@ -31,6 +31,19 @@
         "dependsOn": [
           "@fitness-recoder/graphql-sqlite-worker:generate-seed-db"
         ]
+      },
+      "typecheck": {
+        "dependsOn": [
+          "^typecheck",
+          {
+            "projects": [
+              "@fitness-recoder/graphql-sqlite-worker",
+              "@fitness-recoder/ui",
+              "@fitness-recoder/structure"
+            ],
+            "target": "build"
+          }
+        ]
       }
     }
   }

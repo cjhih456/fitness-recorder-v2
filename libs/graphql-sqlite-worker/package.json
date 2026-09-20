@@ -66,15 +66,32 @@
           "command": "yarn tsx libs/graphql-sqlite-worker/scripts/generate-seed-db.ts"
         }
       },
-      "build-lib": {
+      "typecheck": {
         "dependsOn": [
-          "generate-seed-db"
-        ],
+          "^typecheck",
+          {
+            "projects": [
+              "@fitness-recoder/structure"
+            ],
+            "target": "build"
+          }
+        ]
+      },
+      "build-lib": {
         "executor": "@nx/vite:build",
         "options": {
           "configFile": "libs/graphql-sqlite-worker/vite.config.mts",
           "outputPath": "libs/graphql-sqlite-worker/dist"
-        }
+        },
+        "dependsOn": [
+          "generate-seed-db",
+          {
+            "projects": [
+              "@fitness-recoder/structure"
+            ],
+            "target": "build"
+          }
+        ]
       },
       "build-worker": {
         "dependsOn": [

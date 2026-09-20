@@ -157,6 +157,7 @@ export function GraphQLSQLiteWorkerProvider({
 
   /**
    * 자동 초기화
+   * 자동 초기화
    */
   useEffect(() => {
     if (autoInit) {
