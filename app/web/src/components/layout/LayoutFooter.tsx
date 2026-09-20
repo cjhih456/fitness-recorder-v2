@@ -106,22 +106,42 @@ export default function LayoutFooter() {
   return (
     <footer className="fixed bottom-0 left-0 right-0 z-40 border-t bg-background/80 px-4 py-2 shadow-lg backdrop-blur-md">
       <nav className="mx-auto flex max-w-md items-center justify-around">
-        <NavButton icon={LayoutDashboard} label={t('nav.home')} onClick={gotoHome} />
-        <NavButton icon={History} label={t('nav.history')} onClick={gotoHistory} />
+        <NavButton
+          icon={LayoutDashboard}
+          label={t('nav.home')}
+          onClick={gotoHome}
+          isActive={location.pathname === '/'}
+        />
+        <NavButton
+          icon={History}
+          label={t('nav.history')}
+          onClick={gotoHistory}
+          isActive={location.pathname.startsWith('/history')}
+        />
         <div className="relative -top-6">
           <Button
             variant="default"
             size="icon-xl"
-            className="rounded-full"
+            className="rounded-full bg-brand text-brand-foreground shadow-lg shadow-brand/40 hover:bg-brand/90"
             onClick={gotoWorkout}
             disabled={isLoading || isStarting}
             aria-label={t('nav.startWorkout')}
           >
-            <Play className="fill-primary-foreground" size={24} />
+            <Play className="fill-brand-foreground" size={24} />
           </Button>
         </div>
-        <NavButton icon={Plus} label={t('nav.routines')} onClick={gotoRoutines} />
-        <NavButton icon={Camera} label={t('nav.photo')} onClick={gotoPhoto} />
+        <NavButton
+          icon={Plus}
+          label={t('nav.routines')}
+          onClick={gotoRoutines}
+          isActive={location.pathname.startsWith('/routines')}
+        />
+        <NavButton
+          icon={Camera}
+          label={t('nav.photo')}
+          onClick={gotoPhoto}
+          isActive={location.pathname.startsWith('/photo')}
+        />
       </nav>
     </footer>
   );
