@@ -5,9 +5,9 @@ export function useTimer(start: number, pausedTime = 0, isPaused = false) {
   const [timer, setTimer] = useState(0);
   useEffect(() => {
     if (isPaused) return;
-    setTimer(dayjs(start).diff(dayjs(), 'millisecond') - pausedTime);
+    setTimer((dayjs(start).diff(dayjs(), 'millisecond') - pausedTime) * -1);
     const interval = setInterval(() => {
-      setTimer(dayjs(start).diff(dayjs(), 'millisecond') - pausedTime);
+      setTimer((dayjs(start).diff(dayjs(), 'millisecond') - pausedTime) * -1);
     }, 1000);
     return () => clearInterval(interval);
   }, [start, pausedTime, isPaused]);
