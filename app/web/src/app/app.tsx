@@ -1,7 +1,7 @@
 import { GraphQLSQLiteWorkerProvider, APP_VERSION } from '@fitness-recoder/graphql-sqlite-worker';
 import DbWorkerUrl from '@fitness-recoder/graphql-sqlite-worker/dbWorker?worker&url';
-import ServiceWorkerUrl from '@fitness-recoder/graphql-sqlite-worker/serviceWorker?worker&url';
 import SeedDbUrl from '@fitness-recoder/graphql-sqlite-worker/seedDb?url';
+import ServiceWorkerUrl from '@fitness-recoder/graphql-sqlite-worker/serviceWorker?worker&url';
 import { ThemeProvider } from 'next-themes';
 import { lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
@@ -29,6 +29,7 @@ export function App() {
             seedDbUrl: SeedDbUrl,
           }}
           serviceWorkerUrl={ServiceWorkerUrl}
+          fallback={<PageLoadingSkeleton />}
         >
           <DefaultLayout>
             <SuspenseBoundary fallback={<PageLoadingSkeleton />}>
