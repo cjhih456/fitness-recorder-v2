@@ -20,7 +20,7 @@ export class GraphQLServiceWorker {
     navigator.serviceWorker.register(serviceWorkerUrl, {
       type: 'module',
       updateViaCache: 'imports',
-      scope: '/',
+      scope: new URL('.', document.baseURI).pathname,
     }).then((registration) => {
       this.registration = registration;
       if(registration.active && !navigator.serviceWorker.controller) {

@@ -1,0 +1,20 @@
+name: Build web
+description: Build the web app for GitHub Pages and prepare the dist folder.
+
+inputs:
+  base-path:
+    description: Vite public base path (e.g. /fitness-recorder-v2/)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Build web
+      shell: bash
+      env:
+        VITE_BASE_PATH: ${{ inputs.base-path }}
+      run: yarn nx build web
+
+    - name: Prepare GitHub Pages SPA fallback
+      shell: bash
+      run: cp dist/app/web/index.html dist/app/web/404.html
