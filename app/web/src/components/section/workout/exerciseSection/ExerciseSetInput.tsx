@@ -55,11 +55,11 @@ export default function ExerciseSetInput({
     <div
       className={`grid grid-cols-12 gap-2 rounded-xl border p-2 transition-all ${
         set.isDone
-          ? 'border-green-200 bg-green-50 opacity-90 dark:border-green-800 dark:bg-green-900/20'
-          : 'border-transparent bg-zinc-50 shadow-inner dark:bg-zinc-900/50'
+          ? 'border-success/30 bg-success-soft opacity-90'
+          : 'border-transparent bg-muted shadow-inner'
       }`}
     >
-      <div className="col-span-2 flex items-center justify-center font-bold text-zinc-500">
+      <div className="col-span-2 flex items-center justify-center font-bold text-muted-foreground">
         {index + 1}
       </div>
       <div className="col-span-3">
@@ -99,8 +99,8 @@ export default function ExerciseSetInput({
           onClick={handleToggleDone}
           className={`flex h-9 w-9 items-center justify-center rounded-full transition-all ${
             set.isDone
-              ? 'bg-green-500 text-white shadow-md'
-              : 'border-2 border-zinc-200 bg-background text-transparent dark:border-zinc-700'
+              ? 'bg-success text-success-foreground shadow-md'
+              : 'border-2 border-border bg-background text-transparent'
           }`}
         >
           <CheckCircle2 size={20} />
@@ -114,7 +114,7 @@ export default function ExerciseSetInput({
             index: index + 1,
           })}
           onClick={handleDelete}
-          className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-100 hover:text-red-500 dark:hover:bg-zinc-800"
+          className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-destructive"
         >
           <Trash2 size={16} />
         </button>

@@ -48,7 +48,7 @@ export default function FinishHub({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <button
         type="button"
-        className="absolute inset-0 bg-black/80"
+        className="absolute inset-0 bg-scrim"
         aria-label={t('common.home')}
         onClick={handleHome}
       />
@@ -56,7 +56,7 @@ export default function FinishHub({
         role="dialog"
         aria-modal="true"
         aria-labelledby="finish-hub-title"
-        className="relative z-10 w-full max-w-sm rounded-3xl border border-zinc-100 bg-background p-6 shadow-lg dark:border-zinc-800"
+        className="relative z-10 w-full max-w-sm rounded-3xl border border-border bg-background p-6 shadow-lg"
       >
         <div className="space-y-2 pb-6 text-center">
           <h2
@@ -73,7 +73,7 @@ export default function FinishHub({
         <div className="flex flex-col gap-3">
           <Button
             type="button"
-            className="w-full rounded-2xl py-6 font-bold"
+            className="w-full rounded-2xl py-6 font-bold bg-brand text-brand-foreground hover:bg-brand/90"
             onClick={onPhoto}
           >
             {t('finish.createPhoto')}
@@ -99,7 +99,7 @@ export default function FinishHub({
         {onSaveRoutine ? (
           <button
             type="button"
-            className="mt-4 w-full py-2 text-sm font-bold text-blue-600 hover:underline disabled:opacity-50"
+            className="mt-4 w-full py-2 text-sm font-bold text-brand-text hover:underline disabled:opacity-50"
             onClick={onSaveRoutine}
             disabled={isSavingRoutine}
           >

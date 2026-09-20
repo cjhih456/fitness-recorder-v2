@@ -274,7 +274,7 @@ export default function Workout() {
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="mt-1 h-7 px-0 text-xs text-zinc-500"
+                className="mt-1 h-7 px-0 text-xs text-muted-foreground"
                 onClick={handleFinishClick}
               >
                 {t('workout.complete')}
@@ -301,7 +301,7 @@ export default function Workout() {
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="h-7 gap-1 px-2 text-xs text-zinc-500"
+                    className="h-7 gap-1 px-2 text-xs text-muted-foreground"
                     onClick={handlePause}
                     disabled={!scheduleData || scheduleData.type !== 'STARTED'}
                   >
@@ -317,7 +317,7 @@ export default function Workout() {
         {isPaused ? (
           <Button
             type="button"
-            className="rounded-full px-6 shadow-lg"
+            className="rounded-full px-6 shadow-lg bg-brand text-brand-foreground hover:bg-brand/90 shadow-brand/30"
             onClick={handleResume}
           >
             {t('workout.resume')}
@@ -325,7 +325,7 @@ export default function Workout() {
         ) : (
           <Button
             type="button"
-            className="rounded-full px-6 shadow-lg"
+            className="rounded-full px-6 shadow-lg bg-brand text-brand-foreground hover:bg-brand/90 shadow-brand/30"
             onClick={handleFinishClick}
             disabled={!scheduleData || isFinished}
           >
@@ -361,7 +361,7 @@ export default function Workout() {
           <Button
             type="button"
             variant="secondary"
-            className="w-full rounded-2xl border-2 border-dashed border-zinc-200 bg-zinc-50 py-4 font-bold text-zinc-500 transition-all hover:border-blue-300 hover:bg-zinc-100 hover:text-blue-600 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+            className="w-full rounded-2xl border-2 border-dashed border-border bg-muted py-4 font-bold text-muted-foreground transition-all hover:border-brand/40 hover:bg-brand-soft hover:text-brand-text"
             onClick={() => setIsAddModalOpen(true)}
           >
             <Plus size={18} className="mr-2" />

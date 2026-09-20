@@ -45,7 +45,7 @@ export default function RecentRecordsSheet({
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
       <button
         type="button"
-        className="absolute inset-0 bg-black/80"
+        className="absolute inset-0 bg-scrim"
         aria-label={t('common.close')}
         onClick={handleClose}
       />
@@ -76,19 +76,19 @@ export default function RecentRecordsSheet({
 
         <div className="min-h-0 flex-1 space-y-2 overflow-y-auto">
           {records.length === 0 ? (
-            <p className="py-12 text-center text-sm text-zinc-500">
+            <p className="py-12 text-center text-sm text-muted-foreground">
               {t('recent.empty')}
             </p>
           ) : (
             records.map((record) => (
               <div
                 key={record.id}
-                className="flex items-center justify-between rounded-xl bg-zinc-50 px-4 py-3 dark:bg-zinc-900"
+                className="flex items-center justify-between rounded-xl bg-muted px-4 py-3"
               >
                 <span className="text-sm font-medium text-foreground">
                   {record.dateLabel}
                 </span>
-                <span className="text-sm text-zinc-500">
+                <span className="text-sm text-muted-foreground">
                   {t('recent.setSummary', {
                     weight: record.weight,
                     reps: record.repeat,

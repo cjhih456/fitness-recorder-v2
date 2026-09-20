@@ -56,25 +56,25 @@ export default function ExerciseCard({
 
   return (
     <>
-      <Card className="border-zinc-100 shadow-sm dark:border-zinc-800">
+      <Card className="border-border shadow-sm">
         <CardContent className="space-y-4 p-4">
           <div className="flex items-center justify-between">
             <h3 className="flex items-center gap-2 text-xl font-bold">
-              <span className="h-6 w-1.5 rounded-full bg-blue-600" />
+              <span className="h-6 w-1.5 rounded-full bg-brand" />
               {exerciseName}
             </h3>
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              className="text-xs text-zinc-500"
+              className="text-xs text-muted-foreground"
               onClick={() => setRecordsOpen(true)}
             >
               {t('workout.checkRecords')}
             </Button>
           </div>
 
-          <div className="grid grid-cols-12 gap-2 px-2 text-[11px] font-bold uppercase text-zinc-400">
+          <div className="grid grid-cols-12 gap-2 px-2 text-[11px] font-bold uppercase text-muted-foreground">
             <div className="col-span-2 text-center">{t('workout.set')}</div>
             <div className="col-span-3 text-center">{t('workout.weightKg')}</div>
             <div className="col-span-3 text-center">{t('workout.reps')}</div>
@@ -96,7 +96,7 @@ export default function ExerciseCard({
           <Button
             type="button"
             variant="outline"
-            className="w-full border-dashed py-3 text-zinc-400 hover:border-blue-200 hover:text-blue-600"
+            className="w-full border-dashed py-3 text-muted-foreground hover:border-brand/40 hover:text-brand-text"
             onClick={handleAddSet}
           >
             <Plus size={18} className="mr-2" />
