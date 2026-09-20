@@ -1,4 +1,4 @@
-import type { SQLiteWorker } from '../sqlite-worker';
+import type { SqlExecutor } from '../types';
 
 const createExerciseTableSql = `
   CREATE TABLE IF NOT EXISTS exercise (
@@ -11,8 +11,8 @@ const createExerciseTableSql = `
 /**
  * exercise 테이블을 생성합니다.
  */
-export async function createExerciseTable(worker: SQLiteWorker): Promise<void> {
-  await worker.exec(createExerciseTableSql);
+export async function createExerciseTable(executor: SqlExecutor): Promise<void> {
+  await executor.exec(createExerciseTableSql);
 }
 
 /**

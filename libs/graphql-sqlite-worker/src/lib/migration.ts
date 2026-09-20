@@ -1,12 +1,12 @@
-import type { SQLiteWorker } from './sqlite-worker';
+import type { SqlExecutor } from './types';
 
 /**
  * 마이그레이션 스크립트 인터페이스
  */
 export interface MigrationScript {
   version: number;
-  up?: string | ((worker: SQLiteWorker) => Promise<void>); // 마이그레이션 SQL 또는 함수
-  down?: string | ((worker: SQLiteWorker) => Promise<void>); // 롤백 SQL 또는 함수 (선택사항)
+  up?: string | ((executor: SqlExecutor) => Promise<void>); // 마이그레이션 SQL 또는 함수
+  down?: string | ((executor: SqlExecutor) => Promise<void>); // 롤백 SQL 또는 함수 (선택사항)
   description?: string;
 }
 
@@ -23,10 +23,10 @@ export interface MigrationHistory {
  * 마이그레이션 관리 클래스
  */
 export class MigrationManager {
-  private worker: SQLiteWorker;
+  private worker: SqlExecutor;
   private migrationsTable = '_migrations';
 
-  constructor(worker: SQLiteWorker) {
+  constructor(worker: SqlExecutor) {
     this.worker = worker;
   }
 

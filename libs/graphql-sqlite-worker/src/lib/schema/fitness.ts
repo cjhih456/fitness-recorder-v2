@@ -1,4 +1,4 @@
-import type { SQLiteWorker } from '../sqlite-worker';
+import type { SqlExecutor } from '../types';
 
 const createFitnessTableSql = `
     CREATE TABLE IF NOT EXISTS fitness (
@@ -22,8 +22,8 @@ const createFitnessTableSql = `
 /**
  * fitness 테이블을 생성합니다.
  */
-export async function createFitnessTable(worker: SQLiteWorker): Promise<void> {
-  await worker.exec(createFitnessTableSql);
+export async function createFitnessTable(executor: SqlExecutor): Promise<void> {
+  await executor.exec(createFitnessTableSql);
 }
 
 /**
@@ -34,15 +34,15 @@ export const recreateFitnessTableSql = createFitnessTableSql;
 /**
  * fitness 테이블의 데이터 개수를 확인합니다.
  */
-export async function checkFitnessDataLength(worker: SQLiteWorker): Promise<number> {
-  const result = await worker.query('SELECT COUNT(*) as count FROM fitness');
+export async function checkFitnessDataLength(executor: SqlExecutor): Promise<number> {
+  const result = await executor.query('SELECT COUNT(*) as count FROM fitness');
   return result.length > 0 ? (result[0]['count'] as number) : 0;
 }
 
 /**
  * fitness 초기 데이터를 삽입합니다.
  */
-export async function insertFitnessData(worker: SQLiteWorker): Promise<void> {
+export async function insertFitnessData(executor: SqlExecutor): Promise<void> {
   const dataLoader = () => import('../fitness-datas/fitness-flat-data.ts');
   const loaded = await dataLoader();
   const { fitnessData } = loaded;
@@ -69,5 +69,5 @@ export async function insertFitnessData(worker: SQLiteWorker): Promise<void> {
     ) VALUES ${placeholders}
   `;
   
-  await worker.exec(sql, fitnessData);
+  await executor.exec(sql, fitnessData);
 }

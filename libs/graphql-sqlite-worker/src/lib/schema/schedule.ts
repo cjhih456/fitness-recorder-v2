@@ -1,4 +1,4 @@
-import type { SQLiteWorker } from '../sqlite-worker';
+import type { SqlExecutor } from '../types';
 
 const createScheduleExerciseTableSql = `
   CREATE TABLE IF NOT EXISTS schedule_exercise (
@@ -24,8 +24,8 @@ const deleteTriggerOnScheduleExercise = `
 /**
  * schedule 테이블과 관련 테이블을 생성합니다.
  */
-export async function createScheduleTable(worker: SQLiteWorker): Promise<void> {
-  await worker.exec(`
+export async function createScheduleTable(executor: SqlExecutor): Promise<void> {
+  await executor.exec(`
     CREATE TABLE IF NOT EXISTS schedule (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       year INTEGER NOT NULL,
@@ -39,19 +39,19 @@ export async function createScheduleTable(worker: SQLiteWorker): Promise<void> {
       type TEXT NOT NULL
     )
   `);
-  await ensureScheduleTitleColumn(worker);
-  await worker.exec(createScheduleExerciseTableSql);
-  await worker.exec(deleteTriggerOnScheduleExercise);
+  await ensureScheduleTitleColumn(executor);
+  await executor.exec(createScheduleExerciseTableSql);
+  await executor.exec(deleteTriggerOnScheduleExercise);
 }
 
 /**
  * 기존 DB에 title 컬럼이 없으면 추가합니다 (CREATE IF NOT EXISTS만으로는 보강되지 않음).
  */
-export async function ensureScheduleTitleColumn(worker: SQLiteWorker): Promise<void> {
-  const columns = await worker.query(`PRAGMA table_info(schedule)`);
+export async function ensureScheduleTitleColumn(executor: SqlExecutor): Promise<void> {
+  const columns = await executor.query(`PRAGMA table_info(schedule)`);
   const hasTitle = columns.some((column) => column['name'] === 'title');
   if (!hasTitle) {
-    await worker.exec(`ALTER TABLE schedule ADD COLUMN title TEXT NOT NULL DEFAULT ''`);
+    await executor.exec(`ALTER TABLE schedule ADD COLUMN title TEXT NOT NULL DEFAULT ''`);
   }
 }
 

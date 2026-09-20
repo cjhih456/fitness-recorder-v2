@@ -1,4 +1,4 @@
-import type { SQLiteWorker } from '../sqlite-worker';
+import type { SqlExecutor } from '../types';
 
 const createExercisePresetExerciseTableSql = `
   CREATE TABLE IF NOT EXISTS exercisePreset_exercise (
@@ -24,16 +24,16 @@ const deleteTriggerOnExercisePresetExercise = `
 /**
  * exercisePreset 테이블과 관련 테이블을 생성합니다.
  */
-export async function createExercisePresetTable(worker: SQLiteWorker): Promise<void> {
-  await worker.exec(`
+export async function createExercisePresetTable(executor: SqlExecutor): Promise<void> {
+  await executor.exec(`
     CREATE TABLE IF NOT EXISTS exercisePreset (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
       deps INTEGER NOT NULL
     )
   `);
-  await worker.exec(createExercisePresetExerciseTableSql);
-  await worker.exec(deleteTriggerOnExercisePresetExercise);
+  await executor.exec(createExercisePresetExerciseTableSql);
+  await executor.exec(deleteTriggerOnExercisePresetExercise);
 }
 
 /**
