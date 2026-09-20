@@ -1,11 +1,22 @@
 /// <reference types='vitest' />
 import { defineConfig } from 'vite';
+import type { PreRenderedChunk } from 'rollup';
 import react from '@vitejs/plugin-react';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 import { vitePluginI18nextLanguagePackageLoader } from './src/vite-plugins/i18next-language-package';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
+
+function isServiceWorkerChunk(chunkInfo: PreRenderedChunk): boolean {
+  const id = chunkInfo.facadeModuleId ?? '';
+  return (
+    /serviceWorker/i.test(chunkInfo.name) ||
+    /service-worker/i.test(chunkInfo.name) ||
+    /serviceWorker/i.test(id) ||
+    /service-worker/i.test(id)
+  );
+}
 
 export default defineConfig(() => {
   const corsObj = {
@@ -51,7 +62,21 @@ export default defineConfig(() => {
       exclude: ['@fitness-recoder/graphql-sqlite-worker'],
     },
     assetsInclude: ['**/*.db'],
-    // Uncomment this if you are using workers.
+    /**
+     * GitHub Pages는 Service-Worker-Allowed 헤더를 내려주지 않으므로
+     * SW 스크립트가 assets/ 아래에 있으면 앱 루트 scope 등록이 거부됩니다.
+     * Service Worker만 dist 루트에 출력합니다.
+     */
+    worker: {
+      rollupOptions: {
+        output: {
+          entryFileNames: (chunkInfo) =>
+            isServiceWorkerChunk(chunkInfo)
+              ? '[name]-[hash].js'
+              : 'assets/[name]-[hash].js',
+        },
+      },
+    },
     build: {
       outDir: '../../dist/app/web',
       emptyOutDir: true,

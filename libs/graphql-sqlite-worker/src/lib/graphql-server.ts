@@ -8,6 +8,15 @@ export interface GraphQLServiceWorkerOptions {
   onActive?: (worker: GraphQLServiceWorker) => void;
 }
 
+/**
+ * document.baseURI 디렉터리를 Service Worker scope로 사용합니다.
+ * GitHub Pages에서는 `<base href="%BASE_URL%">`가 `/repo-name/` 이므로
+ * scope는 `/fitness-recoder-v2/`처럼 앱 루트가 됩니다.
+ */
+export function resolveServiceWorkerScope(baseURI: string): string {
+  return new URL('.', baseURI).pathname;
+}
+
 export class GraphQLServiceWorker {
   registration: ServiceWorkerRegistration | null = null;
   onActive?: (worker: GraphQLServiceWorker) => void;
@@ -36,7 +45,7 @@ export class GraphQLServiceWorker {
         {
           type: 'module',
           updateViaCache: 'imports',
-          scope: new URL('.', document.baseURI).pathname,
+          scope: resolveServiceWorkerScope(document.baseURI),
         }
       );
       this.registration = registration;
