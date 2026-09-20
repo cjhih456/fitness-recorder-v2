@@ -5,6 +5,7 @@ import ServiceWorkerUrl from '@fitness-recoder/graphql-sqlite-worker/serviceWork
 import { ThemeProvider } from 'next-themes';
 import { lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import DbInitError from '../components/layout/DbInitError';
 import DefaultLayout from '../components/layout/DefaultLayout';
 import PageLoadingSkeleton from '../components/utils/PageLoadingSkeleton';
 import SuspenseBoundary from '../components/utils/SuspenseBoundary';
@@ -30,6 +31,9 @@ export function App() {
           }}
           serviceWorkerUrl={ServiceWorkerUrl}
           fallback={<PageLoadingSkeleton />}
+          errorFallback={({ error, retry }) => (
+            <DbInitError error={error} onRetry={retry} />
+          )}
         >
           <DefaultLayout>
             <SuspenseBoundary fallback={<PageLoadingSkeleton />}>

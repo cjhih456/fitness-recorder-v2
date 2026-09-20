@@ -66,6 +66,11 @@ export interface GraphQLSQLiteWorkerProviderProps {
   serviceWorkerUrl: string;
   /** ready 전 표시할 fallback UI */
   fallback?: ReactNode;
+  /** 초기화 실패 시 표시할 UI */
+  errorFallback?: (props: {
+    error: Error | null;
+    retry: () => void;
+  }) => ReactNode;
 }
 
 const DefaultFallback = () => (
@@ -83,6 +88,7 @@ export function GraphQLSQLiteWorkerProvider({
   children,
   serviceWorkerUrl,
   fallback,
+  errorFallback,
 }: GraphQLSQLiteWorkerProviderProps) {
   const [queryClient] = useState(
     () =>
@@ -179,12 +185,17 @@ export function GraphQLSQLiteWorkerProvider({
   if (status === 'ready') {
     content = children;
   } else if (status === 'error') {
-    console.error(error)
-    content = (
+    console.error(error);
+    const retry = () => {
+      void initialize();
+    };
+    content = errorFallback ? (
+      errorFallback({ error, retry })
+    ) : (
       <div role="alert">
         <p>{error?.message ?? 'Failed to initialize database'}</p>
         <p>{error?.stack ?? ''}</p>
-        <button type="button" onClick={() => void initialize()}>
+        <button type="button" onClick={retry}>
           재시도
         </button>
       </div>
