@@ -31,7 +31,7 @@ jobs:
 
       - name: Restore web dist cache
         id: dist-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ${{ env.WEB_DIST_PATH }}
           key: web-dist-${{ runner.os }}-${{ hashFiles('yarn.lock', 'package.json', 'nx.json', 'tsconfig.base.json', 'app/web/**', 'libs/**') }}
@@ -105,7 +105,7 @@ jobs:
       - name: Save web dist cache on main
         if: steps.dist-cache.outputs.cache-hit != 'true'
         continue-on-error: true
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: ${{ env.WEB_DIST_PATH }}
           key: web-dist-${{ runner.os }}-${{ hashFiles('yarn.lock', 'package.json', 'nx.json', 'tsconfig.base.json', 'app/web/**', 'libs/**') }}

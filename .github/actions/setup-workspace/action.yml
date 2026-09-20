@@ -9,13 +9,13 @@ runs:
       run: corepack enable
 
     - name: Setup Node
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v7
       with:
-        node-version: '20'
+        node-version: '24'
         cache: yarn
 
     - name: Restore Yarn node_modules
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: |
           node_modules
@@ -26,7 +26,7 @@ runs:
           yarn-nm-${{ runner.os }}-
 
     - name: Restore Nx cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: .nx/cache
         key: nx-${{ runner.os }}-${{ hashFiles('yarn.lock') }}-${{ github.sha }}
@@ -35,7 +35,7 @@ runs:
           nx-${{ runner.os }}-
 
     - name: Restore Vite cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: node_modules/.vite
         key: vite-${{ runner.os }}-${{ hashFiles('yarn.lock', 'app/web/vite.config.mts', 'libs/**/vite.config.mts') }}
