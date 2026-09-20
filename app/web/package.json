@@ -27,7 +27,9 @@
           "^typecheck",
           {
             "projects": [
-              "@fitness-recoder/graphql-sqlite-worker"
+              "@fitness-recoder/graphql-sqlite-worker",
+              "@fitness-recoder/ui",
+              "@fitness-recoder/structure"
             ],
             "target": "build"
           }
