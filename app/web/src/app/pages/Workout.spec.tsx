@@ -170,6 +170,9 @@ describe('Workout page', () => {
       data: [mockFitness],
       isLoading: false,
       isFetching: false,
+      isFetchingNextPage: false,
+      hasNextPage: false,
+      fetchNextPage: vi.fn(),
     });
     mutateUpdateSchedule.mockImplementation(async (input: ScheduleData) => input);
   });
@@ -311,6 +314,9 @@ describe('Workout page', () => {
       data: [],
       isLoading: false,
       isFetching: false,
+      isFetchingNextPage: false,
+      hasNextPage: false,
+      fetchNextPage: vi.fn(),
     });
 
     renderWorkout();

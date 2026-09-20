@@ -1,9 +1,10 @@
 import type { Fitness, FitnessCategory, FitnessMuscle } from "@fitness-recoder/structure";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { gql } from "graphql-request";
 import { useGraphQLSQLiteWorker } from "../../context";
 import { Fitness as FitnessFragment } from "../../fragment";
-import { CustomQueryOptions } from "../types/CustomQueryOptions";
+import { CustomInfiniteQueryOptions } from "../types/CustomQueryOptions";
+import { flattenInfinitePages, getNextOffsetPageParam } from "../utils/infiniteList";
 
 const query = gql`
   query getFitnessListByKeywords($name: String, $category: [ICategory], $muscle: [IMuscle], $limit: Int!, $offset: Int!) {
@@ -19,19 +20,23 @@ export interface FitnessListByKeywordsParams {
   category?: FitnessCategory[];
   muscle?: FitnessMuscle[];
   limit: number;
-  offset: number;
 }
 
 export const useFitnessListByKeywordsQuery = (
   params: FitnessListByKeywordsParams,
-  options?: Omit<CustomQueryOptions<['fitness', 'byKeywords', FitnessListByKeywordsParams], Fitness[]>, 'queryKey' | 'queryFn'>
+  options?: CustomInfiniteQueryOptions<['fitness', 'byKeywords', FitnessListByKeywordsParams], Fitness[]>
 ) => {
   const { graphqlClient } = useGraphQLSQLiteWorker();
-  return useQuery({
+  return useInfiniteQuery({
     ...options,
     queryKey: ['fitness', 'byKeywords', params],
-    queryFn: async () => {
-      const result = await graphqlClient.request<{ getFitnessListByKeywords: Fitness[] }>(query, params).catch(e => {
+    initialPageParam: 0,
+    getNextPageParam: getNextOffsetPageParam(params.limit),
+    queryFn: async ({ pageParam }) => {
+      const result = await graphqlClient.request<{ getFitnessListByKeywords: Fitness[] }>(query, {
+        ...params,
+        offset: pageParam,
+      }).catch(e => {
         console.error(e)
         return {
           getFitnessListByKeywords: []
@@ -39,5 +44,6 @@ export const useFitnessListByKeywordsQuery = (
       });
       return result.getFitnessListByKeywords;
     },
+    select: flattenInfinitePages,
   })
 }

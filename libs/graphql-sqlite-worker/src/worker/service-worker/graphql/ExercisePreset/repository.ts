@@ -20,7 +20,7 @@ export const getExercisePresetWithListByIds: ResponseBuilder<{ ids: number[] }, 
 
 export const getExercisePresetWithListByOffset: ResponseBuilder<{ offset: number, size: number }, ExercisePresetData[] | null> = async ({ dbBus}, { offset, size }) => {
   if (!dbBus) return null
-  const result = await dbBus.sendTransaction<ExercisePresetData>('selects', 'select * from exercisePreset limit ?, ?', [offset, size])
+  const result = await dbBus.sendTransaction<ExercisePresetData>('selects', 'select * from exercisePreset order by id limit ?, ?', [offset, size])
   return (result ?? []).map(parsePreset)
 }
 

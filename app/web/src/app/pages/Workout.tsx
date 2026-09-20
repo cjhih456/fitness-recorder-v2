@@ -10,6 +10,7 @@ import FinishHub from '../../components/section/workout/exerciseSection/FinishHu
 import FinishIncompleteConfirm from '../../components/section/workout/exerciseSection/FinishIncompleteConfirm';
 import Timer from '../../components/section/workout/exerciseSection/Timer';
 import FitnessSearchDrawer from '../../components/section/workout/fitnessSearchDrawer/FitnessSearchDrawer';
+import VirtualList from '../../components/utils/VirtualList';
 import { useFormatedTime, useTimer } from '../../components/utils/timer';
 
 function countSets(setsByExercise: Map<number, SetData[]>) {
@@ -345,16 +346,22 @@ export default function Workout() {
             </p>
           </div>
         ) : (
-          exercises.map((exercise) => (
-            <ExerciseCard
-              key={exercise.id}
-              exercise={exercise}
-              addSet={handleAddSet}
-              onUpdateSet={handleUpdateSet}
-              onDeleteSet={handleDeleteSet}
-              onSetsLoaded={handleSetsChange}
-            />
-          ))
+          <VirtualList
+            items={exercises}
+            estimateSize={280}
+            gap={32}
+            scroll="window"
+            getItemKey={(exercise) => exercise.id}
+            renderItem={(exercise) => (
+              <ExerciseCard
+                exercise={exercise}
+                addSet={handleAddSet}
+                onUpdateSet={handleUpdateSet}
+                onDeleteSet={handleDeleteSet}
+                onSetsLoaded={handleSetsChange}
+              />
+            )}
+          />
         )}
 
         <div className="pb-8 pt-4">

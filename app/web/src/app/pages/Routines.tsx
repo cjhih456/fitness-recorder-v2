@@ -18,10 +18,18 @@ function getTodayParts() {
 
 export default function Routines() {
   const navigate = useNavigate();
-  const { data = [], isLoading } = hooks.useExercisePresetListQuery({
-    offset: 0,
+  const {
+    data = [],
+    isLoading,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = hooks.useExercisePresetListQuery({
     size: 20,
   });
+  const loadMore = useCallback(() => {
+    void fetchNextPage();
+  }, [fetchNextPage]);
   const deleteMutation = hooks.useDeleteExercisePresetMutation();
   const cloneMutation = hooks.useCloneScheduleFromPresetMutation();
 
@@ -90,6 +98,9 @@ export default function Routines() {
       <RoutineSection
         data={data}
         isLoading={isLoading}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        onLoadMore={loadMore}
         startingPresetId={startingPresetId}
         onClickCreateRoutine={handleCreateRoutine}
         onClickDeleteRoutine={handleDeleteRequest}

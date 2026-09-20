@@ -35,6 +35,9 @@ describe('FitnessPicker', () => {
       data: [mockFitness],
       isLoading: false,
       isFetching: false,
+      isFetchingNextPage: false,
+      hasNextPage: false,
+      fetchNextPage: vi.fn(),
     });
   });
 
@@ -42,7 +45,7 @@ describe('FitnessPicker', () => {
     render(<FitnessPicker open />);
 
     expect(useFitnessListByKeywordsQuery).toHaveBeenCalledWith(
-      { limit: 40, offset: 0 },
+      { limit: 40 },
       { enabled: true },
     );
     expect(screen.getByRole('dialog', { name: '운동 선택' })).toBeTruthy();

@@ -35,7 +35,7 @@ input UpdateSetsInput {
 type Query {
   getSetByIds(ids: [Int!]): [Sets!]
   getSetById(id: Int!): Sets
-  getSetListByExerciseId(id: Int!): [Sets!]
+  getSetListByExerciseId(id: Int!, offset: Int, size: Int): [Sets!]
 }
 
 type Mutation {

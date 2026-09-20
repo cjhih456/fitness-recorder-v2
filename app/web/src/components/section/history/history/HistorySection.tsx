@@ -1,5 +1,6 @@
 import type { HistoryListItem } from './types';
 import { useTranslation } from 'react-i18next';
+import VirtualList from '../../../utils/VirtualList';
 import SectionSkeleton from '../../SectionSkeleton';
 import HistoryDayGroup from './HistoryDayGroup';
 import HistoryEmpty from './HistoryEmpty';
@@ -32,15 +33,21 @@ export default function HistorySection({
             {isEmpty ? (
               <HistoryEmpty onClickHome={onClickHome} />
             ) : (
-              finishDates.map((date) => (
-                <HistoryDayGroup
-                  key={`${year}-${month}-${date}`}
-                  year={year}
-                  month={month}
-                  date={date}
-                  onClickHistory={onClickHistory}
-                />
-              ))
+              <VirtualList
+                items={finishDates}
+                estimateSize={160}
+                gap={16}
+                scroll="window"
+                getItemKey={(date) => `${year}-${month}-${date}`}
+                renderItem={(date) => (
+                  <HistoryDayGroup
+                    year={year}
+                    month={month}
+                    date={date}
+                    onClickHistory={onClickHistory}
+                  />
+                )}
+              />
             )}
           </div>
         ),

@@ -26,12 +26,12 @@ export default (): IResolvers<unknown, GraphQLResolveInfo> => {
     const result = await getExerciseByIds(context, { ids })
     return await loadFitnessByExerciseList(context, { exerciseList: result })
   }
-  const getExerciseListByScheduleIdShell: ResponseResolver<{ scheduleId: number }, ExerciseData[]> = async (_, { scheduleId }, context) => {
-    const result = await getExerciseByScheduleId(context, { scheduleId })
+  const getExerciseListByScheduleIdShell: ResponseResolver<{ scheduleId: number, offset?: number, size?: number }, ExerciseData[]> = async (_, { scheduleId, offset, size }, context) => {
+    const result = await getExerciseByScheduleId(context, { scheduleId, offset, size })
     return await loadFitnessByExerciseList(context, { exerciseList: result })
   }
-  const getExerciseListByExercisePresetIdShell: ResponseResolver<{ exercisePresetId: number }, ExerciseData[]> = async (_, { exercisePresetId }, context) => {
-    const result = await getExerciseByExercisePresetId(context, { exercisePresetId })
+  const getExerciseListByExercisePresetIdShell: ResponseResolver<{ exercisePresetId: number, offset?: number, size?: number }, ExerciseData[]> = async (_, { exercisePresetId, offset, size }, context) => {
+    const result = await getExerciseByExercisePresetId(context, { exercisePresetId, offset, size })
     return await loadFitnessByExerciseList(context, { exerciseList: result })
   }
   const getExerciseFinishHistoryShell: ResponseResolver<{ fitnessId: number }, ExerciseHistoryData[]> = async (_, { fitnessId }, context) => {
