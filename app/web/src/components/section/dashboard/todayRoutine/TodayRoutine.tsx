@@ -29,7 +29,7 @@ export default function TodayRoutine({
 
   return (
     <Card
-      className="cursor-pointer transition-all hover:border-blue-200 group"
+      className="cursor-pointer transition-all hover:border-brand/40 group"
       onClick={handleStartWorkout}
       role="button"
       tabIndex={0}
@@ -44,14 +44,14 @@ export default function TodayRoutine({
     >
       <CardContent className="flex items-center justify-between p-4">
         <div className="flex items-center gap-4">
-          <div className="flex size-12 items-center justify-center rounded-full bg-zinc-100 text-zinc-500 transition-colors group-hover:bg-blue-100 group-hover:text-blue-600 dark:bg-zinc-800 dark:group-hover:bg-blue-900">
+          <div className="flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors group-hover:bg-brand-soft group-hover:text-brand-text">
             <Dumbbell size={20} />
           </div>
           <div>
-            <h3 className="font-bold text-zinc-800 dark:text-zinc-100">
+            <h3 className="font-bold text-foreground">
               {routine.name}
             </h3>
-            <p className="text-sm text-zinc-500">
+            <p className="text-sm text-muted-foreground">
               {t('dashboard.routineMeta', {
                 target,
                 count: exerciseCount,
@@ -72,7 +72,7 @@ export default function TodayRoutine({
           aria-hidden="true"
           tabIndex={-1}
         >
-          <ChevronRight size={20} className="text-zinc-400" />
+          <ChevronRight size={20} className="text-muted-foreground" />
         </Button>
       </CardContent>
     </Card>

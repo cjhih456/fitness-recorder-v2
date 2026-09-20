@@ -18,17 +18,17 @@ interface ChartProps {
 const SERIES = [
   {
     key: 'chest' as const,
-    color: '#3B82F6',
+    color: 'var(--chart-chest)',
     strokeDasharray: undefined,
   },
   {
     key: 'back' as const,
-    color: '#10B981',
+    color: 'var(--chart-back)',
     strokeDasharray: '6 4',
   },
   {
     key: 'legs' as const,
-    color: '#F59E0B',
+    color: 'var(--chart-legs)',
     strokeDasharray: '2 3',
   },
 ];
@@ -70,20 +70,20 @@ export default function Chart({ data }: ChartProps) {
           <CartesianGrid
             strokeDasharray="3 3"
             vertical={false}
-            stroke="#f0f0f0"
+            stroke="var(--border)"
           />
           <XAxis
             dataKey="date"
             fontSize={12}
             tickLine={false}
             axisLine={false}
-            tick={{ fill: '#888' }}
+            tick={{ fill: 'var(--muted-foreground)' }}
           />
           <YAxis
             fontSize={12}
             tickLine={false}
             axisLine={false}
-            tick={{ fill: '#888' }}
+            tick={{ fill: 'var(--muted-foreground)' }}
           />
           {series.map((item) => (
             <Line

@@ -11,9 +11,9 @@ interface SparseChartProps {
 }
 
 const STATS = [
-  { key: 'chest' as const, colorClass: 'text-[#3B82F6]' },
-  { key: 'back' as const, colorClass: 'text-[#10B981]' },
-  { key: 'legs' as const, colorClass: 'text-[#F59E0B]' },
+  { key: 'chest' as const, colorClass: 'text-chart-chest' },
+  { key: 'back' as const, colorClass: 'text-chart-back' },
+  { key: 'legs' as const, colorClass: 'text-chart-legs' },
 ];
 
 function formatVolume(value: number, locale: string): string {

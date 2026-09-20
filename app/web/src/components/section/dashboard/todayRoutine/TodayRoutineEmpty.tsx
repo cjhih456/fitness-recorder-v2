@@ -17,7 +17,7 @@ export default function TodayRoutineEmpty({
 
   return (
     <Card
-      className="cursor-pointer border bg-muted transition-colors hover:border-primary/30"
+      className="cursor-pointer border bg-card transition-colors hover:border-brand/40"
       onClick={handleCreate}
       role="button"
       tabIndex={0}
@@ -37,11 +37,11 @@ export default function TodayRoutineEmpty({
           <p className="text-[15px] font-bold text-foreground">
             {t('dashboard.emptyRoutine')}
           </p>
-          <p className="text-[13px] font-medium text-primary">
+          <p className="text-[13px] font-medium text-brand-text">
             {t('dashboard.emptyRoutineHint')}
           </p>
         </div>
-        <ChevronRight size={20} className="shrink-0 text-zinc-400" />
+        <ChevronRight size={20} className="shrink-0 text-muted-foreground" />
       </CardContent>
     </Card>
   );
