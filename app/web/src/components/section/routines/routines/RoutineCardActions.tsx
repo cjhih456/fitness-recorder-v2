@@ -61,7 +61,7 @@ export default function RoutineCardActions({
     <div className="fixed inset-0 z-50 flex items-end justify-center">
       <button
         type="button"
-        className="absolute inset-0 bg-black/80"
+        className="absolute inset-0 bg-scrim"
         aria-label={t('common.close')}
         onClick={handleClose}
       />
@@ -73,7 +73,7 @@ export default function RoutineCardActions({
       >
         <p
           id="routine-actions-title"
-          className="text-sm font-medium text-zinc-500 mb-4"
+          className="text-sm font-medium text-muted-foreground mb-4"
         >
           {routine.name}
         </p>

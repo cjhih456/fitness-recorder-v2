@@ -43,7 +43,7 @@ export default function DiscardDraftConfirm({
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
       <button
         type="button"
-        className="absolute inset-0 bg-black/80"
+        className="absolute inset-0 bg-scrim"
         aria-label={t('common.close')}
         onClick={handleCancel}
       />
@@ -76,7 +76,7 @@ export default function DiscardDraftConfirm({
           </Button>
           <Button
             type="button"
-            className="flex-1 rounded-full font-bold bg-zinc-900 text-white hover:bg-zinc-800"
+            className="flex-1 rounded-full font-bold bg-primary text-primary-foreground hover:bg-primary/80"
             onClick={handleConfirm}
           >
             {t('routines.leave')}

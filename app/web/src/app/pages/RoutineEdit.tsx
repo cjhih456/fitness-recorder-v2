@@ -283,7 +283,7 @@ export default function RoutineEdit() {
             aria-label={t('routines.deleteRoutine')}
             onClick={() => setDeleteOpen(true)}
           >
-            <Trash2 size={18} className="text-zinc-500" />
+            <Trash2 size={18} className="text-muted-foreground" />
           </Button>
         ) : (
           <span className="inline-block w-9" aria-hidden />
@@ -299,7 +299,7 @@ export default function RoutineEdit() {
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder={t('routines.namePlaceholder')}
-          className="h-12 rounded-2xl border-zinc-200 bg-zinc-50 px-4 text-base focus-visible:border-blue-500"
+          className="h-12 rounded-2xl border-border bg-muted px-4 text-base focus-visible:border-ring"
           aria-invalid={trimmedName.length === 0}
         />
         {trimmedName.length === 0 ? (
@@ -313,8 +313,8 @@ export default function RoutineEdit() {
           <span
             className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
               exercises.length === 0
-                ? 'bg-zinc-100 text-zinc-500'
-                : 'bg-blue-50 text-blue-600'
+                ? 'bg-muted text-muted-foreground'
+                : 'bg-brand-soft text-brand-text'
             }`}
           >
             {exerciseCountLabel}
@@ -322,8 +322,8 @@ export default function RoutineEdit() {
         </div>
 
         {exercises.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-2 rounded-3xl bg-zinc-50 px-6 py-12 text-center dark:bg-zinc-900/40">
-            <Dumbbell size={36} className="text-zinc-300" aria-hidden />
+          <div className="flex flex-col items-center justify-center gap-2 rounded-3xl bg-muted px-6 py-12 text-center">
+            <Dumbbell size={36} className="text-muted-foreground/50" aria-hidden />
             <p className="font-bold text-foreground">
               {t('workout.emptyTitle')}
             </p>
@@ -347,7 +347,7 @@ export default function RoutineEdit() {
         <Button
           type="button"
           variant="outline"
-          className="w-full rounded-2xl border-blue-200 bg-white py-4 font-bold text-blue-600 hover:bg-blue-50"
+          className="w-full rounded-2xl border-brand/30 bg-background py-4 font-bold text-brand-text hover:bg-brand-soft"
           onClick={() => setPickerOpen(true)}
         >
           <Plus size={18} className="mr-2" />
@@ -359,7 +359,7 @@ export default function RoutineEdit() {
         <div className="mx-auto max-w-md">
           <Button
             type="button"
-            className="w-full rounded-2xl py-6 text-base font-bold"
+            className="w-full rounded-2xl py-6 text-base font-bold bg-brand text-brand-foreground hover:bg-brand/90"
             disabled={!canSave}
             onClick={handleSave}
           >

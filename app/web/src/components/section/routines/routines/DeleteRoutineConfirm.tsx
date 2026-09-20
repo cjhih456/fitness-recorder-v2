@@ -44,7 +44,7 @@ export default function DeleteRoutineConfirm({
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
       <button
         type="button"
-        className="absolute inset-0 bg-black/80"
+        className="absolute inset-0 bg-scrim"
         aria-label={t('common.close')}
         onClick={handleCancel}
       />

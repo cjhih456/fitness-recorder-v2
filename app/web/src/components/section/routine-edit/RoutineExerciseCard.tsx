@@ -38,25 +38,25 @@ export default function RoutineExerciseCard({
   );
 
   return (
-    <Card className="border-zinc-100 shadow-sm dark:border-zinc-800">
+    <Card className="border-border shadow-sm">
       <CardContent className="space-y-4 p-4">
         <div className="flex items-center justify-between">
           <h3 className="flex items-center gap-2 text-xl font-bold">
-            <span className="h-6 w-1.5 rounded-full bg-blue-600" />
+            <span className="h-6 w-1.5 rounded-full bg-brand" />
             {exercise.fitness.name}
           </h3>
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            className="text-xs text-zinc-500"
+            className="text-xs text-muted-foreground"
             onClick={handleRemove}
           >
             {t('common.delete')}
           </Button>
         </div>
 
-        <div className="grid grid-cols-12 gap-2 px-2 text-[11px] font-bold uppercase text-zinc-400">
+        <div className="grid grid-cols-12 gap-2 px-2 text-[11px] font-bold uppercase text-muted-foreground">
           <div className="col-span-2 text-center">{t('workout.set')}</div>
           <div className="col-span-4 text-center">{t('workout.weightKg')}</div>
           <div className="col-span-4 text-center">{t('workout.reps')}</div>
@@ -66,9 +66,9 @@ export default function RoutineExerciseCard({
         {exercise.sets.map((set, index) => (
           <div
             key={set.localId}
-            className="grid grid-cols-12 gap-2 rounded-xl border border-transparent bg-zinc-50 p-2 shadow-inner dark:bg-zinc-900/50"
+            className="grid grid-cols-12 gap-2 rounded-xl border border-transparent bg-muted p-2 shadow-inner"
           >
-            <div className="col-span-2 flex items-center justify-center font-bold text-zinc-500">
+            <div className="col-span-2 flex items-center justify-center font-bold text-muted-foreground">
               {index + 1}
             </div>
             <div className="col-span-4">
@@ -113,7 +113,7 @@ export default function RoutineExerciseCard({
               <span
                 aria-disabled="true"
                 title={t('routines.completeDisabled')}
-                className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-zinc-200 bg-zinc-100 text-zinc-300 dark:border-zinc-700 dark:bg-zinc-800"
+                className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-border bg-muted text-muted-foreground/40"
               >
                 <span className="sr-only">{t('routines.completeInactive')}</span>
               </span>
@@ -124,7 +124,7 @@ export default function RoutineExerciseCard({
         <Button
           type="button"
           variant="outline"
-          className="w-full border-dashed py-3 text-zinc-400 hover:border-blue-200 hover:text-blue-600"
+          className="w-full border-dashed py-3 text-muted-foreground hover:border-brand/40 hover:text-brand-text"
           onClick={handleAddSet}
         >
           <Plus size={18} className="mr-2" />

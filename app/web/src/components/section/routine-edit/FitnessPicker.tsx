@@ -111,7 +111,7 @@ export default function FitnessPicker({
     <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center">
       <button
         type="button"
-        className="absolute inset-0 bg-black/80"
+        className="absolute inset-0 bg-scrim"
         aria-label={t('common.close')}
         onClick={handleClose}
       />
@@ -121,7 +121,7 @@ export default function FitnessPicker({
         aria-labelledby="fitness-picker-title"
         className="relative z-10 flex max-h-[85vh] w-full max-w-md flex-col rounded-t-3xl bg-background shadow-lg md:max-h-[80vh] md:rounded-2xl"
       >
-        <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-zinc-200 md:hidden" />
+        <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-muted-foreground/30 md:hidden" />
         <div className="flex items-center justify-between px-4 pb-2 pt-4">
           <h2
             id="fitness-picker-title"
@@ -133,7 +133,7 @@ export default function FitnessPicker({
             type="button"
             variant="ghost"
             size="icon-sm"
-            className="rounded-full bg-zinc-100 p-2"
+            className="rounded-full bg-muted p-2"
             onClick={handleClose}
             aria-label={t('common.close')}
           >
@@ -144,7 +144,7 @@ export default function FitnessPicker({
         <div className="px-4 pb-3">
           <div className="relative">
             <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
               size={18}
               aria-hidden
             />
@@ -152,7 +152,7 @@ export default function FitnessPicker({
               type="search"
               aria-label={t('routines.searchAria')}
               placeholder={t('routines.searchPlaceholder')}
-              className="rounded-full border-blue-500 bg-zinc-50 py-3 pl-10 pr-4"
+              className="rounded-full border-ring bg-muted py-3 pl-10 pr-4"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               autoFocus
