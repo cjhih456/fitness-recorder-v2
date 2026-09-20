@@ -36,7 +36,7 @@ export class GraphQLServiceWorker {
         {
           type: 'module',
           updateViaCache: 'imports',
-          scope: '/',
+          scope: new URL('.', document.baseURI).pathname,
         }
       );
       this.registration = registration;

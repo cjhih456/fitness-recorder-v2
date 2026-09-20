@@ -1,0 +1,123 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+
+env:
+  WEB_DIST_PATH: dist/app/web
+  VITE_BASE_PATH: ${{ endsWith(github.event.repository.name, '.github.io') && '/' || format('/{0}/', github.event.repository.name) }}
+
+jobs:
+  deploy:
+    name: Deploy GitHub Pages
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Restore web dist cache
+        id: dist-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.WEB_DIST_PATH }}
+          key: web-dist-${{ runner.os }}-${{ hashFiles('yarn.lock', 'package.json', 'nx.json', 'tsconfig.base.json', 'app/web/**', 'libs/**') }}
+
+      - name: Find Validate run for this commit
+        if: steps.dist-cache.outputs.cache-hit != 'true'
+        id: validate-run
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const { data: pulls } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner,
+              repo,
+              commit_sha: context.sha,
+            });
+
+            const pull = pulls.find((item) => item.merged_at) ?? pulls[0];
+            if (!pull) {
+              core.info('No associated pull request; dist must come from cache or a rebuild.');
+              return;
+            }
+
+            const { data: runs } = await github.rest.actions.listWorkflowRuns({
+              owner,
+              repo,
+              workflow_id: 'validate.yml',
+              event: 'pull_request',
+              status: 'success',
+              head_sha: pull.head.sha,
+              per_page: 5,
+            });
+
+            const run = runs.workflow_runs[0];
+            if (!run) {
+              core.info(`No successful Validate run for PR #${pull.number} (${pull.head.sha}).`);
+              return;
+            }
+
+            core.info(`Using Validate run ${run.id} from PR #${pull.number}.`);
+            core.setOutput('run-id', String(run.id));
+
+      - name: Download Validate web dist
+        if: steps.dist-cache.outputs.cache-hit != 'true' && steps.validate-run.outputs.run-id
+        uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: ${{ env.WEB_DIST_PATH }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ steps.validate-run.outputs.run-id }}
+
+      - name: Check restored web dist
+        id: dist
+        run: |
+          if [ -f "${WEB_DIST_PATH}/index.html" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup workspace
+        if: steps.dist.outputs.ready != 'true'
+        uses: ./.github/actions/setup-workspace
+
+      - name: Build web
+        if: steps.dist.outputs.ready != 'true'
+        uses: ./.github/actions/build-web
+        with:
+          base-path: ${{ env.VITE_BASE_PATH }}
+
+      - name: Save web dist cache on main
+        if: steps.dist-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.WEB_DIST_PATH }}
+          key: web-dist-${{ runner.os }}-${{ hashFiles('yarn.lock', 'package.json', 'nx.json', 'tsconfig.base.json', 'app/web/**', 'libs/**') }}
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ env.WEB_DIST_PATH }}
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,48 @@
+name: Setup workspace
+description: Enable Yarn, restore dependency and Nx caches, then install.
+
+runs:
+  using: composite
+  steps:
+    - name: Enable Corepack
+      shell: bash
+      run: corepack enable
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: yarn
+
+    - name: Restore Yarn node_modules
+      uses: actions/cache@v4
+      with:
+        path: |
+          node_modules
+          app/web/node_modules
+          libs/*/node_modules
+        key: yarn-nm-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+        restore-keys: |
+          yarn-nm-${{ runner.os }}-
+
+    - name: Restore Nx cache
+      uses: actions/cache@v4
+      with:
+        path: .nx/cache
+        key: nx-${{ runner.os }}-${{ hashFiles('yarn.lock') }}-${{ github.sha }}
+        restore-keys: |
+          nx-${{ runner.os }}-${{ hashFiles('yarn.lock') }}-
+          nx-${{ runner.os }}-
+
+    - name: Restore Vite cache
+      uses: actions/cache@v4
+      with:
+        path: node_modules/.vite
+        key: vite-${{ runner.os }}-${{ hashFiles('yarn.lock', 'app/web/vite.config.mts', 'libs/**/vite.config.mts') }}
+        restore-keys: |
+          vite-${{ runner.os }}-${{ hashFiles('yarn.lock') }}-
+          vite-${{ runner.os }}-
+
+    - name: Install dependencies
+      shell: bash
+      run: yarn install --immutable

@@ -19,6 +19,7 @@ export default defineConfig(() => {
   }
   return {
     root: import.meta.dirname,
+    base: process.env.VITE_BASE_PATH || '/',
     cacheDir: '../../node_modules/.vite/app/web',
     server: {
       port: 3000,

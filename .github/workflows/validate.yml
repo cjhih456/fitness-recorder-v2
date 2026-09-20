@@ -1,0 +1,56 @@
+name: Validate
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: validate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  WEB_DIST_PATH: dist/app/web
+  VITE_BASE_PATH: ${{ endsWith(github.event.repository.name, '.github.io') && '/' || format('/{0}/', github.event.repository.name) }}
+
+jobs:
+  validate:
+    name: Lint, test, and build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup workspace
+        uses: ./.github/actions/setup-workspace
+
+      - name: Lint
+        run: yarn nx run-many -t lint
+
+      - name: Typecheck
+        run: yarn nx run-many -t typecheck
+
+      - name: Test
+        run: yarn nx run-many -t test
+
+      - name: Build web
+        uses: ./.github/actions/build-web
+        with:
+          base-path: ${{ env.VITE_BASE_PATH }}
+
+      - name: Save web dist cache
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.WEB_DIST_PATH }}
+          key: web-dist-${{ runner.os }}-${{ hashFiles('yarn.lock', 'package.json', 'nx.json', 'tsconfig.base.json', 'app/web/**', 'libs/**') }}
+
+      - name: Upload web dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-dist
+          path: ${{ env.WEB_DIST_PATH }}
+          if-no-files-found: error
+          retention-days: 14
