@@ -7,6 +7,25 @@
 
 import type { BindingSpec, Database } from '@sqlite.org/sqlite-wasm';
 import Sqlite3InitModule from '@sqlite.org/sqlite-wasm';
+import sqlite3WasmUrl from '@sqlite.org/sqlite-wasm/sqlite3.wasm?url';
+
+type Sqlite3InitModuleState = {
+  wasmFilename?: string;
+};
+
+/**
+ * sqlite-wasm 3.51+는 locateFile을 `new URL(filename, import.meta.url)`로 덮어씁니다.
+ * Vite가 worker를 재작성하면 그 기준 URL이 앱 루트가 되어 `/sqlite3.wasm`을 HTML로 받게 됩니다.
+ * 패키지 WASM URL을 절대 경로로 넘기면 locateFile이 올바른 application/wasm 응답을 받습니다.
+ */
+const sqlite3InitModuleState = (
+  globalThis as typeof globalThis & {
+    sqlite3InitModuleState?: Sqlite3InitModuleState;
+  }
+).sqlite3InitModuleState;
+if (sqlite3InitModuleState) {
+  sqlite3InitModuleState.wasmFilename = sqlite3WasmUrl;
+}
 
 let db: Database | null = null;
 const broadcastChannel = new BroadcastChannel('graphql-sqlite-worker');
@@ -107,6 +126,15 @@ self.onmessage = async (event: MessageEvent) => {
 async function handleInit(payload: {
   dbName: string;
 }) {
+  const initState = (
+    globalThis as typeof globalThis & {
+      sqlite3InitModuleState?: Sqlite3InitModuleState;
+    }
+  ).sqlite3InitModuleState;
+  if (initState) {
+    initState.wasmFilename = sqlite3WasmUrl;
+  }
+
   const sqlite3Module = await Sqlite3InitModule({
     print: console.log,
     printErr: console.error

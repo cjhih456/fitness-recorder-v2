@@ -29,7 +29,12 @@ export const useScheduleByDateQuery = (
     ...options,
     queryKey: ['schedule', 'date', params.year, params.month, params.date] as ScheduleByDateCacheKey,
     queryFn: async () => {
-      const result = await graphqlClient.request<{ getScheduleByDate: ScheduleData[] }>(query, params);
+      const result = await graphqlClient.request<{ getScheduleByDate: ScheduleData[] }>(query, params).catch(e=> {
+        console.error(e)
+        return {
+          getScheduleByDate: []
+        }
+      });
       return result.getScheduleByDate;
     },
   })

@@ -13,13 +13,12 @@ import {
   updateVersion,
   getVersion
 } from './schema';
-import { isNewVersion } from './version';
 
 /**
  * 데이터베이스 초기화 옵션
  */
 export interface DatabaseInitOptions {
-  /** 앱 버전 (예: '1.3.0') */
+  /** 앱 버전 (예: '1.5.0') */
   appVersion: string;
 }
 
@@ -54,21 +53,13 @@ export async function initializeDatabase(
   await createSetTable(worker);
 
   // 5. 마이그레이션 실행 (버전이 다른 경우)
+  // MigrationManager가 _migrations 기준으로 이미 적용된 버전을 스킵한다.
+  // appVersion(semver)과 migration.version(숫자)을 version-sort로 비교하면 누락이 생기므로 필터하지 않는다.
   if (currentVersion && currentVersion !== appVersion) {
     const migrations = getAllMigrations();
     const migrationManager = new MigrationManager(worker);
-    
-    // 현재 버전보다 높은 버전의 마이그레이션만 필터링
-    const applicableMigrations = migrations.filter((migration) => {
-      // 마이그레이션 버전을 문자열로 변환 (간단한 변환)
-      const migrationVersion = migration.version.toString();
-      return isNewVersion(currentVersion, migrationVersion);
-    });
-
-    if (applicableMigrations.length > 0) {
-      await migrationManager.migrate(applicableMigrations);
-      await updateVersion(worker, appVersion);
-    }
+    await migrationManager.migrate(migrations);
+    await updateVersion(worker, appVersion);
   }
 }
 

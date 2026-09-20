@@ -1,20 +1,25 @@
 interface BaseExercise{
   id: Int!
   fitnessId: Int!
-  deps: Int
+  deps: Int!
 }
 
 type Exercise implements BaseExercise {
   id: Int!
   fitnessId: Int!
-  deps: Int
+  deps: Int!
 }
 
 type ExerciseWithFitness implements BaseExercise {
   id: Int!
   fitnessId: Int!
-  deps: Int
+  deps: Int!
   fitness: Fitness
+}
+
+type ExerciseHistorySet {
+  weight: Float!
+  repeat: Int!
 }
 
 type ExerciseHistoryData {
@@ -22,23 +27,19 @@ type ExerciseHistoryData {
   year: Int!
   month: Int!
   date: Int!
-  type: String!
-  exercise: Int!
-  cnt: Int!
-  hasDone: Int!
-  weights: String!
-  repeats: String!
+  fitnessId: Int!
   weightUnit: String!
+  historyList: [ExerciseHistorySet!]!
 }
 
 type Query {
   getExerciseListByIds(ids: [Int!]): [ExerciseWithFitness!]
-  getExerciseById(id: Int): ExerciseWithFitness
+  getExerciseById(id: Int!): ExerciseWithFitness
   getExerciseListByScheduleId(scheduleId: Int): [ExerciseWithFitness!]
   getExerciseListByExercisePresetId(
     exercisePresetId: Int
   ): [ExerciseWithFitness!]
-  getExerciseFinishHistory(exerciseId: Int): [ExerciseHistoryData!]
+  getExerciseFinishHistory(fitnessId: Int): [ExerciseHistoryData!]
 }
 
 input CreateExerciseByScheduleInput {

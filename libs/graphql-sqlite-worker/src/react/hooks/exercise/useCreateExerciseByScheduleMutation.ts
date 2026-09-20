@@ -28,7 +28,12 @@ export const useCreateExerciseByScheduleMutation = (
   return useMutation({
     ...options,
     mutationFn: async (input: CreateExerciseByScheduleInput) => {
-      const result = await graphqlClient.request<{ createExerciseBySchedule: ExerciseData[] }>(mutation, { exercise: input });
+      const result = await graphqlClient.request<{ createExerciseBySchedule: ExerciseData[] }>(mutation, { exercise: input }).catch(e => {
+        console.error(e)
+        return {
+          createExerciseBySchedule: []
+        }
+      });
       return result.createExerciseBySchedule;
     },
     onSuccess: (data, variables, ...rest) => {

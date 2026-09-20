@@ -28,7 +28,10 @@ export const useUpdateExerciseMutation = (
   return useMutation({
     ...options,
     mutationFn: async (input: UpdateExerciseInput) => {
-      const result = await graphqlClient.request<{ updateExercise: ExerciseData }>(mutation, { exercise: input });
+      const result = await graphqlClient.request<{ updateExercise: ExerciseData }>(mutation, { exercise: input }).catch(e => {
+        console.error(e)
+        throw e
+      });
       return result.updateExercise;
     },
     onSuccess: (data, variables, ...rest) => {

@@ -18,7 +18,10 @@ export const useDeleteExerciseByIdMutation = (
   return useMutation({
     ...options,
     mutationFn: async (id: number) => {
-      const result = await graphqlClient.request<{ deleteExerciseById: string }>(mutation, { id });
+      const result = await graphqlClient.request<{ deleteExerciseById: string }>(mutation, { id }).catch(e => {
+        console.error(e)
+        throw e
+      });
       return result.deleteExerciseById;
     },
     onSuccess: (data, variables, ...rest) => {

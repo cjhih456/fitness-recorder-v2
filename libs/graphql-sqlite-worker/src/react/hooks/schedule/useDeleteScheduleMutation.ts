@@ -17,7 +17,10 @@ export const useDeleteScheduleMutation = (
   return useMutation({
     ...options,
     mutationFn: async (id: number) => {
-      const result = await graphqlClient.request<{ deleteSchedule: string }>(mutation, { id });
+      const result = await graphqlClient.request<{ deleteSchedule: string }>(mutation, { id }).catch(e => {
+        console.error(e)
+        throw e
+      });
       return result.deleteSchedule;
     },
     onSuccess: (data, variables, ...rest) => {

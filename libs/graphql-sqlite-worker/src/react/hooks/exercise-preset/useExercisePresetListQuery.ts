@@ -6,7 +6,7 @@ import { ExercisePreset, Exercise, Fitness } from "../../fragment";
 import { CustomQueryOptions } from "../types/CustomQueryOptions";
 
 const query = gql`
-  query getExercisePresetWithListByOffset($offset: Int, $size: Int) {
+  query getExercisePresetWithListByOffset($offset: Int!, $size: Int!) {
     getExercisePresetWithListByOffset(offset: $offset, size: $size) {
       ...ExercisePreset
     }
@@ -17,12 +17,12 @@ const query = gql`
 `
 
 export interface ExercisePresetListParams {
-  offset?: number;
-  size?: number;
+  offset: number;
+  size: number;
 }
 
 export const useExercisePresetListQuery = (
-  params: ExercisePresetListParams = {},
+  params: ExercisePresetListParams,
   options?: Omit<CustomQueryOptions<['exercisePreset', 'list', ExercisePresetListParams], ExercisePresetWithExerciseList[]>, 'queryKey' | 'queryFn'>
 ) => {
   const { graphqlClient } = useGraphQLSQLiteWorker();
@@ -30,7 +30,12 @@ export const useExercisePresetListQuery = (
     ...options,
     queryKey: ['exercisePreset', 'list', params],
     queryFn: async () => {
-      const result = await graphqlClient.request<{ getExercisePresetWithListByOffset: ExercisePresetWithExerciseList[] }>(query, params);
+      const result = await graphqlClient.request<{ getExercisePresetWithListByOffset: ExercisePresetWithExerciseList[] }>(query, params).catch(e => {
+        console.error(e)
+        return {
+          getExercisePresetWithListByOffset: []
+        }
+      });
       return result.getExercisePresetWithListByOffset;
     },
   })

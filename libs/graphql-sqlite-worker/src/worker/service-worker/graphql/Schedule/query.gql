@@ -13,6 +13,7 @@ type ScheduleData {
   year: Int!
   month: Int!
   date: Int!
+  title: String!
   beforeTime: Timestamp!
   start: Timestamp!
   breakTime: Int!
@@ -24,6 +25,7 @@ input CreateScheduleDataInput {
   year: Int!
   month: Int!
   date: Int!
+  title: String!
   type: ScheduleType!
 }
 
@@ -32,6 +34,7 @@ input UpdateScheduleDataInput {
   year: Int!
   month: Int!
   date: Int!
+  title: String!
   beforeTime: Timestamp!
   start: Timestamp!
   breakTime: Int!

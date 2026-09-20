@@ -1,51 +1,53 @@
-// Uncomment this line to use CSS modules
-// import styles from './app.module.css';
-import NxWelcome from './nx-welcome';
+import { GraphQLSQLiteWorkerProvider } from '@fitness-recoder/graphql-sqlite-worker';
+import DbWorkerUrl from '@fitness-recoder/graphql-sqlite-worker/dbWorker?worker&url';
+import ServiceWorkerUrl from '@fitness-recoder/graphql-sqlite-worker/serviceWorker?worker&url';
+import { ThemeProvider } from 'next-themes';
+import { lazy } from 'react';
+import { Route, Routes } from 'react-router-dom';
+import DefaultLayout from '../components/layout/DefaultLayout';
+import PageLoadingSkeleton from '../components/utils/PageLoadingSkeleton';
+import SuspenseBoundary from '../components/utils/SuspenseBoundary';
 
-import { Route, Routes, Link } from 'react-router-dom';
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const History = lazy(() => import('./pages/History'));
+const HistoryDetail = lazy(() => import('./pages/HistoryDetail'));
+const Routines = lazy(() => import('./pages/Routines'));
+const RoutineEdit = lazy(() => import('./pages/RoutineEdit'));
+const Workout = lazy(() => import('./pages/Workout'));
+const Photo = lazy(() => import('./pages/Photo'));
 
 export function App() {
   return (
-    <div>
-      <NxWelcome title="web" />
-
-      {/* START: routes */}
-      {/* These routes and navigation have been generated for you */}
-      {/* Feel free to move and update them to fit your needs */}
-      <br />
-      <hr />
-      <br />
-      <div role="navigation">
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/page-2">Page 2</Link>
-          </li>
-        </ul>
-      </div>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <div>
-              This is the generated root route.{' '}
-              <Link to="/page-2">Click here for page 2.</Link>
-            </div>
-          }
-        />
-        <Route
-          path="/page-2"
-          element={
-            <div>
-              <Link to="/">Click here to go back to root page.</Link>
-            </div>
-          }
-        />
-      </Routes>
-      {/* END: routes */}
-    </div>
+    <ThemeProvider defaultTheme="light" enableSystem={false} attribute="class">
+      <SuspenseBoundary fallback={<PageLoadingSkeleton />}>
+        <GraphQLSQLiteWorkerProvider
+          workerConfig={{
+            dbName: 'fitness.db',
+            appVersion: '1.5.0',
+            dbWorkerUrl: DbWorkerUrl,
+          }}
+          serviceWorkerUrl={ServiceWorkerUrl}
+        >
+          <DefaultLayout>
+            <SuspenseBoundary fallback={<PageLoadingSkeleton />}>
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/history" element={<History />} />
+                <Route
+                  path="/history/:scheduleId"
+                  element={<HistoryDetail />}
+                />
+                <Route path="/routines" element={<Routines />} />
+                <Route path="/routines/new" element={<RoutineEdit />} />
+                <Route path="/routines/:id/edit" element={<RoutineEdit />} />
+                <Route path="/workout/:scheduleId" element={<Workout />} />
+                <Route path="/photo" element={<Photo />} />
+              </Routes>
+            </SuspenseBoundary>
+          </DefaultLayout>
+        </GraphQLSQLiteWorkerProvider>
+      </SuspenseBoundary>
+    </ThemeProvider>
   );
 }
 

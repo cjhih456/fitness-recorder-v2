@@ -66,7 +66,7 @@ export function GraphQLSQLiteWorkerProvider({
   const worker = useRef<SQLiteWorker | null>(null);
   const graphQLServer = useRef<GraphQLServiceWorker | null>(null);
   
-  const graphqlClient = useRef<GraphQLClient>(new GraphQLClient('/api/graphql'));
+  const graphqlClient = useRef<GraphQLClient>(new GraphQLClient(window.location.origin + '/api/graphql'));
 
   const batchers = useRef({
     set: createSetQueryBatcher(graphqlClient.current),
@@ -101,6 +101,7 @@ export function GraphQLSQLiteWorkerProvider({
 
   /**
    * 자동 초기화
+   * 자동 초기화
    */
   useEffect(() => {
     if (autoInit && !worker.current) {
@@ -115,11 +116,11 @@ export function GraphQLSQLiteWorkerProvider({
   };
 
   return (
-    <GraphQLSQLiteWorkerContext.Provider value={value}>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <GraphQLSQLiteWorkerContext.Provider value={value}>
         {children}
-      </QueryClientProvider>
-    </GraphQLSQLiteWorkerContext.Provider>
+      </GraphQLSQLiteWorkerContext.Provider>
+    </QueryClientProvider>
   );
 }
 

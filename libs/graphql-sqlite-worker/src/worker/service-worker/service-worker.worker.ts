@@ -87,26 +87,23 @@ self.addEventListener('fetch', async (event) => {
     return event.respondWith(yogaServer.handleRequest(event.request, {
       dbBus
     }))
-  } else if (event.request.url.includes('.wasm') || event.request.url.includes('.js')){
-    if (!(event.request.url.startsWith('https://') || event.request.url.startsWith('http://'))) {
-      return
-    }
-    const cache = await caches.open('fitness-recorder-caches');
-    const matched = await cache.match(event.request)
-    if (matched) {
-      try {
-        return event.respondWith(matched);
-      } catch {
-        await cache.delete(event.request)
-      }
-    }
-    const response = await fetch(event.request)
-    const clonedResponse = response.clone()
-    try {
-      cache.put(event.request, clonedResponse)
-      return event.respondWith(response)
-    } catch {
-      await cache.delete(event.request)
-    }
+  } else if (url.pathname.endsWith('.wasm')) {
+    event.respondWith(respondWithWasm(event.request));
   }
 });
+
+async function respondWithWasm(request: Request): Promise<Response> {
+  const cache = await caches.open('fitness-recorder-caches');
+  const cached = await cache.match(request);
+  if (cached?.headers.get('content-type')?.includes('application/wasm')) {
+    return cached;
+  }
+  if (cached) {
+    await cache.delete(request);
+  }
+  const response = await fetch(request);
+  if (response.ok && response.headers.get('content-type')?.includes('application/wasm')) {
+    await cache.put(request, response.clone());
+  }
+  return response;
+}

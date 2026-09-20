@@ -28,7 +28,10 @@ export const useCloneScheduleMutation = (
   return useMutation({
     ...options,
     mutationFn: async (input: CloneScheduleInput) => {
-      const result = await graphqlClient.request<{ cloneSchedule: ScheduleData }>(mutation, input);
+      const result = await graphqlClient.request<{ cloneSchedule: ScheduleData }>(mutation, input).catch(e => {
+        console.error(e)
+        throw e
+      });
       return result.cloneSchedule;
     },
     onSuccess: (data, variables, ...rest) => {

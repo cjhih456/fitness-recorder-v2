@@ -31,6 +31,7 @@ export async function createScheduleTable(worker: SQLiteWorker): Promise<void> {
       year INTEGER NOT NULL,
       month INTEGER NOT NULL,
       date INTEGER NOT NULL,
+      title TEXT NOT NULL DEFAULT '',
       start INTEGER NOT NULL,
       beforeTime INTEGER NOT NULL,
       breakTime INTEGER NOT NULL,
@@ -38,8 +39,20 @@ export async function createScheduleTable(worker: SQLiteWorker): Promise<void> {
       type TEXT NOT NULL
     )
   `);
+  await ensureScheduleTitleColumn(worker);
   await worker.exec(createScheduleExerciseTableSql);
   await worker.exec(deleteTriggerOnScheduleExercise);
+}
+
+/**
+ * 기존 DB에 title 컬럼이 없으면 추가합니다 (CREATE IF NOT EXISTS만으로는 보강되지 않음).
+ */
+export async function ensureScheduleTitleColumn(worker: SQLiteWorker): Promise<void> {
+  const columns = await worker.query(`PRAGMA table_info(schedule)`);
+  const hasTitle = columns.some((column) => column['name'] === 'title');
+  if (!hasTitle) {
+    await worker.exec(`ALTER TABLE schedule ADD COLUMN title TEXT NOT NULL DEFAULT ''`);
+  }
 }
 
 /**

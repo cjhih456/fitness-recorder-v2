@@ -1,4 +1,9 @@
 import type { SetData, SetCreateType } from '@fitness-recoder/structure'
+import { SetSchema } from '@fitness-recoder/structure'
+
+function parseSet(row: unknown): SetData {
+  return SetSchema.parse(row)
+}
 
 export const getSetByIds: ResponseBuilder<{ ids: number[] }, SetData[]> = async (
   { dbBus },
@@ -9,7 +14,7 @@ export const getSetByIds: ResponseBuilder<{ ids: number[] }, SetData[]> = async 
     'selects', `select * from sets where id in (${temp})`,
     ids
   )
-  return setList || []
+  return (setList || []).map(parseSet)
 }
 export const getSetById: ResponseBuilder<{ id: number }, SetData | null> = async (
   { dbBus },
@@ -19,7 +24,7 @@ export const getSetById: ResponseBuilder<{ id: number }, SetData | null> = async
     'select', 'select * from sets where id=?',
     [id]
   )
-  return set[0] || null
+  return set?.[0] ? parseSet(set[0]) : null
 }
 export const getSetListByExerciseId: ResponseBuilder<{ id: number }, SetData[]> = async (
   { dbBus },
@@ -29,17 +34,17 @@ export const getSetListByExerciseId: ResponseBuilder<{ id: number }, SetData[]> 
     'selects', 'select * from sets where exerciseId=?',
     [id]
   )
-  return setList || []
+  return (setList || []).map(parseSet)
 }
 export const createSet: ResponseBuilder<{ sets: SetCreateType }, SetData | null> = async (
   { dbBus },
   { sets }
 ) => {
   const result = await dbBus?.sendTransaction<SetData>(
-    'insert', 'insert into sets (repeat, isDone, weightUnit, weight, duration, exerciseId) values (?,?,?,?,?,?)',
+    'insert', 'insert into sets (repeat, isDone, weightUnit, weight, duration, exerciseId) values (?,?,?,?,?,?) RETURNING *',
     [sets.repeat, sets.isDone ? 1 : 0, sets.weightUnit, sets.weight, sets.duration, sets.exerciseId]
   )
-  return result ? result[0] : null
+  return result?.[0] ? parseSet(result[0]) : null
 }
 
 export const cloneListByExerciseId: ResponseBuilder<{ exerciseId: number, newExerciseId: number }, SetData[]> = async (
@@ -49,13 +54,13 @@ export const cloneListByExerciseId: ResponseBuilder<{ exerciseId: number, newExe
 ) => {
   const result = await dbBus?.sendTransaction<SetData>(
     'insert',
-    'insert into sets (repeat, isDone, weightUnit, weight, duration, exerciseId) select repeat, 0, weightUnit, weight, duration, ? from sets where exerciseId=?',
+    'insert into sets (repeat, isDone, weightUnit, weight, duration, exerciseId) select repeat, 0, weightUnit, weight, duration, ? from sets where exerciseId=? RETURNING *',
     [
       newExerciseId,
       exerciseId
     ]
   )
-  return result ? result : []
+  return (result ?? []).map(parseSet)
 }
 
 export const updateSet: ResponseBuilder<{ sets: SetData }, SetData | null> = async (
@@ -63,10 +68,10 @@ export const updateSet: ResponseBuilder<{ sets: SetData }, SetData | null> = asy
   { sets }
 ) => {
   const result = await dbBus?.sendTransaction<SetData>(
-    'update', 'update sets set repeat=?, isDone=?, weightUnit=?, weight=?, duration=? where id=?',
+    'update', 'update sets set repeat=?, isDone=?, weightUnit=?, weight=?, duration=? where id=? RETURNING *',
     [sets.repeat, sets.isDone ? 1 : 0, sets.weightUnit, sets.weight, sets.duration, sets.id]
   )
-  return result ? result[0] : null
+  return result?.[0] ? parseSet(result[0]) : null
 }
 export const deleteSetById: ResponseBuilder<{ id: number }, string | null> = async (
   { dbBus },

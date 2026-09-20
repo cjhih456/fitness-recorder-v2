@@ -19,5 +19,22 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "6.29.0"
+  },
+  "nx": {
+    "targets": {
+      "typecheck": {
+        "dependsOn": [
+          "^typecheck",
+          {
+            "projects": [
+              "@fitness-recoder/graphql-sqlite-worker",
+              "@fitness-recoder/ui",
+              "@fitness-recoder/structure"
+            ],
+            "target": "build"
+          }
+        ]
+      }
+    }
   }
 }

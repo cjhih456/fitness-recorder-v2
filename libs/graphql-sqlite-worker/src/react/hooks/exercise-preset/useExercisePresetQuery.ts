@@ -27,7 +27,10 @@ export const useExercisePresetQuery = (
     queryKey: ['exercisePreset', id] as ExercisePresetCacheKey,
     queryFn: async () => {
       if (id === undefined) return null;
-      const result = await graphqlClient.request<{ getExercisePresetWithListById: ExercisePresetWithExerciseList | null }>(query, { id });
+      const result = await graphqlClient.request<{ getExercisePresetWithListById: ExercisePresetWithExerciseList | null }>(query, { id }).catch(e => {
+        console.error(e)
+        throw e
+      });
       return result.getExercisePresetWithListById;
     },
     enabled: id !== undefined,

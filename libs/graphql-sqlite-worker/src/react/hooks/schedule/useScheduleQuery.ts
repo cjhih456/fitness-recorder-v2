@@ -24,7 +24,10 @@ export const useScheduleQuery = (
     queryKey: ['schedule', id] as ScheduleCacheKey,
     queryFn: async () => {
       if (id === undefined) return null;
-      const result = await graphqlClient.request<{ getScheduleById: ScheduleData | null }>(query, { id });
+      const result = await graphqlClient.request<{ getScheduleById: ScheduleData | null }>(query, { id }).catch(e => {
+        console.error(e)
+        throw e
+      });
       return result.getScheduleById;
     },
     enabled: id !== undefined,

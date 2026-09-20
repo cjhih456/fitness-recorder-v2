@@ -40,19 +40,39 @@
     "graphql-request": "^7.4.0",
     "graphql-yoga": "^5.18.0",
     "react": "^19.0.0",
+    "version-sort": "^0.1.1",
     "vite": "^7.0.0",
     "vite-plugin-dts": "~4.5.0",
     "vite-plugin-graphql-loader": "^4.0.4",
-    "vite-plugin-wasm": "^3.5.0"
+    "vite-plugin-static-copy": "^3.1.4"
   },
   "nx": {
     "targets": {
+      "typecheck": {
+        "dependsOn": [
+          "^typecheck",
+          {
+            "projects": [
+              "@fitness-recoder/structure"
+            ],
+            "target": "build"
+          }
+        ]
+      },
       "build-lib": {
         "executor": "@nx/vite:build",
         "options": {
           "configFile": "libs/graphql-sqlite-worker/vite.config.mts",
           "outputPath": "libs/graphql-sqlite-worker/dist"
-        }
+        },
+        "dependsOn": [
+          {
+            "projects": [
+              "@fitness-recoder/structure"
+            ],
+            "target": "build"
+          }
+        ]
       },
       "build-worker": {
         "dependsOn": [

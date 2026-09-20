@@ -22,7 +22,10 @@ export const useExerciseByIdQuery = (id: number | undefined, options?: Omit<Cust
     queryKey: ['exercise', 'byId', id],
     queryFn: async () => {
       if (id === undefined) return null;
-      const result = await graphqlClient.request<{ getExerciseById: ExerciseData | null }>(query, { id });
+      const result = await graphqlClient.request<{ getExerciseById: ExerciseData | null }>(query, { id }).catch(e => {
+        console.error(e)
+        throw e
+      });
       return result.getExerciseById;
     },
     enabled: id !== undefined,

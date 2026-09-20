@@ -5,7 +5,7 @@ export const IExerciesSchema = z.object({
   id: z.number(),
   fitnessId: z.number(),
   fitness: IFitnessSchema.optional(),
-  deps: z.number(),
+  deps: z.number().nullish().transform((value) => value ?? 0),
 })
 
 export const IHistoryDBSchema = z.object({
@@ -13,7 +13,7 @@ export const IHistoryDBSchema = z.object({
   year: z.number(),
   month: z.number(),
   date: z.number(),
-  exercise: z.number(),
+  fitnessId: z.number(),
   cnt: z.number(),
   weights: z.string(),
   repeats: z.string(),
@@ -30,8 +30,8 @@ export const IHistorySchema = IHistoryDBSchema.transform((data) => {
   const numWeights = weights.split(',').map(Number)
   const numRepeats = repeats.split(',').map(Number)
   const historyList = Array(cnt).fill(0).map((_, idx) => ({
-    weight: numWeights[idx],
-    repeat: numRepeats[idx],
+    weight: numWeights[idx] ?? 0,
+    repeat: numRepeats[idx] ?? 0,
   }))
   return {
     ...rest,

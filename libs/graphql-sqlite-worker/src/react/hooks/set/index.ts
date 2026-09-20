@@ -1,4 +1,5 @@
 export * from './useSetQuery'
+export * from './useSetListByExerciseIdQuery'
 export * from './useUpdateSetMutation'
 export * from './useCreateSetMutation'
 export * from './useDeleteSetMutation'

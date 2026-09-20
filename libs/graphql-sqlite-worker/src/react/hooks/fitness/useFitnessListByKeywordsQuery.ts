@@ -6,7 +6,7 @@ import { Fitness as FitnessFragment } from "../../fragment";
 import { CustomQueryOptions } from "../types/CustomQueryOptions";
 
 const query = gql`
-  query getFitnessListByKeywords($name: String, $category: [ICategory], $muscle: [IMuscle], $limit: Int, $offset: Int) {
+  query getFitnessListByKeywords($name: String, $category: [ICategory], $muscle: [IMuscle], $limit: Int!, $offset: Int!) {
     getFitnessListByKeywords(name: $name, category: $category, muscle: $muscle, limit: $limit, offset: $offset) {
       ...Fitness
     }
@@ -18,8 +18,8 @@ export interface FitnessListByKeywordsParams {
   name?: string;
   category?: FitnessCategory[];
   muscle?: FitnessMuscle[];
-  limit?: number;
-  offset?: number;
+  limit: number;
+  offset: number;
 }
 
 export const useFitnessListByKeywordsQuery = (
@@ -31,7 +31,12 @@ export const useFitnessListByKeywordsQuery = (
     ...options,
     queryKey: ['fitness', 'byKeywords', params],
     queryFn: async () => {
-      const result = await graphqlClient.request<{ getFitnessListByKeywords: Fitness[] }>(query, params);
+      const result = await graphqlClient.request<{ getFitnessListByKeywords: Fitness[] }>(query, params).catch(e => {
+        console.error(e)
+        return {
+          getFitnessListByKeywords: []
+        }
+      });
       return result.getFitnessListByKeywords;
     },
   })
