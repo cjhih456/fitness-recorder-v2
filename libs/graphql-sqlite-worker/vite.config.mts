@@ -50,4 +50,19 @@ export default defineConfig({
       ]
     },
   },
+  test: {
+    name: 'graphql-sqlite-worker',
+    watch: false,
+    globals: true,
+    environment: 'node',
+    include: [
+      'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+      'scripts/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts}',
+    ],
+    reporters: ['default'],
+    coverage: {
+      reportsDirectory: '../../coverage/libs/graphql-sqlite-worker',
+      provider: 'v8' as const,
+    },
+  },
 })
