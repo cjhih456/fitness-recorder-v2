@@ -21,11 +21,14 @@
       "types": "./dist/worker/serviceWorker.d.ts",
       "import": "./dist/worker/serviceWorker.mjs",
       "require": "./dist/worker/serviceWorker.js"
-    }
+    },
+    "./seedDb": "./src/assets/seed.db"
   },
   "files": [
     "./dist/worker/sqlite3.wasm",
-    "./dist/worker/sqlite3-opfs-async-proxy.js"
+    "./dist/worker/sqlite3-opfs-async-proxy.js",
+    "./dist/worker/seed.db",
+    "./src/assets/seed.db"
   ],
   "dependencies": {
     "@fitness-recoder/structure": "workspace:*",
@@ -40,15 +43,33 @@
     "graphql-request": "^7.4.0",
     "graphql-yoga": "^5.18.0",
     "react": "^19.0.0",
+    "version-sort": "^0.1.1",
     "vite": "^7.0.0",
     "vite-plugin-dts": "~4.5.0",
     "vite-plugin-graphql-loader": "^4.0.4",
-    "version-sort": "^0.1.1",
     "vite-plugin-static-copy": "^3.1.4"
   },
   "nx": {
     "targets": {
+      "generate-seed-db": {
+        "executor": "nx:run-commands",
+        "cache": true,
+        "inputs": [
+          "{projectRoot}/src/lib/**/*",
+          "{projectRoot}/scripts/**/*",
+          "{projectRoot}/src/lib/fitness-datas/**/*"
+        ],
+        "outputs": [
+          "{projectRoot}/src/assets/seed.db"
+        ],
+        "options": {
+          "command": "yarn tsx libs/graphql-sqlite-worker/scripts/generate-seed-db.ts"
+        }
+      },
       "build-lib": {
+        "dependsOn": [
+          "generate-seed-db"
+        ],
         "executor": "@nx/vite:build",
         "options": {
           "configFile": "libs/graphql-sqlite-worker/vite.config.mts",
@@ -57,7 +78,8 @@
       },
       "build-worker": {
         "dependsOn": [
-          "build-lib"
+          "build-lib",
+          "generate-seed-db"
         ],
         "executor": "@nx/vite:build",
         "options": {
