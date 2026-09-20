@@ -152,7 +152,7 @@ export default function PhotoSession({ schedule }: PhotoSessionProps) {
           type="button"
           variant="outline"
           className={`flex-1 rounded-2xl py-6 font-semibold ${
-            hasImage ? '' : 'border-blue-600 text-blue-600 hover:bg-blue-50'
+            hasImage ? '' : 'border-brand text-brand-text hover:bg-brand-soft'
           }`}
           onClick={handleChangePhoto}
         >
@@ -160,7 +160,7 @@ export default function PhotoSession({ schedule }: PhotoSessionProps) {
         </Button>
         <Button
           type="button"
-          className="flex-1 rounded-2xl bg-blue-600 py-6 font-bold text-white hover:bg-blue-700 disabled:opacity-40"
+          className="flex-1 rounded-2xl bg-brand py-6 font-bold text-brand-foreground hover:bg-brand/90 disabled:opacity-40"
           disabled={!hasImage || isSaving}
           onClick={handleSave}
         >

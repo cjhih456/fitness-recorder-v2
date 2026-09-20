@@ -28,7 +28,7 @@ export default function PhotoEmptySession({
       </div>
       <Button
         type="button"
-        className="rounded-full px-5 py-3 text-[13px] font-semibold"
+        className="rounded-full px-5 py-3 text-[13px] font-semibold bg-brand text-brand-foreground hover:bg-brand/90"
         onClick={handleStart}
       >
         {t('photo.startWorkout')}
