@@ -94,7 +94,6 @@ describe('Dashboard page', () => {
     renderDashboard();
 
     expect(useExercisePresetListQuery).toHaveBeenCalledWith({
-      offset: 0,
       size: 20,
     });
     expect(screen.getByText('오늘 시작할 루틴이 없습니다')).toBeTruthy();

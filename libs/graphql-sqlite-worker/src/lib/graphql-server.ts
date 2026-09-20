@@ -5,6 +5,7 @@
 
 export interface GraphQLServiceWorkerOptions {
   serviceWorkerUrl: string;
+  scope: string;
   onActive?: (worker: GraphQLServiceWorker) => void;
 }
 
@@ -27,10 +28,11 @@ export class GraphQLServiceWorker {
 
   constructor({
     serviceWorkerUrl,
+    scope,
     onActive,
-  }: GraphQLServiceWorkerOptions = { serviceWorkerUrl: '' }) {
+  }: GraphQLServiceWorkerOptions = { serviceWorkerUrl: '', scope: '/' }) {
     this.onActive = onActive;
-    this.readyPromise = this.register(serviceWorkerUrl);
+    this.readyPromise = this.register(serviceWorkerUrl, scope);
   }
 
   /**
@@ -41,14 +43,14 @@ export class GraphQLServiceWorker {
     return this.readyPromise;
   }
 
-  private async register(serviceWorkerUrl: string): Promise<void> {
+  private async register(serviceWorkerUrl: string, scope: string): Promise<void> {
     try {
       const registration = await navigator.serviceWorker.register(
         serviceWorkerUrl,
         {
           type: 'module',
           updateViaCache: 'imports',
-          scope: resolveServiceWorkerScope(serviceWorkerUrl, document.baseURI),
+          scope,
         }
       );
       this.registration = registration;

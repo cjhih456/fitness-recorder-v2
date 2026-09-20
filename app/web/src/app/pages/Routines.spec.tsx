@@ -90,7 +90,6 @@ describe('Routines page', () => {
     renderRoutines();
 
     expect(useExercisePresetListQuery).toHaveBeenCalledWith({
-      offset: 0,
       size: 20,
     });
     expect(screen.getByText('나만의 루틴을 만들어 보세요')).toBeTruthy();

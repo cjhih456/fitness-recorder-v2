@@ -59,26 +59,53 @@ export const getExerciseByIds: ResponseBuilder<{ ids: number[] | number }, Exerc
   return (result ?? []).map(parseExercise)
 }
 
-export const getExerciseByExercisePresetId: ResponseBuilder<{ exercisePresetId: number }, ExerciseData[]> = async (
+function withOffsetLimit(
+  sql: string,
+  args: number[],
+  offset?: number,
+  size?: number,
+): { sql: string; args: number[] } {
+  if (size === undefined) {
+    return { sql, args }
+  }
+  return {
+    sql: `${sql} order by id limit ?, ?`,
+    args: [...args, offset ?? 0, size],
+  }
+}
+
+export const getExerciseByExercisePresetId: ResponseBuilder<{ exercisePresetId: number, offset?: number, size?: number }, ExerciseData[]> = async (
   { dbBus },
-  { exercisePresetId }
+  { exercisePresetId, offset, size }
 ) => {
+  const paged = withOffsetLimit(
+    'select * from exercise where id in (select exerciseId from exercisePreset_exercise where exercisePresetId = ?)',
+    [exercisePresetId],
+    offset,
+    size,
+  )
   const result = await dbBus?.sendTransaction<ExerciseData>(
     'selects',
-    'select * from exercise where id in (select exerciseId from exercisePreset_exercise where exercisePresetId = ?)',
-    [exercisePresetId]
+    paged.sql,
+    paged.args
   )
   return (result ?? []).map(parseExercise)
 }
 
-export const getExerciseByScheduleId: ResponseBuilder<{ scheduleId: number }, ExerciseData[]> = async (
+export const getExerciseByScheduleId: ResponseBuilder<{ scheduleId: number, offset?: number, size?: number }, ExerciseData[]> = async (
   { dbBus },
-  { scheduleId }
+  { scheduleId, offset, size }
 ) => {
+  const paged = withOffsetLimit(
+    'select * from exercise where id in (select exerciseId from schedule_exercise where scheduleId = ?)',
+    [scheduleId],
+    offset,
+    size,
+  )
   const result = await dbBus?.sendTransaction<ExerciseData>(
     'selects',
-    'select * from exercise where id in (select exerciseId from schedule_exercise where scheduleId = ?)',
-    [scheduleId]
+    paged.sql,
+    paged.args
   )
   return (result ?? []).map(parseExercise)
 }

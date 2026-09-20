@@ -4,6 +4,7 @@ import { Button } from '@fitness-recoder/ui';
 import { ChevronLeft } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import VirtualList from '../../../utils/VirtualList';
 import MuscleChip from '../history/MuscleChip';
 import {
   formatHistoryDateLabel,
@@ -134,11 +135,16 @@ export default function HistoryDetailSection({
           {t('history.sessionEmpty')}
         </p>
       ) : (
-        <div className="flex flex-col gap-4">
-          {exercises.map((exercise) => (
-            <HistoryExerciseCard key={exercise.id} exercise={exercise} />
-          ))}
-        </div>
+        <VirtualList
+          items={exercises}
+          estimateSize={200}
+          gap={16}
+          scroll="window"
+          getItemKey={(exercise) => exercise.id}
+          renderItem={(exercise) => (
+            <HistoryExerciseCard exercise={exercise} />
+          )}
+        />
       )}
     </div>
   );

@@ -11,7 +11,7 @@ import {
   useRef,
   type ReactNode,
 } from 'react';
-import { GraphQLServiceWorker } from '../lib/graphql-server';
+import { GraphQLServiceWorker, resolveServiceWorkerScope } from '../lib/graphql-server';
 import { initializeDatabase, insertInitialFitnessData } from '../lib/init';
 import { SQLiteWorker, type SQLiteWorkerConfig } from '../lib/sqlite-worker';
 import {
@@ -60,6 +60,8 @@ export interface GraphQLSQLiteWorkerProviderProps {
   workerConfig: SQLiteWorkerConfig;
   /** 자동 초기화 여부 */
   autoInit?: boolean;
+  /** 개발 환경 여부 */
+  isDev?: boolean;
   /** 자식 컴포넌트 */
   children: React.ReactNode;
   /** Service Worker URL */
@@ -85,6 +87,7 @@ const DefaultFallback = () => (
 export function GraphQLSQLiteWorkerProvider({
   workerConfig,
   autoInit = true,
+  isDev = false,
   children,
   serviceWorkerUrl,
   fallback,
@@ -139,6 +142,7 @@ export function GraphQLSQLiteWorkerProvider({
         if (!graphQLServer.current) {
           const server = new GraphQLServiceWorker({
             serviceWorkerUrl,
+            scope: isDev ? '/' : resolveServiceWorkerScope(serviceWorkerUrl, document.baseURI),
           });
           graphQLServer.current = server;
           await server.whenReady();
@@ -159,7 +163,7 @@ export function GraphQLSQLiteWorkerProvider({
     })();
 
     return initPromiseRef.current;
-  }, [workerConfig, serviceWorkerUrl]);
+  }, [workerConfig, serviceWorkerUrl, isDev]);
 
   /**
    * 자동 초기화

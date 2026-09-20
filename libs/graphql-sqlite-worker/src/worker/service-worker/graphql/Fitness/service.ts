@@ -50,7 +50,7 @@ export const getFitnessListByKeywords: ResponseBuilder<GetFitnessListByKeywordsA
       argsQuery.push(`%${m}%`)
     })
   }
-  const query = `select * from fitness ${whereQuery.length ? 'where ' + whereQuery.join(' and ') : ''} limit ?,?`
+  const query = `select * from fitness ${whereQuery.length ? 'where ' + whereQuery.join(' and ') : ''} order by id limit ?,?`
   const result = await dbBus?.sendTransaction<FitnessDB>(
     'selects',
     query,

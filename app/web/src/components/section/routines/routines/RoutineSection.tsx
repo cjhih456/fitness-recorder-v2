@@ -3,6 +3,7 @@ import { Button, Spinner } from '@fitness-recoder/ui';
 import { Plus } from 'lucide-react';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import VirtualList from '../../../utils/VirtualList';
 import SectionSkeleton from '../../SectionSkeleton';
 import Routine from './Routine';
 import RoutineEmpty from './RoutineEmpty';
@@ -10,7 +11,10 @@ import RoutineEmpty from './RoutineEmpty';
 interface RoutineSectionProps {
   data: ExercisePresetWithExerciseList[];
   isLoading?: boolean;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
   startingPresetId?: number | null;
+  onLoadMore?: () => void;
   onClickCreateRoutine?: () => void;
   onClickDeleteRoutine?: (routine: ExercisePresetWithExerciseList) => void;
   onClickEditRoutine?: (routine: ExercisePresetWithExerciseList) => void;
@@ -21,7 +25,10 @@ interface RoutineSectionProps {
 export default function RoutineSection({
   data,
   isLoading = false,
+  hasNextPage = false,
+  isFetchingNextPage = false,
   startingPresetId = null,
+  onLoadMore,
   onClickCreateRoutine,
   onClickDeleteRoutine,
   onClickEditRoutine,
@@ -72,28 +79,38 @@ export default function RoutineSection({
             {t('routines.create')}
           </Button>
         ),
-        default: (
-          <div className="flex flex-col gap-4">
-            {isLoading ? (
-              <div className="flex justify-center py-12">
+        default: isLoading ? (
+          <div className="flex justify-center py-12">
+            <Spinner />
+          </div>
+        ) : data.length === 0 ? (
+          <RoutineEmpty onClickCreateRoutine={handleCreateRoutine} />
+        ) : (
+          <VirtualList
+            items={data}
+            estimateSize={188}
+            gap={16}
+            scroll="window"
+            getItemKey={(routine) => routine.id}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            onLoadMore={onLoadMore}
+            renderLoader={() => (
+              <div className="flex justify-center py-4">
                 <Spinner />
               </div>
-            ) : data.length === 0 ? (
-              <RoutineEmpty onClickCreateRoutine={handleCreateRoutine} />
-            ) : (
-              data.map((routine) => (
-                <Routine
-                  key={routine.id}
-                  routine={routine}
-                  onClickDeleteRoutine={handleDeleteRoutine}
-                  onClickEditRoutine={handleEditRoutine}
-                  onClickStartRoutine={handleStartRoutine}
-                  onClickOpenActions={handleOpenActions}
-                  isStarting={startingPresetId === routine.id}
-                />
-              ))
             )}
-          </div>
+            renderItem={(routine) => (
+              <Routine
+                routine={routine}
+                onClickDeleteRoutine={handleDeleteRoutine}
+                onClickEditRoutine={handleEditRoutine}
+                onClickStartRoutine={handleStartRoutine}
+                onClickOpenActions={handleOpenActions}
+                isStarting={startingPresetId === routine.id}
+              />
+            )}
+          />
         ),
       }}
     </SectionSkeleton>

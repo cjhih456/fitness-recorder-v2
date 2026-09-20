@@ -21,6 +21,7 @@ vi.mock('../lib/graphql-server', () => ({
   GraphQLServiceWorker: class {
     whenReady = whenReadyMock;
   },
+  resolveServiceWorkerScope: () => '/',
 }));
 
 vi.mock('../lib/init', () => ({

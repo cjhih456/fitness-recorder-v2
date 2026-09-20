@@ -2,8 +2,9 @@ import type { Fitness } from '@fitness-recoder/structure';
 import { hooks } from '@fitness-recoder/graphql-sqlite-worker';
 import { Button, Input, Spinner } from '@fitness-recoder/ui';
 import { Search, X } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState, type UIEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import VirtualList from '../../utils/VirtualList';
 import FitnessItem from '../workout/fitnessSearchDrawer/FitnessItem';
 
 const FITNESS_PICKER_PAGE_SIZE = 40;
@@ -22,15 +23,11 @@ export default function FitnessPicker({
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [offset, setOffset] = useState(0);
-  const [loadedItems, setLoadedItems] = useState<Fitness[]>([]);
 
   useEffect(() => {
     if (!open) {
       setSearchQuery('');
       setDebouncedQuery('');
-      setOffset(0);
-      setLoadedItems([]);
       return;
     }
     const timer = window.setTimeout(() => {
@@ -39,35 +36,22 @@ export default function FitnessPicker({
     return () => window.clearTimeout(timer);
   }, [open, searchQuery]);
 
-  useEffect(() => {
-    setOffset(0);
-    setLoadedItems([]);
-  }, [debouncedQuery]);
-
   const listParams = useMemo(
     () => ({
       ...(debouncedQuery ? { name: debouncedQuery } : {}),
       limit: FITNESS_PICKER_PAGE_SIZE,
-      offset,
     }),
-    [debouncedQuery, offset],
+    [debouncedQuery],
   );
 
-  const { data = [], isLoading, isFetching } = hooks.useFitnessListByKeywordsQuery(
-    listParams,
-    { enabled: open },
-  );
-
-  useEffect(() => {
-    if (!open || isFetching || offset === 0) return;
-    setLoadedItems((prev) => {
-      const seen = new Set(prev.map((item) => item.id));
-      const next = data.filter((item) => !seen.has(item.id));
-      return next.length > 0 ? [...prev, ...next] : prev;
-    });
-  }, [open, isFetching, data, offset]);
-
-  const items = offset === 0 ? data : loadedItems;
+  const {
+    data = [],
+    isLoading,
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = hooks.useFitnessListByKeywordsQuery(listParams, { enabled: open });
 
   const handleClose = useCallback(() => {
     onOpenChange?.(false);
@@ -78,19 +62,12 @@ export default function FitnessPicker({
       onSelect?.(fitness);
       onOpenChange?.(false);
     },
-    [onSelect, onOpenChange],
+    [onOpenChange, onSelect],
   );
 
-  const handleListScroll = useCallback(
-    (event: UIEvent<HTMLDivElement>) => {
-      if (isFetching || data.length < FITNESS_PICKER_PAGE_SIZE) return;
-      const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
-      if (scrollHeight - scrollTop - clientHeight > 80) return;
-      setLoadedItems((prev) => (offset === 0 ? data : prev));
-      setOffset((prev) => prev + FITNESS_PICKER_PAGE_SIZE);
-    },
-    [data, isFetching, offset],
-  );
+  const handleLoadMore = useCallback(() => {
+    void fetchNextPage();
+  }, [fetchNextPage]);
 
   useEffect(() => {
     if (!open) return;
@@ -105,7 +82,7 @@ export default function FitnessPicker({
 
   if (!open) return null;
 
-  const showEmpty = !isLoading && !isFetching && items.length === 0;
+  const showEmpty = !isLoading && !isFetching && data.length === 0;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center">
@@ -160,32 +137,39 @@ export default function FitnessPicker({
           </div>
         </div>
 
-        <div
-          className="min-h-0 flex-1 space-y-2 overflow-y-auto px-4 pb-6"
-          onScroll={handleListScroll}
-        >
-          {showEmpty ? (
-            <div className="flex flex-col items-center justify-center gap-1 py-16 text-center">
-              <p className="font-bold text-foreground">{t('routines.searchEmptyTitle')}</p>
-              <p className="text-sm text-muted-foreground">
-                {t('routines.searchEmptyHint')}
-              </p>
-            </div>
-          ) : (
-            items.map((fitness) => (
-              <FitnessItem
-                key={fitness.id}
-                fitness={fitness}
-                onClick={handleSelect}
-              />
-            ))
-          )}
-          {(isLoading || isFetching) && !showEmpty ? (
-            <div className="flex justify-center py-4">
-              <Spinner />
-            </div>
-          ) : null}
-        </div>
+        {showEmpty ? (
+          <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-1 px-4 py-16 text-center">
+            <p className="font-bold text-foreground">{t('routines.searchEmptyTitle')}</p>
+            <p className="text-sm text-muted-foreground">
+              {t('routines.searchEmptyHint')}
+            </p>
+          </div>
+        ) : (
+          <VirtualList
+            items={data}
+            estimateSize={72}
+            gap={8}
+            scroll="element"
+            className="min-h-0 flex-1 overflow-y-auto px-4 pb-6"
+            getItemKey={(fitness) => fitness.id}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            onLoadMore={handleLoadMore}
+            renderLoader={() => (
+              <div className="flex justify-center py-4">
+                <Spinner />
+              </div>
+            )}
+            renderItem={(fitness) => (
+              <FitnessItem fitness={fitness} onClick={handleSelect} />
+            )}
+          />
+        )}
+        {isLoading && data.length === 0 ? (
+          <div className="flex justify-center py-4">
+            <Spinner />
+          </div>
+        ) : null}
       </div>
     </div>
   );

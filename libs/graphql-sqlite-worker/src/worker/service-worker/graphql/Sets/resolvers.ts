@@ -9,8 +9,8 @@ export default (): IResolvers<unknown, GraphQLResolveInfo> => {
   const getSetByIdShell: ResponseResolver<{ id: number }, SetData | null> = async (_, { id }, context) => {
     return getSetById(context, { id })
   }
-  const getSetListByExerciseIdShell: ResponseResolver<{ id: number }, SetData[]> = async (_, { id }, context) => {
-    return getSetListByExerciseId(context, { id })
+  const getSetListByExerciseIdShell: ResponseResolver<{ id: number, offset?: number, size?: number }, SetData[]> = async (_, { id, offset, size }, context) => {
+    return getSetListByExerciseId(context, { id, offset, size })
   }
   const createSetShell: ResponseResolver<{ sets: SetCreateType }, SetData | null> = async (_, { sets }, context) => {
     return createSet(context, { sets })

@@ -38,10 +38,18 @@ function useWeeklyVolumeData(): ChartData[] {
 export default function Dashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { data = [], isLoading } = hooks.useExercisePresetListQuery({
-    offset: 0,
+  const {
+    data = [],
+    isLoading,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = hooks.useExercisePresetListQuery({
     size: 20,
   });
+  const loadMore = useCallback(() => {
+    void fetchNextPage();
+  }, [fetchNextPage]);
   const cloneMutation = hooks.useCloneScheduleFromPresetMutation();
   const [startingPresetId, setStartingPresetId] = useState<number | null>(null);
   const volumeData = useWeeklyVolumeData();
@@ -78,6 +86,9 @@ export default function Dashboard() {
         data={data}
         dateLabel={dateLabel}
         startingPresetId={startingPresetId}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        onLoadMore={loadMore}
         onClickStartWorkout={handleStartWorkout}
         onClickCreateRoutine={handleCreateRoutine}
       />

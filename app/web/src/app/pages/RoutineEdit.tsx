@@ -14,6 +14,7 @@ import {
   type DraftSet,
 } from '../../components/section/routine-edit/types';
 import DeleteRoutineConfirm from '../../components/section/routines/routines/DeleteRoutineConfirm';
+import VirtualList from '../../components/utils/VirtualList';
 
 export default function RoutineEdit() {
   const { t } = useTranslation();
@@ -332,16 +333,20 @@ export default function RoutineEdit() {
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {exercises.map((exercise) => (
+          <VirtualList
+            items={exercises}
+            estimateSize={220}
+            gap={16}
+            scroll="window"
+            getItemKey={(exercise) => exercise.localId}
+            renderItem={(exercise) => (
               <RoutineExerciseCard
-                key={exercise.localId}
                 exercise={exercise}
                 onRemove={handleRemoveExercise}
                 onChangeSets={handleChangeSets}
               />
-            ))}
-          </div>
+            )}
+          />
         )}
 
         <Button

@@ -35,9 +35,15 @@ type ExerciseHistoryData {
 type Query {
   getExerciseListByIds(ids: [Int!]): [ExerciseWithFitness!]
   getExerciseById(id: Int!): ExerciseWithFitness
-  getExerciseListByScheduleId(scheduleId: Int): [ExerciseWithFitness!]
+  getExerciseListByScheduleId(
+    scheduleId: Int
+    offset: Int
+    size: Int
+  ): [ExerciseWithFitness!]
   getExerciseListByExercisePresetId(
     exercisePresetId: Int
+    offset: Int
+    size: Int
   ): [ExerciseWithFitness!]
   getExerciseFinishHistory(fitnessId: Int): [ExerciseHistoryData!]
 }

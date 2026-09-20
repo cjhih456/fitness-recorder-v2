@@ -23,6 +23,7 @@ export function App() {
     <ThemeProvider defaultTheme="light" enableSystem={false} attribute="class">
       <SuspenseBoundary fallback={<PageLoadingSkeleton />}>
         <GraphQLSQLiteWorkerProvider
+          isDev={import.meta.env.DEV}
           workerConfig={{
             dbName: 'fitness.db',
             appVersion: APP_VERSION,

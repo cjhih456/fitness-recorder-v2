@@ -26,13 +26,17 @@ export const getSetById: ResponseBuilder<{ id: number }, SetData | null> = async
   )
   return set?.[0] ? parseSet(set[0]) : null
 }
-export const getSetListByExerciseId: ResponseBuilder<{ id: number }, SetData[]> = async (
+export const getSetListByExerciseId: ResponseBuilder<{ id: number, offset?: number, size?: number }, SetData[]> = async (
   { dbBus },
-  { id }
+  { id, offset, size }
 ) => {
+  const hasPaging = size !== undefined
   const setList = await dbBus?.sendTransaction<SetData>(
-    'selects', 'select * from sets where exerciseId=?',
-    [id]
+    'selects',
+    hasPaging
+      ? 'select * from sets where exerciseId=? order by id limit ?, ?'
+      : 'select * from sets where exerciseId=?',
+    hasPaging ? [id, offset ?? 0, size] : [id]
   )
   return (setList || []).map(parseSet)
 }

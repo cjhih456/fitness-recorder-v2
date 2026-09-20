@@ -110,6 +110,9 @@ describe('RoutineEdit page', () => {
       data: [mockFitness],
       isLoading: false,
       isFetching: false,
+      isFetchingNextPage: false,
+      hasNextPage: false,
+      fetchNextPage: vi.fn(),
     });
   });
 
