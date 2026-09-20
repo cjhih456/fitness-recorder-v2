@@ -2,6 +2,7 @@ import type { SetData } from '@fitness-recoder/structure';
 import { Input } from '@fitness-recoder/ui';
 import { CheckCircle2, Trash2 } from 'lucide-react';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ExerciseSetInputProps {
   set: SetData;
@@ -18,6 +19,7 @@ export default function ExerciseSetInput({
   onUpdate,
   onDelete,
 }: ExerciseSetInputProps) {
+  const { t } = useTranslation();
   const handleWeightChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onUpdate({
@@ -64,7 +66,10 @@ export default function ExerciseSetInput({
         <Input
           type="number"
           inputMode="decimal"
-          aria-label={`${exerciseName} ${index + 1}세트 무게`}
+          aria-label={t('workout.setWeightAria', {
+            name: exerciseName,
+            index: index + 1,
+          })}
           value={set.weight ?? 0}
           onChange={handleWeightChange}
           className="rounded-lg border-none bg-background p-2 text-center font-bold shadow-sm"
@@ -74,7 +79,10 @@ export default function ExerciseSetInput({
         <Input
           type="number"
           inputMode="numeric"
-          aria-label={`${exerciseName} ${index + 1}세트 횟수`}
+          aria-label={t('workout.setRepsAria', {
+            name: exerciseName,
+            index: index + 1,
+          })}
           value={set.repeat}
           onChange={handleRepeatChange}
           className="rounded-lg border-none bg-background p-2 text-center font-bold shadow-sm"
@@ -83,7 +91,10 @@ export default function ExerciseSetInput({
       <div className="col-span-2 flex items-center justify-center">
         <button
           type="button"
-          aria-label={`${exerciseName} ${index + 1}세트 완료`}
+          aria-label={t('workout.setDoneAria', {
+            name: exerciseName,
+            index: index + 1,
+          })}
           aria-pressed={set.isDone}
           onClick={handleToggleDone}
           className={`flex h-9 w-9 items-center justify-center rounded-full transition-all ${
@@ -98,7 +109,10 @@ export default function ExerciseSetInput({
       <div className="col-span-2 flex items-center justify-center">
         <button
           type="button"
-          aria-label={`${exerciseName} ${index + 1}세트 삭제`}
+          aria-label={t('workout.setDeleteAria', {
+            name: exerciseName,
+            index: index + 1,
+          })}
           onClick={handleDelete}
           className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-100 hover:text-red-500 dark:hover:bg-zinc-800"
         >

@@ -1,5 +1,6 @@
 import type { SetData } from '@fitness-recoder/structure';
 import { CheckCircle2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface HistorySetRowProps {
   set: SetData;
@@ -12,6 +13,7 @@ export default function HistorySetRow({
   index,
   exerciseName,
 }: HistorySetRowProps) {
+  const { t } = useTranslation();
   return (
     <div
       className={`grid grid-cols-12 gap-2 rounded-xl border p-2 ${
@@ -19,7 +21,10 @@ export default function HistorySetRow({
           ? 'border-green-200 bg-green-50 opacity-90 dark:border-green-800 dark:bg-green-900/20'
           : 'border-transparent bg-zinc-50 dark:bg-zinc-900/50'
       }`}
-      aria-label={`${exerciseName} ${index + 1}세트`}
+      aria-label={t('history.setAria', {
+        name: exerciseName,
+        index: index + 1,
+      })}
     >
       <div className="col-span-2 flex items-center justify-center font-bold text-zinc-500">
         {index + 1}
@@ -36,7 +41,11 @@ export default function HistorySetRow({
       </div>
       <div className="col-span-2 flex items-center justify-center">
         <span
-          aria-label={`${exerciseName} ${index + 1}세트 ${set.isDone ? '완료' : '미완료'}`}
+          aria-label={t('history.setDoneAria', {
+            name: exerciseName,
+            index: index + 1,
+            status: set.isDone ? t('common.done') : t('common.incomplete'),
+          })}
           className={`flex h-9 w-9 items-center justify-center rounded-full ${
             set.isDone
               ? 'bg-green-500 text-white shadow-md'

@@ -2,6 +2,7 @@ import type { ExercisePresetWithExerciseList } from '@fitness-recoder/structure'
 import { Button, Card, CardContent } from '@fitness-recoder/ui';
 import { ChevronRight, Dumbbell } from 'lucide-react';
 import { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { formatPresetTarget } from './formatPresetTarget';
 
 interface TodayRoutineProps {
@@ -15,9 +16,10 @@ export default function TodayRoutine({
   onClickStartWorkout,
   isStarting = false,
 }: TodayRoutineProps) {
+  const { t } = useTranslation();
   const target = useMemo(
-    () => formatPresetTarget(routine),
-    [routine],
+    () => formatPresetTarget(routine, t),
+    [routine, t],
   );
   const exerciseCount = routine.exerciseList?.length ?? 0;
 
@@ -37,7 +39,7 @@ export default function TodayRoutine({
           handleStartWorkout();
         }
       }}
-      aria-label={`${routine.name} 시작`}
+      aria-label={t('dashboard.startRoutineAria', { name: routine.name })}
       aria-disabled={isStarting}
     >
       <CardContent className="flex items-center justify-between p-4">
@@ -50,7 +52,10 @@ export default function TodayRoutine({
               {routine.name}
             </h3>
             <p className="text-sm text-zinc-500">
-              {target} • {exerciseCount}개 종목
+              {t('dashboard.routineMeta', {
+                target,
+                count: exerciseCount,
+              })}
             </p>
           </div>
         </div>

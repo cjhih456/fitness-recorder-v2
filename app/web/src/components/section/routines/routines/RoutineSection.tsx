@@ -2,6 +2,7 @@ import type { ExercisePresetWithExerciseList } from '@fitness-recoder/structure'
 import { Button, Spinner } from '@fitness-recoder/ui';
 import { Plus } from 'lucide-react';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import SectionSkeleton from '../../SectionSkeleton';
 import Routine from './Routine';
 import RoutineEmpty from './RoutineEmpty';
@@ -27,6 +28,7 @@ export default function RoutineSection({
   onClickStartRoutine,
   onClickOpenActions,
 }: RoutineSectionProps) {
+  const { t } = useTranslation();
   const handleDeleteRoutine = useCallback(
     (routine: ExercisePresetWithExerciseList) => {
       onClickDeleteRoutine?.(routine);
@@ -56,7 +58,7 @@ export default function RoutineSection({
   }, [onClickCreateRoutine]);
 
   return (
-    <SectionSkeleton title="나의 루틴" useCard={false}>
+    <SectionSkeleton title={t('routines.mine')} useCard={false}>
       {{
         subtitle: (
           <Button
@@ -67,7 +69,7 @@ export default function RoutineSection({
             onClick={handleCreateRoutine}
           >
             <Plus size={20} />
-            루틴 생성
+            {t('routines.create')}
           </Button>
         ),
         default: (

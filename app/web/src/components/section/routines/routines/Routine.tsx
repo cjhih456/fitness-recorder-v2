@@ -12,6 +12,7 @@ import {
 } from '@fitness-recoder/ui';
 import { Trash2 } from 'lucide-react';
 import { useCallback, useMemo, type MouseEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface RoutineProps {
   routine: ExercisePresetWithExerciseList;
@@ -30,16 +31,25 @@ export default function Routine({
   onClickOpenActions,
   isStarting = false,
 }: RoutineProps) {
+  const { t } = useTranslation();
   const target = useMemo(() => {
     const targets = routine.exerciseList
       .map((exercise) => exercise.fitness?.primaryMuscles)
       .filter(Boolean)
       .flat();
     const uniqueTargets = Array.from(new Set(targets));
-    if (uniqueTargets.length === 0) return '없음';
-    if (uniqueTargets.length < 3) return uniqueTargets.join(', ');
-    return `${uniqueTargets.slice(0, 3).join(', ')} 외 ${uniqueTargets.length - 3}부위`;
-  }, [routine.exerciseList]);
+    if (uniqueTargets.length === 0) return t('routines.none');
+    const labels = uniqueTargets.map((muscle) => {
+      const key = `muscle.${muscle}`;
+      const translated = t(key as never);
+      return translated === key ? muscle : translated;
+    });
+    if (labels.length < 3) return labels.join(', ');
+    return t('routines.moreTargets', {
+      targets: labels.slice(0, 3).join(', '),
+      count: labels.length - 3,
+    });
+  }, [routine.exerciseList, t]);
 
   const mostCategory = useMemo(() => {
     const categories = routine.exerciseList
@@ -118,7 +128,7 @@ export default function Routine({
             size="icon-sm"
             className="text-zinc-400 hover:text-red-500"
             onClick={handleDeleteRoutine}
-            aria-label={`${routine.name} 삭제`}
+            aria-label={t('routines.deleteAria', { name: routine.name })}
           >
             <Trash2 size={16} />
           </Button>
@@ -134,7 +144,7 @@ export default function Routine({
             onClick={handleStartRoutine}
             disabled={isStarting}
           >
-            이 루틴으로 시작
+            {t('routines.startWithThis')}
           </Button>
           <Separator />
           <Button
@@ -143,7 +153,7 @@ export default function Routine({
             className="rounded-t-none rounded-b-2xl w-full text-xs font-bold text-blue-600 dark:text-blue-400"
             onClick={handleEditRoutine}
           >
-            편집하기
+            {t('routines.editAction')}
           </Button>
         </div>
       </CardFooter>

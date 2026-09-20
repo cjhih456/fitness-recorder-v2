@@ -3,6 +3,7 @@ import { hooks } from '@fitness-recoder/graphql-sqlite-worker';
 import { Button, Card, CardContent } from '@fitness-recoder/ui';
 import { Plus } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ExerciseSetInput from './ExerciseSetInput';
 import RecentRecordsSheet, {
   type RecentRecordRow,
@@ -23,8 +24,9 @@ export default function ExerciseCard({
   onDeleteSet,
   onSetsLoaded,
 }: ExerciseCardProps) {
+  const { t } = useTranslation();
   const [recordsOpen, setRecordsOpen] = useState(false);
-  const exerciseName = exercise.fitness?.name ?? '운동';
+  const exerciseName = exercise.fitness?.name ?? t('workout.exerciseFallback');
 
   const { data: sets = [] } = hooks.useSetListByExerciseIdQuery(exercise.id);
   const { data: history = [] } = hooks.useExerciseFinishHistoryQuery(
@@ -42,12 +44,15 @@ export default function ExerciseCard({
     return history.flatMap((entry) =>
       entry.historyList.map((set, index) => ({
         id: `${entry.id}-${index}`,
-        dateLabel: `${entry.month}월 ${entry.date}일`,
+        dateLabel: t('workout.historyDate', {
+          month: entry.month,
+          date: entry.date,
+        }),
         weight: set.weight,
         repeat: set.repeat,
       })),
     );
-  }, [history]);
+  }, [history, t]);
 
   return (
     <>
@@ -65,16 +70,16 @@ export default function ExerciseCard({
               className="text-xs text-zinc-500"
               onClick={() => setRecordsOpen(true)}
             >
-              기록 확인
+              {t('workout.checkRecords')}
             </Button>
           </div>
 
           <div className="grid grid-cols-12 gap-2 px-2 text-[11px] font-bold uppercase text-zinc-400">
-            <div className="col-span-2 text-center">세트</div>
-            <div className="col-span-3 text-center">무게 (kg)</div>
-            <div className="col-span-3 text-center">횟수</div>
-            <div className="col-span-2 text-center">완료</div>
-            <div className="col-span-2 text-center">삭제</div>
+            <div className="col-span-2 text-center">{t('workout.set')}</div>
+            <div className="col-span-3 text-center">{t('workout.weightKg')}</div>
+            <div className="col-span-3 text-center">{t('workout.reps')}</div>
+            <div className="col-span-2 text-center">{t('common.done')}</div>
+            <div className="col-span-2 text-center">{t('common.delete')}</div>
           </div>
 
           {sets.map((set, index) => (
@@ -95,7 +100,7 @@ export default function ExerciseCard({
             onClick={handleAddSet}
           >
             <Plus size={18} className="mr-2" />
-            세트 추가
+            {t('workout.addSet')}
           </Button>
         </CardContent>
       </Card>

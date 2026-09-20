@@ -1,9 +1,12 @@
+import { useTranslation } from 'react-i18next';
+
 export default function PageLoadingSkeleton() {
+  const { t } = useTranslation();
   return (
     <div
       className="max-w-md mx-auto space-y-6 p-4"
       aria-busy="true"
-      aria-label="로딩 중"
+      aria-label={t('common.loading')}
     >
       <div className="space-y-2">
         <div className="h-4 w-28 animate-pulse rounded-md bg-muted" />

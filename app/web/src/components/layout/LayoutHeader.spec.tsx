@@ -62,4 +62,15 @@ describe('LayoutHeader Settings', () => {
 
     expect(screen.queryByRole('dialog')).toBeNull();
   });
+
+  it('changes language when language control is used', async () => {
+    const user = userEvent.setup();
+    render(<LayoutHeader />);
+
+    await user.click(screen.getByRole('button', { name: '설정' }));
+    await user.click(screen.getByRole('button', { name: 'English' }));
+
+    expect(screen.getByRole('heading', { name: 'Settings' })).toBeTruthy();
+    expect(screen.getByText('Theme')).toBeTruthy();
+  });
 });

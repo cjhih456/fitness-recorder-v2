@@ -1,6 +1,7 @@
 import type { ExercisePresetWithExerciseList } from '@fitness-recoder/structure';
 import { Button } from '@fitness-recoder/ui';
 import { useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface RoutineCardActionsProps {
   open: boolean;
@@ -21,6 +22,7 @@ export default function RoutineCardActions({
   onClickDelete,
   isStarting = false,
 }: RoutineCardActionsProps) {
+  const { t } = useTranslation();
   const handleClose = useCallback(() => {
     onOpenChange?.(false);
   }, [onOpenChange]);
@@ -60,7 +62,7 @@ export default function RoutineCardActions({
       <button
         type="button"
         className="absolute inset-0 bg-black/80"
-        aria-label="닫기"
+        aria-label={t('common.close')}
         onClick={handleClose}
       />
       <div
@@ -83,7 +85,7 @@ export default function RoutineCardActions({
             onClick={handleStart}
             disabled={isStarting}
           >
-            이 루틴으로 시작
+            {t('routines.startWithThis')}
           </Button>
           <Button
             type="button"
@@ -91,7 +93,7 @@ export default function RoutineCardActions({
             className="w-full rounded-2xl h-12 font-bold"
             onClick={handleEdit}
           >
-            편집하기
+            {t('routines.editAction')}
           </Button>
           <Button
             type="button"
@@ -99,7 +101,7 @@ export default function RoutineCardActions({
             className="w-full h-11 font-bold text-red-500 hover:text-red-600"
             onClick={handleDelete}
           >
-            삭제
+            {t('common.delete')}
           </Button>
         </div>
       </div>

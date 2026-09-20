@@ -1,5 +1,6 @@
 import { Button } from '@fitness-recoder/ui';
 import { useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface DeleteRoutineConfirmProps {
   open: boolean;
@@ -16,6 +17,7 @@ export default function DeleteRoutineConfirm({
   onCancel,
   isPending = false,
 }: DeleteRoutineConfirmProps) {
+  const { t } = useTranslation();
   const handleCancel = useCallback(() => {
     onCancel?.();
     onOpenChange?.(false);
@@ -43,7 +45,7 @@ export default function DeleteRoutineConfirm({
       <button
         type="button"
         className="absolute inset-0 bg-black/80"
-        aria-label="닫기"
+        aria-label={t('common.close')}
         onClick={handleCancel}
       />
       <div
@@ -58,10 +60,10 @@ export default function DeleteRoutineConfirm({
             id="delete-routine-title"
             className="text-lg font-bold text-foreground"
           >
-            루틴을 삭제할까요?
+            {t('routines.deleteTitle')}
           </h2>
-          <p id="delete-routine-body" className="text-sm text-zinc-500">
-            삭제하면 되돌릴 수 없습니다.
+          <p id="delete-routine-body" className="text-sm text-muted-foreground">
+            {t('routines.deleteBody')}
           </p>
         </div>
         <div className="flex flex-row gap-3">
@@ -72,7 +74,7 @@ export default function DeleteRoutineConfirm({
             onClick={handleCancel}
             disabled={isPending}
           >
-            취소
+            {t('common.cancel')}
           </Button>
           <Button
             type="button"
@@ -80,7 +82,7 @@ export default function DeleteRoutineConfirm({
             onClick={handleConfirm}
             disabled={isPending}
           >
-            삭제
+            {t('common.delete')}
           </Button>
         </div>
       </div>

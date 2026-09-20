@@ -1,29 +1,23 @@
 import type { ExerciseData, ScheduleData, SetData } from '@fitness-recoder/structure';
+import type { TFunction } from 'i18next';
 import dayjs from '../../../libs/dayjs';
 
-const WEEKDAY_KO = [
-  '일요일',
-  '월요일',
-  '화요일',
-  '수요일',
-  '목요일',
-  '금요일',
-  '토요일',
-] as const;
-
-export function formatPhotoDateLabel(schedule: ScheduleData): string {
-  const weekday =
-    WEEKDAY_KO[new Date(schedule.year, schedule.month - 1, schedule.date).getDay()] ??
-    '';
+export function formatPhotoDateLabel(
+  schedule: ScheduleData,
+  t: TFunction,
+): string {
+  const weekday = t(
+    `weekdayLong.${new Date(schedule.year, schedule.month - 1, schedule.date).getDay()}` as never,
+  );
   const y = String(schedule.year);
   const m = String(schedule.month).padStart(2, '0');
   const d = String(schedule.date).padStart(2, '0');
-  return `${y}.${m}.${d} ${weekday}`;
+  return t('photo.date', { date: `${y}.${m}.${d}`, weekday });
 }
 
-export function formatPhotoTitle(schedule: ScheduleData): string {
+export function formatPhotoTitle(schedule: ScheduleData, t: TFunction): string {
   const title = schedule.title.trim();
-  return title ? title : '오늘의 운동';
+  return title ? title : t('workout.todayTitle');
 }
 
 export function formatDurationFromMinutes(minutes: number): string {
@@ -42,14 +36,15 @@ export function calcVolume(setsByExercise: Map<number, SetData[]>): number {
   return volume;
 }
 
-export function formatVolumeLabel(volume: number): string {
-  return volume.toLocaleString('ko-KR');
+export function formatVolumeLabel(volume: number, locale: string): string {
+  return volume.toLocaleString(locale === 'en' ? 'en-US' : 'ko-KR');
 }
 
 /** Heaviest completed set → highlight line (e.g. "데드리프트 140kg 성공"). */
 export function formatHighlightLine(
   exercises: ExerciseData[],
   setsByExercise: Map<number, SetData[]>,
+  t: TFunction,
 ): string | null {
   let best: { name: string; weight: number } | null = null;
 
@@ -60,7 +55,7 @@ export function formatHighlightLine(
       const weight = set.weight ?? 0;
       if (!best || weight > best.weight) {
         best = {
-          name: exercise.fitness?.name ?? '운동',
+          name: exercise.fitness?.name ?? t('workout.exerciseFallback'),
           weight,
         };
       }
@@ -68,7 +63,7 @@ export function formatHighlightLine(
   }
 
   if (!best || best.weight <= 0) return null;
-  return `${best.name} ${best.weight}kg 성공`;
+  return t('photo.highlight', { name: best.name, weight: best.weight });
 }
 
 export function pickLatestFinish(

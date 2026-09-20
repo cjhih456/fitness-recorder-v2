@@ -1,22 +1,14 @@
 import type { ChartData } from '../../components/section/dashboard/chart/Chart';
 import type { ExercisePresetWithExerciseList } from '@fitness-recoder/structure';
+import type { TFunction } from 'i18next';
 import { hooks } from '@fitness-recoder/graphql-sqlite-worker';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import ChartSection from '../../components/section/dashboard/chart/ChartSection';
 import TodayRoutineSection from '../../components/section/dashboard/todayRoutine/TodayRoutineSection';
 import PageLoadingSkeleton from '../../components/utils/PageLoadingSkeleton';
 import dayjs from '../../libs/dayjs';
-
-const WEEKDAY_KO = [
-  '일요일',
-  '월요일',
-  '화요일',
-  '수요일',
-  '목요일',
-  '금요일',
-  '토요일',
-] as const;
 
 function getTodayParts() {
   const today = dayjs();
@@ -27,8 +19,12 @@ function getTodayParts() {
   };
 }
 
-function formatTodayLabel(now = dayjs()): string {
-  return `${now.month() + 1}월 ${now.date()}일 ${WEEKDAY_KO[now.day()]}`;
+function formatTodayLabel(t: TFunction, now = dayjs()): string {
+  return t('dashboard.todayLabel', {
+    month: now.month() + 1,
+    date: now.date(),
+    weekday: t(`weekdayLong.${now.day()}`),
+  });
 }
 
 /**
@@ -40,6 +36,7 @@ function useWeeklyVolumeData(): ChartData[] {
 }
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { data = [], isLoading } = hooks.useExercisePresetListQuery({
     offset: 0,
@@ -48,7 +45,7 @@ export default function Dashboard() {
   const cloneMutation = hooks.useCloneScheduleFromPresetMutation();
   const [startingPresetId, setStartingPresetId] = useState<number | null>(null);
   const volumeData = useWeeklyVolumeData();
-  const dateLabel = formatTodayLabel();
+  const dateLabel = useMemo(() => formatTodayLabel(t), [t]);
 
   const handleCreateRoutine = useCallback(() => {
     navigate('/routines');

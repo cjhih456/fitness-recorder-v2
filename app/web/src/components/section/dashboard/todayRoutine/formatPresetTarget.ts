@@ -2,38 +2,28 @@ import type {
   ExercisePresetWithExerciseList,
   FitnessMuscle,
 } from '@fitness-recoder/structure';
+import type { TFunction } from 'i18next';
 
-const MUSCLE_LABEL: Partial<Record<FitnessMuscle, string>> = {
-  chest: '가슴',
-  shoulders: '어깨',
-  triceps: '삼두',
-  biceps: '이두',
-  lats: '광배',
-  middle_back: '등',
-  lower_back: '하부 등',
-  traps: '승모',
-  abdominals: '복근',
-  quadriceps: '대퇴',
-  hamstrings: '햄스트링',
-  glutes: '둔근',
-  calves: '종아리',
-  adductors: '내전근',
-  abductors: '외전근',
-  forearms: '전완',
-  neck: '목',
-};
+function translateMuscle(t: TFunction, muscle: FitnessMuscle | string): string {
+  const translated = t(`muscle.${muscle}` as never);
+  return translated === `muscle.${muscle}` ? muscle : translated;
+}
 
 export function formatPresetTarget(
   routine: ExercisePresetWithExerciseList,
+  t: TFunction,
 ): string {
   const muscles = routine.exerciseList
     .flatMap((exercise) => exercise.fitness?.primaryMuscles ?? [])
     .filter(Boolean);
 
   const unique = Array.from(new Set(muscles));
-  if (unique.length === 0) return '부위 없음';
+  if (unique.length === 0) return t('dashboard.noTarget');
 
-  const labels = unique.map((muscle) => MUSCLE_LABEL[muscle] ?? muscle);
+  const labels = unique.map((muscle) => translateMuscle(t, muscle));
   if (labels.length <= 2) return labels.join('/');
-  return `${labels.slice(0, 2).join('/')} 외 ${labels.length - 2}`;
+  return t('dashboard.moreTargets', {
+    labels: labels.slice(0, 2).join('/'),
+    count: labels.length - 2,
+  });
 }

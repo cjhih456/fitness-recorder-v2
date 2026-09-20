@@ -2,6 +2,7 @@ import type { HistoryListItem } from './types';
 import { Card, CardContent } from '@fitness-recoder/ui';
 import { ChevronRight } from 'lucide-react';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import MuscleChip from './MuscleChip';
 
 interface HistoryProps {
@@ -10,6 +11,7 @@ interface HistoryProps {
 }
 
 export default function History({ data, onClickHistory }: HistoryProps) {
+  const { t } = useTranslation();
   const handleClickHistory = useCallback(() => {
     onClickHistory?.(data);
   }, [data, onClickHistory]);
@@ -25,13 +27,13 @@ export default function History({ data, onClickHistory }: HistoryProps) {
           handleClickHistory();
         }
       }}
-      aria-label={`${data.title} 상세 보기`}
+      aria-label={t('history.detailAria', { title: data.title })}
       className="cursor-pointer border border-zinc-200 transition-all hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900/50"
     >
       <CardContent className="flex items-center gap-4 p-4">
         <div className="flex min-w-[64px] flex-col items-center rounded-2xl bg-blue-50 p-3 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
           <span className="text-[10px] font-black uppercase leading-tight">
-            {data.month}월
+            {t('history.month', { month: data.month })}
           </span>
           <span className="text-xl font-black">{data.date}</span>
         </div>
@@ -40,7 +42,10 @@ export default function History({ data, onClickHistory }: HistoryProps) {
             {data.title}
           </h3>
           <p className="text-xs font-medium text-zinc-400">
-            시간: {data.workoutTimes}분 · 총 볼륨: {data.totalVolume}
+            {t('history.summary', {
+              minutes: data.workoutTimes,
+              volume: data.totalVolume,
+            })}
           </p>
           {data.muscles.length > 0 ? (
             <div className="flex flex-wrap gap-1.5">

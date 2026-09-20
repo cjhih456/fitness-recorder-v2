@@ -1,4 +1,5 @@
 import { ChartContainer, ChartTooltip } from '@fitness-recoder/ui';
+import { useTranslation } from 'react-i18next';
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 
 export interface ChartData {
@@ -17,36 +18,38 @@ interface ChartProps {
 const SERIES = [
   {
     key: 'chest' as const,
-    label: '가슴',
     color: '#3B82F6',
     strokeDasharray: undefined,
   },
   {
     key: 'back' as const,
-    label: '등',
     color: '#10B981',
     strokeDasharray: '6 4',
   },
   {
     key: 'legs' as const,
-    label: '하체',
     color: '#F59E0B',
     strokeDasharray: '2 3',
   },
 ];
 
 export default function Chart({ data }: ChartProps) {
+  const { t } = useTranslation();
+  const series = SERIES.map((item) => ({
+    ...item,
+    label: t(`group.${item.key}`),
+  }));
   return (
     <div className="flex h-[180px] flex-col gap-3">
       <div className="flex gap-3" aria-hidden="true">
-        {SERIES.map((series) => (
-          <div key={series.key} className="flex items-center gap-1">
+        {series.map((item) => (
+          <div key={item.key} className="flex items-center gap-1">
             <span
               className="size-2 rounded-full"
-              style={{ backgroundColor: series.color }}
+              style={{ backgroundColor: item.color }}
             />
             <span className="text-[10px] font-medium text-muted-foreground">
-              {series.label}
+              {item.label}
             </span>
           </div>
         ))}
@@ -54,7 +57,7 @@ export default function Chart({ data }: ChartProps) {
       <ChartContainer
         config={{}}
         className="min-h-0 flex-1"
-        aria-label="최근 7일 가슴, 등, 하체 총 볼륨 추이"
+        aria-label={t('dashboard.volumeTrendAria')}
       >
         <LineChart data={data}>
           <ChartTooltip
@@ -82,16 +85,16 @@ export default function Chart({ data }: ChartProps) {
             axisLine={false}
             tick={{ fill: '#888' }}
           />
-          {SERIES.map((series) => (
+          {series.map((item) => (
             <Line
-              key={series.key}
+              key={item.key}
               type="monotone"
-              dataKey={series.key}
-              name={series.label}
-              stroke={series.color}
+              dataKey={item.key}
+              name={item.label}
+              stroke={item.color}
               strokeWidth={2}
-              strokeDasharray={series.strokeDasharray}
-              dot={{ r: 3, fill: series.color }}
+              strokeDasharray={item.strokeDasharray}
+              dot={{ r: 3, fill: item.color }}
               activeDot={{ r: 4 }}
             />
           ))}

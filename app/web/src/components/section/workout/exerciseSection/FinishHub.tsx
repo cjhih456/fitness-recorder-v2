@@ -1,5 +1,6 @@
 import { Button } from '@fitness-recoder/ui';
 import { useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface FinishHubProps {
   open: boolean;
@@ -24,6 +25,7 @@ export default function FinishHub({
   onSaveRoutine,
   isSavingRoutine = false,
 }: FinishHubProps) {
+  const { t } = useTranslation();
   const handleHome = useCallback(() => {
     onHome?.();
     onOpenChange?.(false);
@@ -47,7 +49,7 @@ export default function FinishHub({
       <button
         type="button"
         className="absolute inset-0 bg-black/80"
-        aria-label="홈으로"
+        aria-label={t('common.home')}
         onClick={handleHome}
       />
       <div
@@ -61,20 +63,20 @@ export default function FinishHub({
             id="finish-hub-title"
             className="text-xl font-bold text-foreground"
           >
-            운동을 마쳤습니다
+            {t('finish.doneTitle')}
           </h2>
-          <p className="text-sm text-zinc-500">
-            {durationLabel} · 총 볼륨 {volumeLabel}
+          <p className="text-sm text-muted-foreground">
+            {t('finish.summary', { duration: durationLabel, volume: volumeLabel })}
           </p>
         </div>
 
         <div className="flex flex-col gap-3">
           <Button
             type="button"
-            className="w-full rounded-2xl bg-blue-600 py-6 font-bold text-white hover:bg-blue-700"
+            className="w-full rounded-2xl py-6 font-bold"
             onClick={onPhoto}
           >
-            인증 만들기
+            {t('finish.createPhoto')}
           </Button>
           <Button
             type="button"
@@ -82,7 +84,7 @@ export default function FinishHub({
             className="w-full rounded-2xl py-6 font-bold"
             onClick={onHistory}
           >
-            기록 보기
+            {t('finish.viewHistory')}
           </Button>
           <Button
             type="button"
@@ -90,7 +92,7 @@ export default function FinishHub({
             className="w-full rounded-2xl py-6 font-bold"
             onClick={handleHome}
           >
-            홈으로
+            {t('common.home')}
           </Button>
         </div>
 
@@ -101,7 +103,7 @@ export default function FinishHub({
             onClick={onSaveRoutine}
             disabled={isSavingRoutine}
           >
-            루틴으로 저장
+            {t('finish.saveAsRoutine')}
           </button>
         ) : null}
       </div>

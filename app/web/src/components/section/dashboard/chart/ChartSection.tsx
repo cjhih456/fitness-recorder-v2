@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import SectionSkeleton from '../../SectionSkeleton';
 import Chart, { ChartData, MIN_CHART_POINTS } from './Chart';
 import SparseChart, { sumVolumeTotals } from './SparseChart';
@@ -7,11 +8,14 @@ interface ChartSectionProps {
 }
 
 export default function ChartSection({ data }: ChartSectionProps) {
+  const { t } = useTranslation();
   const isSparse = data.length < MIN_CHART_POINTS;
-  const subtitle = isSparse ? '최근 7일 · 데이터 부족' : '최근 7일';
+  const subtitle = isSparse
+    ? t('dashboard.last7daysSparse')
+    : t('dashboard.last7days');
 
   return (
-    <SectionSkeleton title="총 볼륨 변화 (kg)">
+    <SectionSkeleton title={t('dashboard.volumeTitle')}>
       {{
         default: isSparse ? (
           <SparseChart totals={sumVolumeTotals(data)} />

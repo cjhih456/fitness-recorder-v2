@@ -1,6 +1,7 @@
 import { Button } from '@fitness-recoder/ui';
 import { ImageOff } from 'lucide-react';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface PhotoEmptySessionProps {
   onStartWorkout?: () => void;
@@ -9,6 +10,7 @@ interface PhotoEmptySessionProps {
 export default function PhotoEmptySession({
   onStartWorkout,
 }: PhotoEmptySessionProps) {
+  const { t } = useTranslation();
   const handleStart = useCallback(() => {
     onStartWorkout?.();
   }, [onStartWorkout]);
@@ -18,18 +20,18 @@ export default function PhotoEmptySession({
       <ImageOff size={32} className="text-muted-foreground" aria-hidden />
       <div className="space-y-1">
         <p className="text-sm font-semibold text-foreground">
-          완료한 운동이 없습니다
+          {t('photo.emptyTitle')}
         </p>
         <p className="text-xs text-muted-foreground">
-          운동을 마치면 인증 사진을 만들 수 있어요
+          {t('photo.emptyHint')}
         </p>
       </div>
       <Button
         type="button"
-        className="rounded-full bg-blue-600 px-5 py-3 text-[13px] font-semibold text-white hover:bg-blue-700"
+        className="rounded-full px-5 py-3 text-[13px] font-semibold"
         onClick={handleStart}
       >
-        운동 시작
+        {t('photo.startWorkout')}
       </Button>
     </div>
   );

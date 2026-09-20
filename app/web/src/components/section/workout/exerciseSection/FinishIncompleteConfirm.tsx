@@ -1,5 +1,6 @@
 import { Button } from '@fitness-recoder/ui';
 import { useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface FinishIncompleteConfirmProps {
   open: boolean;
@@ -16,6 +17,7 @@ export default function FinishIncompleteConfirm({
   onCancel,
   isPending = false,
 }: FinishIncompleteConfirmProps) {
+  const { t } = useTranslation();
   const handleCancel = useCallback(() => {
     onCancel?.();
     onOpenChange?.(false);
@@ -43,7 +45,7 @@ export default function FinishIncompleteConfirm({
       <button
         type="button"
         className="absolute inset-0 bg-black/80"
-        aria-label="닫기"
+        aria-label={t('common.close')}
         onClick={handleCancel}
       />
       <div
@@ -58,10 +60,10 @@ export default function FinishIncompleteConfirm({
             id="finish-incomplete-title"
             className="text-lg font-bold text-foreground"
           >
-            운동을 종료할까요?
+            {t('finish.incompleteTitle')}
           </h2>
-          <p id="finish-incomplete-body" className="text-sm text-zinc-500">
-            아직 끝내지 않은 세트가 있습니다.
+          <p id="finish-incomplete-body" className="text-sm text-muted-foreground">
+            {t('finish.incompleteBody')}
           </p>
         </div>
         <div className="flex flex-row gap-3">
@@ -72,15 +74,15 @@ export default function FinishIncompleteConfirm({
             onClick={handleCancel}
             disabled={isPending}
           >
-            계속하기
+            {t('finish.keepGoing')}
           </Button>
           <Button
             type="button"
-            className="flex-1 rounded-full font-bold bg-blue-600 text-white hover:bg-blue-700"
+            className="flex-1 rounded-full font-bold"
             onClick={handleConfirm}
             disabled={isPending}
           >
-            종료
+            {t('finish.end')}
           </Button>
         </div>
       </div>

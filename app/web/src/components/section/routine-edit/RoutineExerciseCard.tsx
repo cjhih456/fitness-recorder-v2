@@ -2,6 +2,7 @@ import type { DraftExercise, DraftSet } from './types';
 import { Button, Card, CardContent, Input } from '@fitness-recoder/ui';
 import { Plus } from 'lucide-react';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createDefaultSet } from './types';
 
 interface RoutineExerciseCardProps {
@@ -15,6 +16,7 @@ export default function RoutineExerciseCard({
   onRemove,
   onChangeSets,
 }: RoutineExerciseCardProps) {
+  const { t } = useTranslation();
   const handleRemove = useCallback(() => {
     onRemove?.(exercise.localId);
   }, [exercise.localId, onRemove]);
@@ -50,15 +52,15 @@ export default function RoutineExerciseCard({
             className="text-xs text-zinc-500"
             onClick={handleRemove}
           >
-            삭제
+            {t('common.delete')}
           </Button>
         </div>
 
         <div className="grid grid-cols-12 gap-2 px-2 text-[11px] font-bold uppercase text-zinc-400">
-          <div className="col-span-2 text-center">세트</div>
-          <div className="col-span-4 text-center">무게 (kg)</div>
-          <div className="col-span-4 text-center">횟수</div>
-          <div className="col-span-2 text-center">완료</div>
+          <div className="col-span-2 text-center">{t('workout.set')}</div>
+          <div className="col-span-4 text-center">{t('workout.weightKg')}</div>
+          <div className="col-span-4 text-center">{t('workout.reps')}</div>
+          <div className="col-span-2 text-center">{t('common.done')}</div>
         </div>
 
         {exercise.sets.map((set, index) => (
@@ -73,7 +75,10 @@ export default function RoutineExerciseCard({
               <Input
                 type="number"
                 inputMode="decimal"
-                aria-label={`${exercise.fitness.name} ${index + 1}세트 무게`}
+                aria-label={t('workout.setWeightAria', {
+                  name: exercise.fitness.name,
+                  index: index + 1,
+                })}
                 value={set.weight}
                 onChange={(event) =>
                   handleSetChange(
@@ -89,7 +94,10 @@ export default function RoutineExerciseCard({
               <Input
                 type="number"
                 inputMode="numeric"
-                aria-label={`${exercise.fitness.name} ${index + 1}세트 횟수`}
+                aria-label={t('workout.setRepsAria', {
+                  name: exercise.fitness.name,
+                  index: index + 1,
+                })}
                 value={set.repeat}
                 onChange={(event) =>
                   handleSetChange(
@@ -104,10 +112,10 @@ export default function RoutineExerciseCard({
             <div className="col-span-2 flex items-center justify-center">
               <span
                 aria-disabled="true"
-                title="루틴 편집에서는 완료를 사용할 수 없습니다"
+                title={t('routines.completeDisabled')}
                 className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-zinc-200 bg-zinc-100 text-zinc-300 dark:border-zinc-700 dark:bg-zinc-800"
               >
-                <span className="sr-only">완료 (비활성)</span>
+                <span className="sr-only">{t('routines.completeInactive')}</span>
               </span>
             </div>
           </div>
@@ -120,7 +128,7 @@ export default function RoutineExerciseCard({
           onClick={handleAddSet}
         >
           <Plus size={18} className="mr-2" />
-          세트 추가
+          {t('workout.addSet')}
         </Button>
       </CardContent>
     </Card>

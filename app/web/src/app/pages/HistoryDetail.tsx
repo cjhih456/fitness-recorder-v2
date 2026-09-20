@@ -1,11 +1,13 @@
 import { hooks } from '@fitness-recoder/graphql-sqlite-worker';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import HistoryDetailSection from '../../components/section/history/detail/HistoryDetailSection';
 import { formatScheduleTitle } from '../../components/section/history/history/formatHistory';
 import PageLoadingSkeleton from '../../components/utils/PageLoadingSkeleton';
 
 export default function HistoryDetail() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { scheduleId } = useParams<{ scheduleId: string }>();
   const numericId = scheduleId ? Number(scheduleId) : undefined;
@@ -27,13 +29,13 @@ export default function HistoryDetail() {
     try {
       await copyPreset.mutateAsync({
         scheduleId: schedule.id,
-        name: formatScheduleTitle(schedule),
+        name: formatScheduleTitle(schedule, t),
       });
       navigate('/routines');
     } finally {
       setIsSaving(false);
     }
-  }, [copyPreset, navigate, schedule]);
+  }, [copyPreset, navigate, schedule, t]);
 
   if (isScheduleLoading || isExercisesLoading) {
     return <PageLoadingSkeleton />;
@@ -45,11 +47,11 @@ export default function HistoryDetail() {
         <button
           type="button"
           onClick={handleBack}
-          className="text-sm font-medium text-blue-600"
+          className="text-sm font-medium text-primary"
         >
-          ← 기록으로
+          {t('error.history.back')}
         </button>
-        <p className="text-sm text-zinc-500">운동 기록을 찾을 수 없습니다</p>
+        <p className="text-sm text-muted-foreground">{t('error.history.notFound')}</p>
       </div>
     );
   }

@@ -2,6 +2,7 @@ import type { ExerciseData, ScheduleData, SetData } from '@fitness-recoder/struc
 import { hooks } from '@fitness-recoder/graphql-sqlite-worker';
 import { Button, Input } from '@fitness-recoder/ui';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import PhotoShareCard from './PhotoShareCard';
 import { downloadShareCard } from './downloadShareCard';
 import {
@@ -32,6 +33,7 @@ function SetVolumeBridge({
 }
 
 export default function PhotoSession({ schedule }: PhotoSessionProps) {
+  const { t, i18n } = useTranslation();
   const cardRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -66,8 +68,8 @@ export default function PhotoSession({ schedule }: PhotoSessionProps) {
     [setsByExercise],
   );
   const highlightLine = useMemo(
-    () => formatHighlightLine(exercises as ExerciseData[], setsByExercise),
-    [exercises, setsByExercise],
+    () => formatHighlightLine(exercises as ExerciseData[], setsByExercise, t),
+    [exercises, setsByExercise, t],
   );
 
   const handleChangePhoto = useCallback(() => {
@@ -111,9 +113,9 @@ export default function PhotoSession({ schedule }: PhotoSessionProps) {
 
       <PhotoShareCard
         ref={cardRef}
-        title={formatPhotoTitle(schedule)}
-        dateLabel={formatPhotoDateLabel(schedule)}
-        volumeLabel={formatVolumeLabel(volume)}
+        title={formatPhotoTitle(schedule, t)}
+        dateLabel={formatPhotoDateLabel(schedule, t)}
+        volumeLabel={formatVolumeLabel(volume, i18n.language)}
         durationLabel={formatDurationFromMinutes(schedule.workoutTimes)}
         highlightLine={highlightLine}
         caption={caption.trim() || undefined}
@@ -125,13 +127,13 @@ export default function PhotoSession({ schedule }: PhotoSessionProps) {
           htmlFor="photo-caption"
           className="text-[13px] font-semibold text-foreground"
         >
-          문구 추가
+          {t('photo.addCaption')}
         </label>
         <Input
           id="photo-caption"
           value={caption}
           onChange={(event) => setCaption(event.target.value)}
-          placeholder="오늘의 운동을 한 줄로 남겨보세요"
+          placeholder={t('photo.captionPlaceholder')}
           className="h-auto rounded-2xl border bg-muted px-4 py-3.5 text-sm"
         />
       </div>
@@ -154,7 +156,7 @@ export default function PhotoSession({ schedule }: PhotoSessionProps) {
           }`}
           onClick={handleChangePhoto}
         >
-          사진 변경
+          {t('photo.changePhoto')}
         </Button>
         <Button
           type="button"
@@ -162,7 +164,7 @@ export default function PhotoSession({ schedule }: PhotoSessionProps) {
           disabled={!hasImage || isSaving}
           onClick={handleSave}
         >
-          이미지 저장
+          {t('photo.saveImage')}
         </Button>
       </div>
     </div>

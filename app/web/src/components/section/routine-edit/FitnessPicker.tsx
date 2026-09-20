@@ -3,6 +3,7 @@ import { hooks } from '@fitness-recoder/graphql-sqlite-worker';
 import { Button, Input, Spinner } from '@fitness-recoder/ui';
 import { Search, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState, type UIEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import FitnessItem from '../workout/fitnessSearchDrawer/FitnessItem';
 
 const FITNESS_PICKER_PAGE_SIZE = 40;
@@ -18,6 +19,7 @@ export default function FitnessPicker({
   onOpenChange,
   onSelect,
 }: FitnessPickerProps) {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [offset, setOffset] = useState(0);
@@ -110,7 +112,7 @@ export default function FitnessPicker({
       <button
         type="button"
         className="absolute inset-0 bg-black/80"
-        aria-label="닫기"
+        aria-label={t('common.close')}
         onClick={handleClose}
       />
       <div
@@ -125,7 +127,7 @@ export default function FitnessPicker({
             id="fitness-picker-title"
             className="text-lg font-bold text-foreground"
           >
-            운동 선택
+            {t('routines.pickerTitle')}
           </h2>
           <Button
             type="button"
@@ -133,7 +135,7 @@ export default function FitnessPicker({
             size="icon-sm"
             className="rounded-full bg-zinc-100 p-2"
             onClick={handleClose}
-            aria-label="닫기"
+            aria-label={t('common.close')}
           >
             <X size={18} />
           </Button>
@@ -148,8 +150,8 @@ export default function FitnessPicker({
             />
             <Input
               type="search"
-              aria-label="운동 이름 검색"
-              placeholder="운동 이름을 검색하세요..."
+              aria-label={t('routines.searchAria')}
+              placeholder={t('routines.searchPlaceholder')}
               className="rounded-full border-blue-500 bg-zinc-50 py-3 pl-10 pr-4"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
@@ -164,9 +166,9 @@ export default function FitnessPicker({
         >
           {showEmpty ? (
             <div className="flex flex-col items-center justify-center gap-1 py-16 text-center">
-              <p className="font-bold text-foreground">검색 결과가 없습니다</p>
-              <p className="text-sm text-zinc-500">
-                다른 키워드로 검색해 보세요
+              <p className="font-bold text-foreground">{t('routines.searchEmptyTitle')}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('routines.searchEmptyHint')}
               </p>
             </div>
           ) : (

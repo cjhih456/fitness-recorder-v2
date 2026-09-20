@@ -3,6 +3,7 @@ import { hooks } from '@fitness-recoder/graphql-sqlite-worker';
 import { Button } from '@fitness-recoder/ui';
 import { Pause, Plus } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import ExerciseCard from '../../components/section/workout/exerciseSection/ExerciseCard';
 import FinishHub from '../../components/section/workout/exerciseSection/FinishHub';
@@ -33,6 +34,7 @@ function calcVolume(setsByExercise: Map<number, SetData[]>) {
 }
 
 export default function Workout() {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { scheduleId } = useParams<{ scheduleId: string }>();
   const numericScheduleId = scheduleId ? Number(scheduleId) : undefined;
@@ -235,12 +237,14 @@ export default function Workout() {
     if (!numericScheduleId) return;
     await copyPreset.mutateAsync({
       scheduleId: numericScheduleId,
-      name: scheduleData?.title || '오늘의 운동',
+      name: scheduleData?.title || t('workout.todayTitle'),
     });
     navigate('/routines');
-  }, [numericScheduleId, copyPreset, scheduleData?.title, navigate]);
+  }, [numericScheduleId, copyPreset, scheduleData?.title, navigate, t]);
 
-  const volumeLabel = `${finishSummary.volume.toLocaleString('ko-KR')} kg`;
+  const volumeLabel = `${finishSummary.volume.toLocaleString(
+    i18n.language === 'en' ? 'en-US' : 'ko-KR',
+  )} kg`;
 
   return (
     <div className="relative mx-auto max-w-md p-4 pb-24">
@@ -248,7 +252,9 @@ export default function Workout() {
         <div className="min-w-0 flex-1">
           {isPaused ? (
             <>
-              <h2 className="text-2xl font-black text-blue-600">일시정지</h2>
+              <h2 className="text-2xl font-black text-primary">
+                {t('workout.actionBtn.pause')}
+              </h2>
               <div className="mt-1 flex flex-wrap items-center gap-2">
                 <Timer
                   start={scheduleData?.start ?? 0}
@@ -256,13 +262,13 @@ export default function Workout() {
                   pausedTime={scheduleData?.breakTime ?? 0}
                 />
                 {total > 0 ? (
-                  <span className="text-sm font-bold text-blue-600">
-                    {done}/{total} 세트
+                  <span className="text-sm font-bold text-primary">
+                    {t('workout.setsProgress', { done, total })}
                   </span>
                 ) : null}
               </div>
-              <p className="mt-1 text-xs text-zinc-500">
-                휴식 중 · 언제든 다시 시작할 수 있어요
+              <p className="mt-1 text-xs text-muted-foreground">
+                {t('workout.pausedHint')}
               </p>
               <Button
                 type="button"
@@ -271,12 +277,14 @@ export default function Workout() {
                 className="mt-1 h-7 px-0 text-xs text-zinc-500"
                 onClick={handleFinishClick}
               >
-                운동 완료
+                {t('workout.complete')}
               </Button>
             </>
           ) : (
             <>
-              <h2 className="text-2xl font-black text-foreground">오늘의 운동</h2>
+              <h2 className="text-2xl font-black text-foreground">
+                {t('workout.todayTitle')}
+              </h2>
               <div className="mt-1 flex flex-wrap items-center gap-2">
                 <Timer
                   start={scheduleData?.start ?? 0}
@@ -284,8 +292,8 @@ export default function Workout() {
                   pausedTime={scheduleData?.breakTime ?? 0}
                 />
                 {total > 0 ? (
-                  <span className="text-sm font-bold text-blue-600">
-                    {done}/{total} 세트
+                  <span className="text-sm font-bold text-primary">
+                    {t('workout.setsProgress', { done, total })}
                   </span>
                 ) : null}
                 {!isFinished ? (
@@ -298,7 +306,7 @@ export default function Workout() {
                     disabled={!scheduleData || scheduleData.type !== 'STARTED'}
                   >
                     <Pause size={12} />
-                    일시 정지
+                    {t('workout.pause')}
                   </Button>
                 ) : null}
               </div>
@@ -309,31 +317,31 @@ export default function Workout() {
         {isPaused ? (
           <Button
             type="button"
-            className="rounded-full bg-blue-600 px-6 shadow-lg shadow-blue-200 hover:bg-blue-700"
+            className="rounded-full px-6 shadow-lg"
             onClick={handleResume}
           >
-            재개하기
+            {t('workout.resume')}
           </Button>
         ) : (
           <Button
             type="button"
-            className="rounded-full bg-blue-600 px-6 shadow-lg shadow-blue-200 hover:bg-blue-700"
+            className="rounded-full px-6 shadow-lg"
             onClick={handleFinishClick}
             disabled={!scheduleData || isFinished}
           >
-            운동 완료
+            {t('workout.complete')}
           </Button>
         )}
       </div>
 
       <div className="space-y-8">
         {exercises.length === 0 ? (
-          <div className="rounded-2xl bg-zinc-100 px-6 py-10 text-center dark:bg-zinc-900">
+          <div className="rounded-2xl bg-muted px-6 py-10 text-center">
             <p className="font-bold text-foreground">
-              아직 추가된 운동이 없습니다
+              {t('workout.emptyTitle')}
             </p>
-            <p className="mt-1 text-sm text-zinc-500">
-              아래에서 종목을 검색해 추가하세요
+            <p className="mt-1 text-sm text-muted-foreground">
+              {t('workout.emptyHint')}
             </p>
           </div>
         ) : (
@@ -357,7 +365,7 @@ export default function Workout() {
             onClick={() => setIsAddModalOpen(true)}
           >
             <Plus size={18} className="mr-2" />
-            새로운 운동 종목 추가
+            {t('workout.addExercise')}
           </Button>
         </div>
       </div>
