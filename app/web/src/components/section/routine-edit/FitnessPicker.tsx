@@ -3,6 +3,7 @@ import { hooks } from '@fitness-recoder/graphql-sqlite-worker';
 import { Button, Input, Spinner } from '@fitness-recoder/ui';
 import { Search, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState, type UIEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import FitnessItem from '../workout/fitnessSearchDrawer/FitnessItem';
 
 const FITNESS_PICKER_PAGE_SIZE = 40;
@@ -18,6 +19,7 @@ export default function FitnessPicker({
   onOpenChange,
   onSelect,
 }: FitnessPickerProps) {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [offset, setOffset] = useState(0);
@@ -109,8 +111,8 @@ export default function FitnessPicker({
     <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center">
       <button
         type="button"
-        className="absolute inset-0 bg-black/80"
-        aria-label="닫기"
+        className="absolute inset-0 bg-scrim"
+        aria-label={t('common.close')}
         onClick={handleClose}
       />
       <div
@@ -119,21 +121,21 @@ export default function FitnessPicker({
         aria-labelledby="fitness-picker-title"
         className="relative z-10 flex max-h-[85vh] w-full max-w-md flex-col rounded-t-3xl bg-background shadow-lg md:max-h-[80vh] md:rounded-2xl"
       >
-        <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-zinc-200 md:hidden" />
+        <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-muted-foreground/30 md:hidden" />
         <div className="flex items-center justify-between px-4 pb-2 pt-4">
           <h2
             id="fitness-picker-title"
             className="text-lg font-bold text-foreground"
           >
-            운동 선택
+            {t('routines.pickerTitle')}
           </h2>
           <Button
             type="button"
             variant="ghost"
             size="icon-sm"
-            className="rounded-full bg-zinc-100 p-2"
+            className="rounded-full bg-muted p-2"
             onClick={handleClose}
-            aria-label="닫기"
+            aria-label={t('common.close')}
           >
             <X size={18} />
           </Button>
@@ -142,15 +144,15 @@ export default function FitnessPicker({
         <div className="px-4 pb-3">
           <div className="relative">
             <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
               size={18}
               aria-hidden
             />
             <Input
               type="search"
-              aria-label="운동 이름 검색"
-              placeholder="운동 이름을 검색하세요..."
-              className="rounded-full border-blue-500 bg-zinc-50 py-3 pl-10 pr-4"
+              aria-label={t('routines.searchAria')}
+              placeholder={t('routines.searchPlaceholder')}
+              className="rounded-full border-ring bg-muted py-3 pl-10 pr-4"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               autoFocus
@@ -164,9 +166,9 @@ export default function FitnessPicker({
         >
           {showEmpty ? (
             <div className="flex flex-col items-center justify-center gap-1 py-16 text-center">
-              <p className="font-bold text-foreground">검색 결과가 없습니다</p>
-              <p className="text-sm text-zinc-500">
-                다른 키워드로 검색해 보세요
+              <p className="font-bold text-foreground">{t('routines.searchEmptyTitle')}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('routines.searchEmptyHint')}
               </p>
             </div>
           ) : (

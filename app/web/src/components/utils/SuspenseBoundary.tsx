@@ -2,6 +2,7 @@ import { Button } from '@fitness-recoder/ui';
 import { CircleAlert } from 'lucide-react';
 import { Suspense, useCallback } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
+import { useTranslation } from 'react-i18next';
 import PageLoadingSkeleton from './PageLoadingSkeleton';
 
 interface SuspenseBoundaryProps {
@@ -15,6 +16,7 @@ export default function SuspenseBoundary({
   children,
   onError,
 }: SuspenseBoundaryProps) {
+  const { t } = useTranslation();
   const handleError = useCallback(
     (error: unknown) => {
       onError?.(error);
@@ -36,17 +38,17 @@ export default function SuspenseBoundary({
             strokeWidth={2}
           />
           <h2 className="text-base font-semibold tracking-tight text-foreground">
-            문제가 발생했습니다
+            {t('error.boundary.title')}
           </h2>
           <p className="text-center text-[13px] text-muted-foreground">
-            잠시 후 다시 시도해 주세요
+            {t('error.boundary.message')}
           </p>
           <Button
             type="button"
             onClick={resetErrorBoundary}
-            className="rounded-full bg-blue-600 px-6 text-white hover:bg-blue-600"
+            className="rounded-full px-6"
           >
-            다시 시도
+            {t('common.tryAgain')}
           </Button>
         </div>
       )}

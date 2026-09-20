@@ -3,6 +3,7 @@ import { hooks } from '@fitness-recoder/graphql-sqlite-worker';
 import { Button, Input, Label } from '@fitness-recoder/ui';
 import { ChevronLeft, Dumbbell, Plus, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import DiscardDraftConfirm from '../../components/section/routine-edit/DiscardDraftConfirm';
 import FitnessPicker from '../../components/section/routine-edit/FitnessPicker';
@@ -15,6 +16,7 @@ import {
 import DeleteRoutineConfirm from '../../components/section/routines/routines/DeleteRoutineConfirm';
 
 export default function RoutineEdit() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);
@@ -245,15 +247,17 @@ export default function RoutineEdit() {
     navigate('/routines');
   }, [deletePreset, navigate, presetId]);
 
-  const title = isEdit ? '루틴 편집' : '루틴 생성';
-  const exerciseCountLabel = `${exercises.length}개`;
+  const title = isEdit ? t('routines.edit') : t('routines.create');
+  const exerciseCountLabel = t('routines.exerciseCount', {
+    count: exercises.length,
+  });
 
   if (isEdit && !hydrated) {
     return (
       <div className="mx-auto max-w-md space-y-6 p-4 pb-28">
-        <div className="h-10 animate-pulse rounded-xl bg-zinc-100" />
-        <div className="h-24 animate-pulse rounded-2xl bg-zinc-100" />
-        <div className="h-40 animate-pulse rounded-2xl bg-zinc-100" />
+        <div className="h-10 animate-pulse rounded-xl bg-muted" />
+        <div className="h-24 animate-pulse rounded-2xl bg-muted" />
+        <div className="h-40 animate-pulse rounded-2xl bg-muted" />
       </div>
     );
   }
@@ -265,7 +269,7 @@ export default function RoutineEdit() {
           type="button"
           variant="ghost"
           size="icon-sm"
-          aria-label="뒤로"
+          aria-label={t('common.back')}
           onClick={handleBack}
         >
           <ChevronLeft size={22} />
@@ -276,10 +280,10 @@ export default function RoutineEdit() {
             type="button"
             variant="ghost"
             size="icon-sm"
-            aria-label="루틴 삭제"
+            aria-label={t('routines.deleteRoutine')}
             onClick={() => setDeleteOpen(true)}
           >
-            <Trash2 size={18} className="text-zinc-500" />
+            <Trash2 size={18} className="text-muted-foreground" />
           </Button>
         ) : (
           <span className="inline-block w-9" aria-hidden />
@@ -288,29 +292,29 @@ export default function RoutineEdit() {
 
       <section className="space-y-2">
         <Label htmlFor="routine-name" className="font-bold text-foreground">
-          루틴 이름
+          {t('routines.name')}
         </Label>
         <Input
           id="routine-name"
           value={name}
           onChange={(event) => setName(event.target.value)}
-          placeholder="예: 상체 위주 루틴"
-          className="h-12 rounded-2xl border-zinc-200 bg-zinc-50 px-4 text-base focus-visible:border-blue-500"
+          placeholder={t('routines.namePlaceholder')}
+          className="h-12 rounded-2xl border-border bg-muted px-4 text-base focus-visible:border-ring"
           aria-invalid={trimmedName.length === 0}
         />
         {trimmedName.length === 0 ? (
-          <p className="text-xs text-zinc-500">루틴 이름을 입력해 주세요</p>
+          <p className="text-xs text-muted-foreground">{t('routines.nameRequired')}</p>
         ) : null}
       </section>
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-bold text-foreground">운동 종목</h2>
+          <h2 className="font-bold text-foreground">{t('routines.exerciseSection')}</h2>
           <span
             className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
               exercises.length === 0
-                ? 'bg-zinc-100 text-zinc-500'
-                : 'bg-blue-50 text-blue-600'
+                ? 'bg-muted text-muted-foreground'
+                : 'bg-brand-soft text-brand-text'
             }`}
           >
             {exerciseCountLabel}
@@ -318,13 +322,13 @@ export default function RoutineEdit() {
         </div>
 
         {exercises.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-2 rounded-3xl bg-zinc-50 px-6 py-12 text-center dark:bg-zinc-900/40">
-            <Dumbbell size={36} className="text-zinc-300" aria-hidden />
-            <p className="font-bold text-zinc-700 dark:text-zinc-200">
-              아직 추가된 운동이 없습니다
+          <div className="flex flex-col items-center justify-center gap-2 rounded-3xl bg-muted px-6 py-12 text-center">
+            <Dumbbell size={36} className="text-muted-foreground/50" aria-hidden />
+            <p className="font-bold text-foreground">
+              {t('workout.emptyTitle')}
             </p>
-            <p className="text-sm text-zinc-500">
-              아래에서 종목을 검색해 추가하세요
+            <p className="text-sm text-muted-foreground">
+              {t('workout.emptyHint')}
             </p>
           </div>
         ) : (
@@ -343,11 +347,11 @@ export default function RoutineEdit() {
         <Button
           type="button"
           variant="outline"
-          className="w-full rounded-2xl border-blue-200 bg-white py-4 font-bold text-blue-600 hover:bg-blue-50"
+          className="w-full rounded-2xl border-brand/30 bg-background py-4 font-bold text-brand-text hover:bg-brand-soft"
           onClick={() => setPickerOpen(true)}
         >
           <Plus size={18} className="mr-2" />
-          운동 종목 추가
+          {t('routines.addExercise')}
         </Button>
       </section>
 
@@ -355,11 +359,11 @@ export default function RoutineEdit() {
         <div className="mx-auto max-w-md">
           <Button
             type="button"
-            className="w-full rounded-2xl py-6 text-base font-bold"
+            className="w-full rounded-2xl py-6 text-base font-bold bg-brand text-brand-foreground hover:bg-brand/90"
             disabled={!canSave}
             onClick={handleSave}
           >
-            {isSaving ? '저장 중...' : '저장하기'}
+            {isSaving ? t('routines.saving') : t('routines.save')}
           </Button>
         </div>
       </div>

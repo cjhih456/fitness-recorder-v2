@@ -4,7 +4,7 @@ import LayoutHeader from "./LayoutHeader";
 
 
 export default function DefaultLayout({ children }: { children: React.ReactNode }) {
-  return (<div className="min-h-screen ">
+  return (<div className="min-h-screen bg-background text-foreground">
     <LayoutHeader />
     <main>
       {children || <Outlet />}

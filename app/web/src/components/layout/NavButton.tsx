@@ -1,10 +1,29 @@
 import type { LucideIcon } from "lucide-react";
-import { Button } from "@fitness-recoder/ui";
+import { Button, cn } from "@fitness-recoder/ui";
 
-export default function NavButton({ icon: Icon, label, onClick }: { icon: LucideIcon, label: string, onClick: () => void }) {
+export default function NavButton({
+  icon: Icon,
+  label,
+  onClick,
+  isActive = false,
+}: {
+  icon: LucideIcon;
+  label: string;
+  onClick: () => void;
+  isActive?: boolean;
+}) {
   return (
-    <Button variant="ghost" size="icon-xl" className="p-2 flex flex-col items-center gap-1" onClick={onClick}>
-      <Icon size={20} />
+    <Button
+      variant="ghost"
+      size="icon-xl"
+      className={cn(
+        "p-2 flex flex-col items-center gap-1",
+        isActive ? "text-brand-text" : "text-muted-foreground",
+      )}
+      onClick={onClick}
+      aria-current={isActive ? "page" : undefined}
+    >
+      <Icon size={20} fill={isActive ? "currentColor" : "none"} />
       <span className="text-[10px] font-medium">{label}</span>
     </Button>
   )

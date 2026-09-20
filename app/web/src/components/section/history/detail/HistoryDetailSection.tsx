@@ -3,6 +3,7 @@ import { hooks } from '@fitness-recoder/graphql-sqlite-worker';
 import { Button } from '@fitness-recoder/ui';
 import { ChevronLeft } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import MuscleChip from '../history/MuscleChip';
 import {
   formatHistoryDateLabel,
@@ -51,6 +52,7 @@ export default function HistoryDetailSection({
   onSaveAsRoutine,
   isSavingRoutine = false,
 }: HistoryDetailSectionProps) {
+  const { t, i18n } = useTranslation();
   const [setsByExercise, setSetsByExercise] = useState(
     () => new Map<number, SetData[]>(),
   );
@@ -63,15 +65,18 @@ export default function HistoryDetailSection({
     });
   }, []);
 
-  const title = formatScheduleTitle(schedule);
+  const title = formatScheduleTitle(schedule, t);
   const dateLabel = formatHistoryDateLabel(
     schedule.year,
     schedule.month,
     schedule.date,
+    t,
   );
-  const muscles = useMemo(() => formatMuscleLabels(exercises), [exercises]);
+  const muscles = useMemo(() => formatMuscleLabels(exercises, t), [exercises, t]);
   const volume = useMemo(() => calcVolume(setsByExercise), [setsByExercise]);
-  const volumeLabel = volume.toLocaleString('ko-KR');
+  const volumeLabel = volume.toLocaleString(
+    i18n.language === 'en' ? 'en-US' : 'ko-KR',
+  );
 
   return (
     <div className="mx-auto max-w-md space-y-6 p-4 pb-24">
@@ -87,8 +92,8 @@ export default function HistoryDetailSection({
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center gap-1 text-sm font-medium text-zinc-600"
-          aria-label="뒤로"
+          className="flex items-center gap-1 text-sm font-medium text-muted-foreground"
+          aria-label={t('common.back')}
         >
           <ChevronLeft size={20} />
           <span className="truncate font-semibold text-foreground">{title}</span>
@@ -98,20 +103,22 @@ export default function HistoryDetailSection({
             type="button"
             variant="ghost"
             size="sm"
-            className="shrink-0 text-blue-600"
+            className="shrink-0 text-brand-text"
             onClick={onSaveAsRoutine}
             disabled={isSavingRoutine}
           >
-            루틴으로 저장
+            {t('history.saveAsRoutine')}
           </Button>
         ) : null}
       </div>
 
       <div className="space-y-2">
         <h2 className="text-2xl font-black tracking-tight">{dateLabel}</h2>
-        <p className="text-sm font-medium text-zinc-500">
-          {schedule.workoutTimes}분{' '}
-          <span className="text-blue-600">총 볼륨 {volumeLabel} kg</span>
+        <p className="text-sm font-medium text-muted-foreground">
+          {t('history.minutes', { minutes: schedule.workoutTimes })}{' '}
+          <span className="text-primary">
+            {t('history.totalVolume', { volume: volumeLabel })}
+          </span>
         </p>
         {muscles.length > 0 ? (
           <div className="flex flex-wrap gap-1.5">
@@ -123,8 +130,8 @@ export default function HistoryDetailSection({
       </div>
 
       {exercises.length === 0 ? (
-        <p className="text-sm text-zinc-400">
-          이 세션에 기록된 운동이 없습니다
+        <p className="text-sm text-muted-foreground">
+          {t('history.sessionEmpty')}
         </p>
       ) : (
         <div className="flex flex-col gap-4">

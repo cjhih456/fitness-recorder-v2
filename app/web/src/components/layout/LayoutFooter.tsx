@@ -3,6 +3,7 @@ import { hooks } from '@fitness-recoder/graphql-sqlite-worker';
 import { Button } from '@fitness-recoder/ui';
 import { LayoutDashboard, History, Plus, Camera, Play } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import dayjs from '../../libs/dayjs';
 import NavButton from './NavButton';
@@ -30,6 +31,7 @@ function findResumableSchedule(
 }
 
 export default function LayoutFooter() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const today = useMemo(() => getTodayParts(), []);
@@ -71,7 +73,7 @@ export default function LayoutFooter() {
         month: today.month,
         date: today.date,
         type: 'SCHEDULED',
-        title: '오늘의 운동',
+        title: t('workout.todayTitle'),
       });
       if (!created) return;
 
@@ -94,31 +96,52 @@ export default function LayoutFooter() {
     today.year,
     today.month,
     today.date,
+    t,
   ]);
-  
+
   if (hideTabBar) {
     return null;
   }
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 z-40 border-t bg-white px-4 py-2 shadow-lg backdrop-blur-md dark:bg-zinc-950/80">
+    <footer className="fixed bottom-0 left-0 right-0 z-40 border-t bg-background/80 px-4 py-2 shadow-lg backdrop-blur-md">
       <nav className="mx-auto flex max-w-md items-center justify-around">
-        <NavButton icon={LayoutDashboard} label="홈" onClick={gotoHome} />
-        <NavButton icon={History} label="기록" onClick={gotoHistory} />
+        <NavButton
+          icon={LayoutDashboard}
+          label={t('nav.home')}
+          onClick={gotoHome}
+          isActive={location.pathname === '/'}
+        />
+        <NavButton
+          icon={History}
+          label={t('nav.history')}
+          onClick={gotoHistory}
+          isActive={location.pathname.startsWith('/history')}
+        />
         <div className="relative -top-6">
           <Button
             variant="default"
             size="icon-xl"
-            className="rounded-full bg-blue-600 hover:bg-blue-600"
+            className="rounded-full bg-brand text-brand-foreground shadow-lg shadow-brand/40 hover:bg-brand/90"
             onClick={gotoWorkout}
             disabled={isLoading || isStarting}
-            aria-label="운동 시작"
+            aria-label={t('nav.startWorkout')}
           >
-            <Play fill="white" size={24} />
+            <Play className="fill-brand-foreground" size={24} />
           </Button>
         </div>
-        <NavButton icon={Plus} label="루틴" onClick={gotoRoutines} />
-        <NavButton icon={Camera} label="인증" onClick={gotoPhoto} />
+        <NavButton
+          icon={Plus}
+          label={t('nav.routines')}
+          onClick={gotoRoutines}
+          isActive={location.pathname.startsWith('/routines')}
+        />
+        <NavButton
+          icon={Camera}
+          label={t('nav.photo')}
+          onClick={gotoPhoto}
+          isActive={location.pathname.startsWith('/photo')}
+        />
       </nav>
     </footer>
   );

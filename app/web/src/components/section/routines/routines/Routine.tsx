@@ -12,6 +12,7 @@ import {
 } from '@fitness-recoder/ui';
 import { Trash2 } from 'lucide-react';
 import { useCallback, useMemo, type MouseEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface RoutineProps {
   routine: ExercisePresetWithExerciseList;
@@ -30,16 +31,25 @@ export default function Routine({
   onClickOpenActions,
   isStarting = false,
 }: RoutineProps) {
+  const { t } = useTranslation();
   const target = useMemo(() => {
     const targets = routine.exerciseList
       .map((exercise) => exercise.fitness?.primaryMuscles)
       .filter(Boolean)
       .flat();
     const uniqueTargets = Array.from(new Set(targets));
-    if (uniqueTargets.length === 0) return '없음';
-    if (uniqueTargets.length < 3) return uniqueTargets.join(', ');
-    return `${uniqueTargets.slice(0, 3).join(', ')} 외 ${uniqueTargets.length - 3}부위`;
-  }, [routine.exerciseList]);
+    if (uniqueTargets.length === 0) return t('routines.none');
+    const labels = uniqueTargets.map((muscle) => {
+      const key = `muscle.${muscle}`;
+      const translated = t(key as never);
+      return translated === key ? muscle : translated;
+    });
+    if (labels.length < 3) return labels.join(', ');
+    return t('routines.moreTargets', {
+      targets: labels.slice(0, 3).join(', '),
+      count: labels.length - 3,
+    });
+  }, [routine.exerciseList, t]);
 
   const mostCategory = useMemo(() => {
     const categories = routine.exerciseList
@@ -105,9 +115,9 @@ export default function Routine({
         <div className="flex justify-between items-start">
           <div>
             <CardTitle className="text-lg">{routine.name}</CardTitle>
-            <p className="text-sm text-zinc-500 mb-2">{target}</p>
+            <p className="text-sm text-muted-foreground mb-2">{target}</p>
             <div className="flex gap-1.5">
-              <span className="px-2 py-0.5 bg-zinc-50 dark:bg-zinc-800 text-zinc-500 rounded-md text-[10px] font-bold uppercase">
+              <span className="px-2 py-0.5 bg-muted text-muted-foreground rounded-md text-[10px] font-bold uppercase">
                 {mostCategory}
               </span>
             </div>
@@ -116,34 +126,34 @@ export default function Routine({
             type="button"
             variant="ghost"
             size="icon-sm"
-            className="text-zinc-400 hover:text-red-500"
+            className="text-muted-foreground hover:text-destructive"
             onClick={handleDeleteRoutine}
-            aria-label={`${routine.name} 삭제`}
+            aria-label={t('routines.deleteAria', { name: routine.name })}
           >
             <Trash2 size={16} />
           </Button>
         </div>
       </CardContent>
-      <CardFooter className="p-0 border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 flex-col">
+      <CardFooter className="p-0 border-border bg-surface-subtle flex-col">
         <div className="w-full">
           <Separator />
           <Button
             type="button"
             variant="ghost"
-            className="rounded-none w-full text-xs font-bold text-blue-600 dark:text-blue-400"
+            className="rounded-none w-full text-xs font-bold text-brand-text"
             onClick={handleStartRoutine}
             disabled={isStarting}
           >
-            이 루틴으로 시작
+            {t('routines.startWithThis')}
           </Button>
           <Separator />
           <Button
             type="button"
             variant="ghost"
-            className="rounded-t-none rounded-b-2xl w-full text-xs font-bold text-blue-600 dark:text-blue-400"
+            className="rounded-t-none rounded-b-2xl w-full text-xs font-bold text-brand-text"
             onClick={handleEditRoutine}
           >
-            편집하기
+            {t('routines.editAction')}
           </Button>
         </div>
       </CardFooter>

@@ -1,5 +1,6 @@
 import { Calendar, Camera, CheckCircle2, Dumbbell } from 'lucide-react';
 import { forwardRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export interface PhotoShareCardProps {
   title: string;
@@ -24,11 +25,12 @@ const PhotoShareCard = forwardRef<HTMLDivElement, PhotoShareCardProps>(
     },
     ref,
   ) {
+    const { t } = useTranslation();
     return (
       <div
         ref={ref}
         id="export-card"
-        className="relative aspect-3/4 w-full overflow-hidden rounded-3xl border-4 border-white shadow-2xl dark:border-zinc-800"
+        className="relative aspect-3/4 w-full overflow-hidden rounded-3xl border-4 border-white shadow-2xl"
       >
         {imageUrl ? (
           <img
@@ -55,7 +57,7 @@ const PhotoShareCard = forwardRef<HTMLDivElement, PhotoShareCardProps>(
                 {dateLabel}
               </div>
             </div>
-            <div className="flex size-12 items-center justify-center rounded-full bg-blue-600 shadow-lg shadow-blue-500/50">
+            <div className="flex size-12 items-center justify-center rounded-full bg-brand shadow-lg shadow-brand/50">
               <Dumbbell size={24} aria-hidden />
             </div>
           </div>
@@ -63,7 +65,7 @@ const PhotoShareCard = forwardRef<HTMLDivElement, PhotoShareCardProps>(
           {!imageUrl ? (
             <div className="flex flex-col items-center gap-2 self-center text-muted-foreground">
               <Camera size={28} aria-hidden />
-              <p className="text-[13px] font-medium">사진을 선택해 주세요</p>
+              <p className="text-[13px] font-medium">{t('photo.choosePhoto')}</p>
             </div>
           ) : caption ? (
             <p className="self-center text-center text-sm font-semibold drop-shadow">
@@ -95,10 +97,10 @@ const PhotoShareCard = forwardRef<HTMLDivElement, PhotoShareCardProps>(
             </div>
 
             {highlightLine ? (
-              <div className="flex items-center justify-between rounded-2xl border border-blue-400/30 bg-blue-600/80 p-4 backdrop-blur-md">
+              <div className="flex items-center justify-between rounded-2xl border border-brand/30 bg-brand/80 p-4 backdrop-blur-md">
                 <div>
                   <p className="mb-0.5 text-[10px] font-bold uppercase tracking-wider opacity-80">
-                    오늘의 최고 기록
+                    {t('photo.bestRecord')}
                   </p>
                   <p className="text-lg font-black">{highlightLine}</p>
                 </div>

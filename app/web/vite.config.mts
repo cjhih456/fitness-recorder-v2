@@ -53,7 +53,7 @@ export default defineConfig(() => {
         outputDir: path.join(import.meta.dirname, 'src/assets/i18n/languages'),
         typeDir: path.join(import.meta.dirname, 'src/assets/i18n/languages'),
         useDts: true,
-        defaultNS: 'common',
+        defaultNS: 'translation',
         langs: ['ko', 'en'],
       }),
       tailwindcss(),
@@ -90,6 +90,7 @@ export default defineConfig(() => {
       watch: false,
       globals: true,
       environment: 'jsdom',
+      setupFiles: ['./src/test/setup.ts'],
       include: ['{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
       reporters: ['default'],
       coverage: {

@@ -1,4 +1,5 @@
 import type { HistoryListItem } from './types';
+import { useTranslation } from 'react-i18next';
 import SectionSkeleton from '../../SectionSkeleton';
 import HistoryDayGroup from './HistoryDayGroup';
 import HistoryEmpty from './HistoryEmpty';
@@ -20,10 +21,11 @@ export default function HistorySection({
   onClickHistory,
   onClickHome,
 }: HistorySectionProps) {
+  const { t } = useTranslation();
   const isEmpty = !isLoading && finishDates.length === 0;
 
   return (
-    <SectionSkeleton title="운동 히스토리" useCard={false}>
+    <SectionSkeleton title={t('history.title')} useCard={false}>
       {{
         default: (
           <div className="flex flex-col gap-4">

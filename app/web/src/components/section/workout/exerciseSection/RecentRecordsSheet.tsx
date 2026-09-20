@@ -1,6 +1,7 @@
 import { Button } from '@fitness-recoder/ui';
 import { X } from 'lucide-react';
 import { useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export interface RecentRecordRow {
   id: string;
@@ -22,6 +23,7 @@ export default function RecentRecordsSheet({
   records = [],
   onOpenChange,
 }: RecentRecordsSheetProps) {
+  const { t } = useTranslation();
   const handleClose = useCallback(() => {
     onOpenChange?.(false);
   }, [onOpenChange]);
@@ -43,8 +45,8 @@ export default function RecentRecordsSheet({
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
       <button
         type="button"
-        className="absolute inset-0 bg-black/80"
-        aria-label="닫기"
+        className="absolute inset-0 bg-scrim"
+        aria-label={t('common.close')}
         onClick={handleClose}
       />
       <div
@@ -58,7 +60,7 @@ export default function RecentRecordsSheet({
             id="recent-records-title"
             className="text-lg font-bold text-foreground"
           >
-            {exerciseName} · 최근 기록
+            {t('recent.title', { name: exerciseName })}
           </h2>
           <Button
             type="button"
@@ -66,7 +68,7 @@ export default function RecentRecordsSheet({
             size="icon-sm"
             className="rounded-full"
             onClick={handleClose}
-            aria-label="닫기"
+            aria-label={t('common.close')}
           >
             <X size={18} />
           </Button>
@@ -74,20 +76,23 @@ export default function RecentRecordsSheet({
 
         <div className="min-h-0 flex-1 space-y-2 overflow-y-auto">
           {records.length === 0 ? (
-            <p className="py-12 text-center text-sm text-zinc-500">
-              아직 이 운동의 기록이 없습니다
+            <p className="py-12 text-center text-sm text-muted-foreground">
+              {t('recent.empty')}
             </p>
           ) : (
             records.map((record) => (
               <div
                 key={record.id}
-                className="flex items-center justify-between rounded-xl bg-zinc-50 px-4 py-3 dark:bg-zinc-900"
+                className="flex items-center justify-between rounded-xl bg-muted px-4 py-3"
               >
                 <span className="text-sm font-medium text-foreground">
                   {record.dateLabel}
                 </span>
-                <span className="text-sm text-zinc-500">
-                  {record.weight} kg · {record.repeat}회
+                <span className="text-sm text-muted-foreground">
+                  {t('recent.setSummary', {
+                    weight: record.weight,
+                    reps: record.repeat,
+                  })}
                 </span>
               </div>
             ))

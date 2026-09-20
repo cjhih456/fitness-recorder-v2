@@ -1,6 +1,7 @@
 import type { ScheduleData } from '@fitness-recoder/structure';
 import { hooks } from '@fitness-recoder/graphql-sqlite-worker';
 import { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import PhotoEmptySession from '../../components/section/photo/PhotoEmptySession';
 import PhotoSession from '../../components/section/photo/PhotoSession';
@@ -24,6 +25,7 @@ function parseScheduleId(raw: string | null): number | undefined {
 }
 
 export default function Photo() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const paramScheduleId = parseScheduleId(searchParams.get('scheduleId'));
@@ -58,7 +60,7 @@ export default function Photo() {
   return (
     <div className="mx-auto max-w-md space-y-4 p-4 pb-24">
       <h2 className="text-lg font-semibold text-foreground">
-        운동 인증 사진 만들기
+        {t('photo.createTitle')}
       </h2>
 
       {schedule ? (

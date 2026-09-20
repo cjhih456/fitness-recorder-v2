@@ -1,5 +1,6 @@
 import { Button } from '@fitness-recoder/ui';
 import { useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface DiscardDraftConfirmProps {
   open: boolean;
@@ -14,6 +15,7 @@ export default function DiscardDraftConfirm({
   onConfirm,
   onCancel,
 }: DiscardDraftConfirmProps) {
+  const { t } = useTranslation();
   const handleCancel = useCallback(() => {
     onCancel?.();
     onOpenChange?.(false);
@@ -41,8 +43,8 @@ export default function DiscardDraftConfirm({
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
       <button
         type="button"
-        className="absolute inset-0 bg-black/80"
-        aria-label="닫기"
+        className="absolute inset-0 bg-scrim"
+        aria-label={t('common.close')}
         onClick={handleCancel}
       />
       <div
@@ -57,10 +59,10 @@ export default function DiscardDraftConfirm({
             id="discard-draft-title"
             className="text-lg font-bold text-foreground"
           >
-            수정을 취소할까요?
+            {t('routines.discardTitle')}
           </h2>
-          <p id="discard-draft-body" className="text-sm text-zinc-500">
-            저장하지 않은 내용이 사라집니다.
+          <p id="discard-draft-body" className="text-sm text-muted-foreground">
+            {t('routines.discardBody')}
           </p>
         </div>
         <div className="flex flex-row gap-3">
@@ -70,14 +72,14 @@ export default function DiscardDraftConfirm({
             className="flex-1 rounded-full font-bold"
             onClick={handleCancel}
           >
-            계속 편집
+            {t('routines.keepEditing')}
           </Button>
           <Button
             type="button"
-            className="flex-1 rounded-full font-bold bg-zinc-900 text-white hover:bg-zinc-800"
+            className="flex-1 rounded-full font-bold bg-primary text-primary-foreground hover:bg-primary/80"
             onClick={handleConfirm}
           >
-            나가기
+            {t('routines.leave')}
           </Button>
         </div>
       </div>

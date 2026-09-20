@@ -2,6 +2,7 @@ import type { SetData } from '@fitness-recoder/structure';
 import { Input } from '@fitness-recoder/ui';
 import { CheckCircle2, Trash2 } from 'lucide-react';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ExerciseSetInputProps {
   set: SetData;
@@ -18,6 +19,7 @@ export default function ExerciseSetInput({
   onUpdate,
   onDelete,
 }: ExerciseSetInputProps) {
+  const { t } = useTranslation();
   const handleWeightChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onUpdate({
@@ -53,18 +55,21 @@ export default function ExerciseSetInput({
     <div
       className={`grid grid-cols-12 gap-2 rounded-xl border p-2 transition-all ${
         set.isDone
-          ? 'border-green-200 bg-green-50 opacity-90 dark:border-green-800 dark:bg-green-900/20'
-          : 'border-transparent bg-zinc-50 shadow-inner dark:bg-zinc-900/50'
+          ? 'border-success/30 bg-success-soft opacity-90'
+          : 'border-transparent bg-muted shadow-inner'
       }`}
     >
-      <div className="col-span-2 flex items-center justify-center font-bold text-zinc-500">
+      <div className="col-span-2 flex items-center justify-center font-bold text-muted-foreground">
         {index + 1}
       </div>
       <div className="col-span-3">
         <Input
           type="number"
           inputMode="decimal"
-          aria-label={`${exerciseName} ${index + 1}세트 무게`}
+          aria-label={t('workout.setWeightAria', {
+            name: exerciseName,
+            index: index + 1,
+          })}
           value={set.weight ?? 0}
           onChange={handleWeightChange}
           className="rounded-lg border-none bg-background p-2 text-center font-bold shadow-sm"
@@ -74,7 +79,10 @@ export default function ExerciseSetInput({
         <Input
           type="number"
           inputMode="numeric"
-          aria-label={`${exerciseName} ${index + 1}세트 횟수`}
+          aria-label={t('workout.setRepsAria', {
+            name: exerciseName,
+            index: index + 1,
+          })}
           value={set.repeat}
           onChange={handleRepeatChange}
           className="rounded-lg border-none bg-background p-2 text-center font-bold shadow-sm"
@@ -83,13 +91,16 @@ export default function ExerciseSetInput({
       <div className="col-span-2 flex items-center justify-center">
         <button
           type="button"
-          aria-label={`${exerciseName} ${index + 1}세트 완료`}
+          aria-label={t('workout.setDoneAria', {
+            name: exerciseName,
+            index: index + 1,
+          })}
           aria-pressed={set.isDone}
           onClick={handleToggleDone}
           className={`flex h-9 w-9 items-center justify-center rounded-full transition-all ${
             set.isDone
-              ? 'bg-green-500 text-white shadow-md'
-              : 'border-2 border-zinc-200 bg-background text-transparent dark:border-zinc-700'
+              ? 'bg-success text-success-foreground shadow-md'
+              : 'border-2 border-border bg-background text-transparent'
           }`}
         >
           <CheckCircle2 size={20} />
@@ -98,9 +109,12 @@ export default function ExerciseSetInput({
       <div className="col-span-2 flex items-center justify-center">
         <button
           type="button"
-          aria-label={`${exerciseName} ${index + 1}세트 삭제`}
+          aria-label={t('workout.setDeleteAria', {
+            name: exerciseName,
+            index: index + 1,
+          })}
           onClick={handleDelete}
-          className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-100 hover:text-red-500 dark:hover:bg-zinc-800"
+          className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-destructive"
         >
           <Trash2 size={16} />
         </button>

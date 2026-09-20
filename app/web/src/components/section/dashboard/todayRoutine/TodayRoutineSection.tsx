@@ -1,4 +1,5 @@
 import type { ExercisePresetWithExerciseList } from '@fitness-recoder/structure';
+import { useTranslation } from 'react-i18next';
 import SectionSkeleton from '../../SectionSkeleton';
 import TodayRoutine from './TodayRoutine';
 import TodayRoutineEmpty from './TodayRoutineEmpty';
@@ -18,8 +19,9 @@ export default function TodayRoutineSection({
   onClickCreateRoutine,
   startingPresetId = null,
 }: TodayRoutineSectionProps) {
+  const { t } = useTranslation();
   return (
-    <SectionSkeleton title="오늘의 루틴" useCard={false}>
+    <SectionSkeleton title={t('dashboard.todayRoutine')} useCard={false}>
       {{
         default: (
           <div className="flex flex-col gap-4">
@@ -38,7 +40,7 @@ export default function TodayRoutineSection({
           </div>
         ),
         subtitle: (
-          <span className="rounded-full bg-blue-50 px-2 py-1 text-[10px] font-bold text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+          <span className="rounded-full bg-brand-soft px-2 py-1 text-[10px] font-bold text-brand-text">
             {dateLabel}
           </span>
         ),

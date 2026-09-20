@@ -2,6 +2,7 @@ import type { HistoryListItem, HistorySchedule } from './types';
 import type { ExerciseData, SetData } from '@fitness-recoder/structure';
 import { hooks } from '@fitness-recoder/graphql-sqlite-worker';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import History from './History';
 import { toHistoryListItem } from './formatHistory';
 
@@ -39,6 +40,7 @@ export default function HistoryCardLoader({
   schedule,
   onClickHistory,
 }: HistoryCardLoaderProps) {
+  const { t } = useTranslation();
   const { data: exercises = [] } = hooks.useExerciseListByScheduleIdQuery(
     schedule.id,
   );
@@ -64,9 +66,10 @@ export default function HistoryCardLoader({
       toHistoryListItem(
         schedule,
         exercises as ExerciseData[],
+        t,
         totalVolume,
       ),
-    [schedule, exercises, totalVolume],
+    [schedule, exercises, totalVolume, t],
   );
 
   return (
