@@ -1,5 +1,5 @@
-import initSqlJs, { type Database, type SqlValue as SqlJsValue } from 'sql.js';
 import type { QueryResult, SqlExecutor } from '../src/lib/types';
+import initSqlJs, { type Database, type SqlValue as SqlJsValue } from 'sql.js';
 
 /**
  * sql.js 기반 SqlExecutor. 시드 DB 생성 스크립트 전용.

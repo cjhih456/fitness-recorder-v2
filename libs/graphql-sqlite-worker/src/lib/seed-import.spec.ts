@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import initSqlJs from 'sql.js';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { createSqlJsDatabase, SqlJsExecutor } from '../../scripts/sqljs-executor';
 import { APP_VERSION } from './app-version';
 import { initializeDatabase, insertInitialFitnessData } from './init';
 import {
@@ -10,7 +11,6 @@ import {
   maybeImportSeedDatabase,
   opfsDatabaseExists,
 } from './seed-import';
-import { createSqlJsDatabase, SqlJsExecutor } from '../../scripts/sqljs-executor';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SEED_PATH = join(__dirname, '../assets/seed.db');

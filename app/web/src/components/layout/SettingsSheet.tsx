@@ -1,5 +1,5 @@
-import { Button } from '@fitness-recoder/ui';
 import { APP_VERSION } from '@fitness-recoder/graphql-sqlite-worker';
+import { Button } from '@fitness-recoder/ui';
 import { X } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useCallback, useEffect, useState } from 'react';
