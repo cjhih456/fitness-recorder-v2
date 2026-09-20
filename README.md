@@ -1,121 +1,263 @@
-# fitness-recoder-v2
+# FITLOG (`fitness-recoder-v2`)
 
-## 프로젝트 소개
+브라우저에서 동작하는 피트니스 기록 앱입니다. 서버 없이 WebAssembly SQLite와 GraphQL을 로컬에서 실행하며, 운동 루틴·세션·이력·공유 카드를 한 화면에서 관리합니다.
 
-fitness-recoder-v2는 Nx 모노레포 기반의 피트니스 기록 관리 애플리케이션입니다. 
-현대적인 웹 기술 스택을 활용하여 확장 가능하고 유지보수가 용이한 구조로 설계되었습니다.
+Nx 워크스페이스 모노레포이며 앱은 `app/web`, 도메인·UI·데이터 계층은 `libs/`에 분리되어 있습니다. 현재 앱 스키마 버전은 `1.5.0`입니다.
 
-### 주요 특징
+## 주요 기능
 
-- **모노레포 구조**: Nx를 활용한 효율적인 코드 공유 및 관리
-- **현대적인 기술 스택**: Vite, React, TypeScript를 기반으로 한 빠른 개발 환경
-- **재사용 가능한 라이브러리**: 공통 기능을 라이브러리로 분리하여 재사용성 극대화
-- **타입 안정성**: TypeScript를 통한 강력한 타입 체크
-- **개발 도구**: ESLint, Prettier, Vitest, Storybook을 통한 품질 관리
+- **대시보드**: 오늘 루틴과 주간 볼륨 차트
+- **운동 세션**: 스케줄 시작/재개, 세트 기록, 타이머, 운동 검색 추가
+- **루틴**: 프리셋 생성·수정·삭제, 오늘 스케줄로 복제
+- **기록**: 월별 완료 이력과 세션 상세
+- **포토 카드**: 완료 세션을 이미지로 저장·공유
+- **설정**: 한국어/영어, 라이트/다크 테마
+- **오프라인 저장**: Origin Private File System(OPFS) 또는 메모리 SQLite
+
+## 아키텍처
+
+```
+React (app/web)
+  └── GraphQLSQLiteWorkerProvider
+        ├── DB Worker (sqlite-wasm)
+        └── Service Worker (GraphQL Yoga)
+              └── BroadcastChannel ('graphql-sqlite-worker')
+```
+
+1. 메인 스레드는 Worker를 초기화하고 React Query로 GraphQL을 호출합니다.
+2. Service Worker는 `/api/graphql` 요청을 GraphQL Yoga로 처리합니다.
+3. Resolver는 `dbBus`로 DB Worker에 SQL을 보내고, 시드는 개발/빌드 시 `seed.db`로 미리 생성됩니다.
+
+SharedArrayBuffer를 쓰는 sqlite-wasm 때문에 개발·프리뷰 서버는 COOP/COEP 헤더를 설정합니다.
+
+## 기술 스택
+
+
+| 영역   | 구성                                                      |
+| ---- | ------------------------------------------------------- |
+| 앱    | React 19, React Router 6, Vite 7, Tailwind CSS 4        |
+| 데이터  | GraphQL Yoga, TanStack Query, `@sqlite.org/sqlite-wasm` |
+| 도메인  | Zod (`@fitness-recoder/structure`)                      |
+| UI   | shadcn/ui + Radix, lucide-react (`@fitness-recoder/ui`) |
+| i18n | i18next, Excel → JSON Vite 플러그인 (ko, en)                |
+| 도구   | Nx 22, Yarn 4.9.2, TypeScript, ESLint, Prettier, Vitest |
+
+
+
+
+## 프로젝트 구조
+
+```
+fitness-recoder-v2/
+├── app/web/                          # FITLOG 웹 앱
+│   └── src/
+│       ├── app/pages/                # 라우트 화면
+│       ├── components/               # 레이아웃·섹션
+│       ├── assets/i18n/              # 언어 파일·xlsx 소스
+│       └── vite-plugins/             # i18next Excel 로더
+├── libs/
+│   ├── structure/                    # Zod 스키마·도메인 타입
+│   ├── ui/                           # 공통 UI 컴포넌트
+│   └── graphql-sqlite-worker/        # GraphQL + SQLite Worker
+├── design-system/fitlog/             # 화면 스펙·플로우
+├── .github/workflows/                # Validate, GitHub Pages Deploy
+├── nx.json
+└── package.json
+```
+
+
+
+### 라우트
+
+
+| 경로                                    | 화면    |
+| ------------------------------------- | ----- |
+| `/`                                   | 대시보드  |
+| `/history`                            | 운동 기록 |
+| `/history/:scheduleId`                | 기록 상세 |
+| `/routines`                           | 루틴 목록 |
+| `/routines/new`, `/routines/:id/edit` | 루틴 편집 |
+| `/workout/:scheduleId`                | 운동 세션 |
+| `/photo`                              | 포토 카드 |
+
+
+
 
 ## 시작하기
 
-### 필수 요구사항
 
-- **Node.js**: 20.x 이상
-- **Yarn**: 4.9.2 이상 (프로젝트에서 사용 중인 버전)
-- **Git**: 버전 관리
 
-### 설치
+### 요구사항
+
+- **Node.js** 20 이상 (CI는 Node 24)
+- **Yarn** 4.9.2 (Corepack 사용)
+- 최신 Chromium 계열 브라우저 (OPFS / Service Worker)
 
 ```bash
-# 의존성 설치
+corepack enable
 yarn install
 ```
 
-### 개발 서버 실행
+
+
+### 개발 서버
 
 ```bash
-# 웹 애플리케이션 개발 서버 시작
 yarn nx serve web
-
 # 또는
 yarn nx dev web
 ```
 
-개발 서버는 기본적으로 `http://localhost:3000`에서 실행됩니다.
+`http://localhost:3000`에서 실행됩니다. `serve`/`dev`는 `@fitness-recoder/graphql-sqlite-worker:generate-seed-db`에 의존하므로 시드 DB가 먼저 생성됩니다.
 
-## 사용 가능한 명령어
+## 명령어
 
-### 애플리케이션 명령어
+
+
+### 웹 앱
 
 ```bash
-# 개발 서버 실행
 yarn nx serve web
-yarn nx dev web
-
-# 프로덕션 빌드
 yarn nx build web
-
-# 빌드 미리보기
 yarn nx preview web
-
-# 테스트 실행
 yarn nx test web
-
-# 테스트 (CI 모드)
-yarn nx test-ci web
-
-# 린트 검사
 yarn nx lint web
-
-# 타입 체크
 yarn nx typecheck web
-
-# Storybook 실행
-yarn nx storybook web
-
-# Storybook 빌드
-yarn nx build-storybook web
 ```
 
-### 라이브러리 명령어
+프로덕션 빌드 결과는 `dist/app/web`입니다. GitHub Pages용으로 `VITE_BASE_PATH`를 바꿀 수 있습니다.
 
 ```bash
-# 라이브러리 빌드
-yarn nx build <library-name>
+VITE_BASE_PATH=/fitness-recorder-v2/ yarn nx build web
+```
 
-# 예시
+
+
+### 라이브러리
+
+Nx 프로젝트 이름은 패키지명 또는 디렉터리명으로 지정할 수 있습니다.
+
+```bash
 yarn nx build structure
-yarn nx build sqlite-worker
+yarn nx build ui
+yarn nx build graphql-sqlite-worker
+yarn nx generate-seed-db graphql-sqlite-worker
 
-# 라이브러리 린트
 yarn nx lint <library-name>
-
-# 라이브러리 타입 체크
 yarn nx typecheck <library-name>
+yarn nx test ui
 ```
 
-### 유용한 Nx 명령어
+
+
+### 워크스페이스
 
 ```bash
-# 프로젝트 정보 확인
 yarn nx show project web
-
-# 모든 프로젝트 빌드
-yarn nx run-many -t build --all
-
-# 모든 프로젝트 테스트
-yarn nx run-many -t test --all
-
-# 모든 프로젝트 린트
-yarn nx run-many -t lint --all
-
-# 의존성 그래프 시각화
+yarn nx run-many -t lint
+yarn nx run-many -t typecheck
+yarn nx run-many -t test
+yarn nx run-many -t build
 yarn nx graph
 ```
 
-## 개발 가이드
 
-### 새 라이브러리 생성
+
+## 라이브러리
+
+
+
+### `@fitness-recoder/structure`
+
+운동, 프리셋, 피트니스 카탈로그, 스케줄, 세트, 측정값에 대한 Zod 스키마와 타입입니다.
+
+```ts
+import { IScheduleSchema, type ScheduleData } from '@fitness-recoder/structure';
+```
+
+
+
+### `@fitness-recoder/ui`
+
+shadcn/ui 기반 공통 컴포넌트입니다. Button, Card, Drawer, Input, Chart 등을 앱에서 재사용합니다.
+
+```ts
+import { Button, Card } from '@fitness-recoder/ui';
+```
+
+
+
+### `@fitness-recoder/graphql-sqlite-worker`
+
+브라우저에서 SQLite와 GraphQL을 Worker로 실행합니다.
+
+- GraphQL 모듈: Schedule, Exercise, ExercisePreset, Sets, Fitness
+- React `hooks` 네임스페이스로 Query/Mutation 제공
+- 버전 마이그레이션 (`0.1.0` ~ `1.5.0`)
+- 피트니스 카탈로그가 들어 있는 `seed.db` 생성
+
+앱 연결 예:
+
+```tsx
+import { GraphQLSQLiteWorkerProvider, APP_VERSION } from '@fitness-recoder/graphql-sqlite-worker';
+import DbWorkerUrl from '@fitness-recoder/graphql-sqlite-worker/dbWorker?worker&url';
+import SeedDbUrl from '@fitness-recoder/graphql-sqlite-worker/seedDb?url';
+import ServiceWorkerUrl from '@fitness-recoder/graphql-sqlite-worker/serviceWorker?worker&url';
+
+<GraphQLSQLiteWorkerProvider
+  workerConfig={{
+    dbName: 'fitness.db',
+    appVersion: APP_VERSION,
+    dbWorkerUrl: DbWorkerUrl,
+    seedDbUrl: SeedDbUrl,
+  }}
+  serviceWorkerUrl={ServiceWorkerUrl}
+>
+  <App />
+</GraphQLSQLiteWorkerProvider>
+```
+
+상세 API는 `[libs/graphql-sqlite-worker/README.md](libs/graphql-sqlite-worker/README.md)`를 참고하세요.
+
+## i18n
+
+`app/web/src/assets/i18n/languages.xlsx`가 소스입니다. Vite 플러그인이 빌드/개발 시작 시 `ko.json`, `en.json`과 타입 정의를 생성합니다. 기본 언어는 한국어이며 설정에서 영어를 선택할 수 있습니다.
+
+## 테스트
+
+Vitest + Testing Library를 사용하며, 테스트 파일은 `*.spec.ts` / `*.spec.tsx`입니다.
 
 ```bash
-# TypeScript 라이브러리 생성
+yarn nx test web
+yarn nx test web --coverage
+yarn nx test web --ui
+```
+
+
+
+## CI / 배포
+
+- **Validate** (`pull_request` → `main`): lint, typecheck, test, web build
+- **Deploy** (`push` → `main`): `dist/app/web`을 GitHub Pages에 배포
+
+Pages는 저장소 이름 기준 `VITE_BASE_PATH`를 넣고 SPA 폴백으로 `404.html`을 복사합니다. 저장소: [cjhih456/fitness-recorder-v2](https://github.com/cjhih456/fitness-recorder-v2).
+
+## 개발 가이드
+
+
+
+### 코드 스타일
+
+```bash
+yarn prettier --write .
+yarn nx lint web --fix
+```
+
+
+
+### 새 라이브러리
+
+```bash
 yarn nx g @nx/js:lib <library-name> \
   --directory=libs/<library-name> \
   --bundler=vite \
@@ -125,177 +267,15 @@ yarn nx g @nx/js:lib <library-name> \
   --importPath=@fitness-recoder/<library-name>
 ```
 
-### 새 React 컴포넌트 생성
+화면·플로우 규칙은 `design-system/fitlog/`를 따릅니다.
 
-```bash
-# 컴포넌트 생성
-yarn nx g @nx/react:component <component-name> --project=web --directory=src/app
-```
+## 참고
 
-### 코드 스타일
+- [Nx](https://nx.dev)
+- [Vite](https://vite.dev)
+- [React](https://react.dev)
+- [GraphQL Yoga](https://the-guild.dev/graphql/yoga-server)
+- [sqlite-wasm](https://sqlite.org/wasm)
+- [TanStack Query](https://tanstack.com/query)
+- [shadcn/ui](https://ui.shadcn.com)
 
-이 프로젝트는 다음 도구들을 사용하여 코드 스타일을 관리합니다:
-
-- **ESLint**: 코드 품질 및 스타일 검사
-- **Prettier**: 코드 포맷팅
-- **TypeScript**: 타입 안정성
-
-```bash
-# 코드 포맷팅
-yarn prettier --write .
-
-# 린트 자동 수정
-yarn nx lint web --fix
-```
-
-## 프로젝트 구조
-
-```
-fitness-recoder-v2/
-├── app/
-│   └── web/                    # 웹 애플리케이션 (Vite + React + TypeScript)
-│       ├── src/
-│       │   ├── app/
-│       │   ├── assets/
-│       │   ├── vite-plugins/
-│       │   │   └── i18next-language-package/ # i18next 언어 패키지 로더 플러그인
-│       │   ├── main.tsx
-│       │   └── styles.css
-│       ├── public/
-│       ├── index.html
-│       ├── vite.config.mts
-│       └── project.json
-├── libs/
-│   ├── structure/                                     # 구조 관련 라이브러리
-│   └── sqlite-worker/                                # SQLite 워커 라이브러리
-├── nx.json
-├── package.json
-├── tsconfig.base.json
-└── vitest.workspace.ts
-```
-
-## 기술 스택
-
-### 앱
-- **app/web**: Vite + React + TypeScript + ESLint + Vitest + Storybook
-
-### 라이브러리
-모든 라이브러리는 다음 기술 스택을 사용합니다:
-- Vite
-- TypeScript
-- ESLint
-- vite-plugin-dts (타입 정의 파일 생성)
-
-## 라이브러리 상세 설명
-
-### i18next-language-package
-
-i18next를 위한 언어 패키지 로더 Vite 플러그인입니다. 다국어 지원을 위한 언어 파일을 동적으로 로드하는 기능을 제공합니다.
-액셀 파일을 활용하여 언어 파일을 자동 생성합니다.
-
-**사용 예시:**
-```typescript
-
-// vite.config.mts
-export default defineConfig({
-  plugins: [
-    i18nextLanguagePackageLoader({
-      // 플러그인 옵션
-    })
-  ]
-});
-```
-
-### structure
-
-프로젝트 전반에서 사용되는 공통 구조 및 타입 정의를 제공하는 라이브러리입니다.
-
-**사용 예시:**
-```typescript
-import { SomeType, SomeFunction } from '@fitness-recoder/structure';
-```
-
-### sqlite-worker
-
-SQLite 데이터베이스를 웹 워커에서 사용하기 위한 유틸리티 라이브러리입니다. 메인 스레드를 블로킹하지 않고 데이터베이스 작업을 수행할 수 있도록 지원합니다.
-
-**사용 예시:**
-```typescript
-import { createSqliteWorker } from '@fitness-recoder/sqlite-worker';
-
-const worker = createSqliteWorker({
-  // 워커 설정
-});
-```
-
-## 테스트
-
-### 단위 테스트 실행
-
-```bash
-# 웹 애플리케이션 테스트
-yarn nx test web
-
-# 특정 라이브러리 테스트 (테스트가 설정된 경우)
-yarn nx test <library-name>
-
-# 테스트 커버리지 확인
-yarn nx test web --coverage
-
-# 테스트 UI 모드
-yarn nx test web --ui
-```
-
-### 테스트 작성
-
-테스트는 Vitest를 사용하며, `*.spec.ts` 또는 `*.spec.tsx` 파일에 작성합니다.
-
-**예시:**
-```typescript
-import { describe, it, expect } from 'vitest';
-
-describe('MyComponent', () => {
-  it('should render correctly', () => {
-    // 테스트 코드
-  });
-});
-```
-
-## 빌드 및 배포
-
-### 프로덕션 빌드
-
-```bash
-# 웹 애플리케이션 빌드
-yarn nx build web
-
-# 빌드 결과물은 dist/app/web 디렉토리에 생성됩니다
-```
-
-### 빌드 최적화
-
-프로덕션 빌드는 자동으로 최적화됩니다:
-- 코드 압축 및 최소화
-- Tree-shaking을 통한 불필요한 코드 제거
-- 에셋 최적화
-
-### 배포
-
-빌드된 파일은 `dist/app/web` 디렉토리에 생성되며, 이를 정적 호스팅 서비스(Vercel, Netlify, AWS S3 등)에 배포할 수 있습니다.
-
-## 참고 자료
-
-### 공식 문서
-
-- [Nx 공식 문서](https://nx.dev)
-- [Vite 공식 문서](https://vite.dev)
-- [React 공식 문서](https://react.dev)
-- [TypeScript 공식 문서](https://www.typescriptlang.org)
-- [Vitest 공식 문서](https://vitest.dev)
-- [Storybook 공식 문서](https://storybook.js.org)
-
-### 유용한 링크
-
-- [Nx 플러그인](https://nx.dev/plugin-registry)
-- [Nx 레시피](https://nx.dev/recipes)
-- [React Best Practices](https://react.dev/learn)
