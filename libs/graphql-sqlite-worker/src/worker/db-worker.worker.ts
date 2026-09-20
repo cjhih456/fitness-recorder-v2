@@ -1,13 +1,12 @@
 /**
  * SQLite DB Worker
- * 실제 Worker 코드는 sqlite-worker.ts에서 동적으로 생성됩니다.
- * 이 파일은 참조용입니다.
+ * OPFS에 DB가 없을 때만 빌드 시드 파일을 import합니다.
  */
-
 
 import type { BindingSpec, Database } from '@sqlite.org/sqlite-wasm';
 import Sqlite3InitModule from '@sqlite.org/sqlite-wasm';
 import sqlite3WasmUrl from '@sqlite.org/sqlite-wasm/sqlite3.wasm?url';
+import { maybeImportSeedDatabase } from '../lib/seed-import';
 
 type Sqlite3InitModuleState = {
   wasmFilename?: string;
@@ -35,6 +34,7 @@ interface WorkerMessage {
   type: string;
   payload?: {
     dbName?: string;
+    seedDbUrl?: string;
     initScript?: string;
     sql?: string;
     params?: BindingSpec;
@@ -58,7 +58,7 @@ async function handleMessage(
   try {
     switch (message.type) {
       case 'init':
-        await handleInit(message.payload as { dbName: string; });
+        await handleInit(message.payload as { dbName: string; seedDbUrl?: string });
         postMessage({ id: message.id, success: true });
         break;
       case 'query': {
@@ -75,19 +75,16 @@ async function handleMessage(
       case 'update':
       case 'delete': {
         const execResult = await handleExec(message.payload as { sql: string; params: BindingSpec });
-        // RETURNING * 결과 반환
         postMessage({ id: message.id, success: true, data: execResult });
         break;
       }
       case 'select': {
         const queryResult = await handleQuery(message.payload as { sql: string; params: BindingSpec });
-        // 단일 결과 반환
         postMessage({ id: message.id, success: true, data: queryResult && queryResult.length > 0 ? queryResult[0] : null });
         break;
       }
       case 'selects': {
         const queryResult = await handleQuery(message.payload as { sql: string; params: BindingSpec });
-        // 배열 결과 반환
         postMessage({ id: message.id, success: true, data: queryResult || [] });
         break;
       }
@@ -125,6 +122,7 @@ self.onmessage = async (event: MessageEvent) => {
 
 async function handleInit(payload: {
   dbName: string;
+  seedDbUrl?: string;
 }) {
   const initState = (
     globalThis as typeof globalThis & {
@@ -140,9 +138,18 @@ async function handleInit(payload: {
     printErr: console.error
   })
   const dbName = payload.dbName || 'worker.sqlite3'
-  db = sqlite3Module.oo1.OpfsDb
-    ? new sqlite3Module.oo1.OpfsDb(dbName)
-    : new sqlite3Module.oo1.DB(dbName, 'c')
+
+  if (sqlite3Module.oo1.OpfsDb) {
+    await maybeImportSeedDatabase(
+      sqlite3Module.oo1.OpfsDb,
+      dbName,
+      payload.seedDbUrl
+    );
+    db = new sqlite3Module.oo1.OpfsDb(dbName);
+  } else {
+    console.warn('[db-worker] OpfsDb unavailable; using transient DB (seed import skipped)');
+    db = new sqlite3Module.oo1.DB(dbName, 'c');
+  }
 }
 
 async function handleQuery(payload: { sql: string; params: BindingSpec }) {
@@ -167,4 +174,3 @@ async function handleClose() {
     db = null;
   }
 }
-

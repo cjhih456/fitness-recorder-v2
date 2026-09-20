@@ -12,5 +12,6 @@
     "types/**/*.d.ts",
     "src/**/*.worker.ts",
     "src/worker/**/*.ts",
+    "src/lib/seed-import.ts"
   ]
 }

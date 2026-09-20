@@ -52,6 +52,7 @@ export class SQLiteWorker {
       type: 'init',
       payload: {
         dbName: this.config.dbName,
+        seedDbUrl: this.config.seedDbUrl,
       },
     }).then(async () => {
       this.initialized = true;

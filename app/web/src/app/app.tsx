@@ -1,6 +1,7 @@
-import { GraphQLSQLiteWorkerProvider } from '@fitness-recoder/graphql-sqlite-worker';
+import { GraphQLSQLiteWorkerProvider, APP_VERSION } from '@fitness-recoder/graphql-sqlite-worker';
 import DbWorkerUrl from '@fitness-recoder/graphql-sqlite-worker/dbWorker?worker&url';
 import ServiceWorkerUrl from '@fitness-recoder/graphql-sqlite-worker/serviceWorker?worker&url';
+import SeedDbUrl from '@fitness-recoder/graphql-sqlite-worker/seedDb?url';
 import { ThemeProvider } from 'next-themes';
 import { lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
@@ -23,8 +24,9 @@ export function App() {
         <GraphQLSQLiteWorkerProvider
           workerConfig={{
             dbName: 'fitness.db',
-            appVersion: '1.5.0',
+            appVersion: APP_VERSION,
             dbWorkerUrl: DbWorkerUrl,
+            seedDbUrl: SeedDbUrl,
           }}
           serviceWorkerUrl={ServiceWorkerUrl}
         >
