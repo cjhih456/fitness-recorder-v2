@@ -11,3 +11,8 @@ vitest.config.*.timestamp*
 dist
 # Generated SQLite seed for cold start (created by generate-seed-db)
 libs/graphql-sqlite-worker/src/assets/seed.db
+
+# Local secrets (see .env.example)
+.env.local
+.env.*.local
+app/web/.env.local

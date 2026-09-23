@@ -16,6 +16,7 @@
     "@fitness-recoder/graphql-sqlite-worker": "workspace:*",
     "@fitness-recoder/structure": "workspace:*",
     "@fitness-recoder/ui": "workspace:*",
+    "firebase": "^12.19.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "6.29.0"
