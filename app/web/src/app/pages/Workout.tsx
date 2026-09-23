@@ -12,6 +12,10 @@ import Timer from '../../components/section/workout/exerciseSection/Timer';
 import FitnessSearchDrawer from '../../components/section/workout/fitnessSearchDrawer/FitnessSearchDrawer';
 import VirtualList from '../../components/utils/VirtualList';
 import { useFormatedTime, useTimer } from '../../components/utils/timer';
+import {
+  trackOperationFail,
+  trackOperationSuccess,
+} from '../../libs/analytics';
 
 function countSets(setsByExercise: Map<number, SetData[]>) {
   let done = 0;
@@ -195,34 +199,57 @@ export default function Workout() {
 
   const handlePause = useCallback(() => {
     if (!scheduleData || scheduleData.type !== 'STARTED') return;
-    void mutateScheduleType({
-      type: 'PAUSED',
-      beforeTime: Date.now(),
-    });
+    void (async () => {
+      try {
+        await mutateScheduleType({
+          type: 'PAUSED',
+          beforeTime: Date.now(),
+        });
+        trackOperationSuccess('workout_pause');
+      } catch (error) {
+        trackOperationFail('workout_pause');
+        throw error;
+      }
+    })();
   }, [scheduleData, mutateScheduleType]);
 
   const handleResume = useCallback(() => {
     if (!scheduleData || scheduleData.type !== 'PAUSED') return;
     const pauseStartedAt = scheduleData.beforeTime || Date.now();
     const extraBreak = Math.max(0, Date.now() - pauseStartedAt);
-    void mutateScheduleType({
-      type: 'STARTED',
-      breakTime: (scheduleData.breakTime ?? 0) + extraBreak,
-      beforeTime: 0,
-    });
+    void (async () => {
+      try {
+        await mutateScheduleType({
+          type: 'STARTED',
+          breakTime: (scheduleData.breakTime ?? 0) + extraBreak,
+          beforeTime: 0,
+        });
+        trackOperationSuccess('workout_resume');
+      } catch (error) {
+        trackOperationFail('workout_resume');
+        throw error;
+      }
+    })();
   }, [scheduleData, mutateScheduleType]);
 
   const performFinish = useCallback(async () => {
     if (!scheduleData) return;
     const durationMs = Math.abs(elapsedMs);
     const volume = calcVolume(setsByExercise);
+    const { done } = countSets(setsByExercise);
     setFinishSummary({ durationMs, volume });
-    await mutateScheduleType({
-      type: 'FINISH',
-      workoutTimes: Math.max(1, Math.round(durationMs / 60000)),
-    });
-    setFinishConfirmOpen(false);
-    setFinishHubOpen(true);
+    try {
+      await mutateScheduleType({
+        type: 'FINISH',
+        workoutTimes: Math.max(1, Math.round(durationMs / 60000)),
+      });
+      trackOperationSuccess('workout_finish', { count: done });
+      setFinishConfirmOpen(false);
+      setFinishHubOpen(true);
+    } catch (error) {
+      trackOperationFail('workout_finish');
+      throw error;
+    }
   }, [scheduleData, elapsedMs, setsByExercise, mutateScheduleType]);
 
   const handleFinishClick = useCallback(() => {
@@ -236,11 +263,17 @@ export default function Workout() {
 
   const handleSaveRoutine = useCallback(async () => {
     if (!numericScheduleId) return;
-    await copyPreset.mutateAsync({
-      scheduleId: numericScheduleId,
-      name: scheduleData?.title || t('workout.todayTitle'),
-    });
-    navigate('/routines');
+    try {
+      await copyPreset.mutateAsync({
+        scheduleId: numericScheduleId,
+        name: scheduleData?.title || t('workout.todayTitle'),
+      });
+      trackOperationSuccess('preset_save');
+      navigate('/routines');
+    } catch (error) {
+      trackOperationFail('preset_save');
+      throw error;
+    }
   }, [numericScheduleId, copyPreset, scheduleData?.title, navigate, t]);
 
   const volumeLabel = `${finishSummary.volume.toLocaleString(

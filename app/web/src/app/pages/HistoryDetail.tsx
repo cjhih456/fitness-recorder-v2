@@ -5,6 +5,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import HistoryDetailSection from '../../components/section/history/detail/HistoryDetailSection';
 import { formatScheduleTitle } from '../../components/section/history/history/formatHistory';
 import PageLoadingSkeleton from '../../components/utils/PageLoadingSkeleton';
+import {
+  trackOperationFail,
+  trackOperationSuccess,
+} from '../../libs/analytics';
 
 export default function HistoryDetail() {
   const { t } = useTranslation();
@@ -31,7 +35,11 @@ export default function HistoryDetail() {
         scheduleId: schedule.id,
         name: formatScheduleTitle(schedule, t),
       });
+      trackOperationSuccess('preset_save');
       navigate('/routines');
+    } catch (error) {
+      trackOperationFail('preset_save');
+      throw error;
     } finally {
       setIsSaving(false);
     }

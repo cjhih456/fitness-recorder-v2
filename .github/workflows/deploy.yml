@@ -101,6 +101,11 @@ jobs:
         uses: ./.github/actions/build-web
         with:
           base-path: ${{ env.VITE_BASE_PATH }}
+          firebase-api-key: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          firebase-auth-domain: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          firebase-project-id: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          firebase-app-id: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          firebase-measurement-id: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
 
       - name: Save web dist cache on main
         if: steps.dist-cache.outputs.cache-hit != 'true'

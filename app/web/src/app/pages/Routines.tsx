@@ -5,6 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import DeleteRoutineConfirm from '../../components/section/routines/routines/DeleteRoutineConfirm';
 import RoutineCardActions from '../../components/section/routines/routines/RoutineCardActions';
 import RoutineSection from '../../components/section/routines/routines/RoutineSection';
+import {
+  trackOperationFail,
+  trackOperationSuccess,
+} from '../../libs/analytics';
 import dayjs from '../../libs/dayjs';
 
 function getTodayParts() {
@@ -59,8 +63,12 @@ export default function Routines() {
           presetId: routine.id,
           targetDate: getTodayParts(),
         });
+        trackOperationSuccess('preset_start');
         setActionsRoutine(null);
         navigate(`/workout/${schedule.id}`);
+      } catch (error) {
+        trackOperationFail('preset_start');
+        throw error;
       } finally {
         setStartingPresetId(null);
       }
@@ -82,8 +90,14 @@ export default function Routines() {
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!pendingDelete) return;
-    await deleteMutation.mutateAsync(pendingDelete.id);
-    setPendingDelete(null);
+    try {
+      await deleteMutation.mutateAsync(pendingDelete.id);
+      trackOperationSuccess('preset_delete');
+      setPendingDelete(null);
+    } catch (error) {
+      trackOperationFail('preset_delete');
+      throw error;
+    }
   }, [deleteMutation, pendingDelete]);
 
   const handleOpenActions = useCallback(

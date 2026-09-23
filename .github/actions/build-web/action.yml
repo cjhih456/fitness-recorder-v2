@@ -5,6 +5,26 @@ inputs:
   base-path:
     description: Vite public base path (e.g. /fitness-recorder-v2/)
     required: true
+  firebase-api-key:
+    description: VITE_FIREBASE_API_KEY (empty disables Analytics)
+    required: false
+    default: ''
+  firebase-auth-domain:
+    description: VITE_FIREBASE_AUTH_DOMAIN
+    required: false
+    default: ''
+  firebase-project-id:
+    description: VITE_FIREBASE_PROJECT_ID
+    required: false
+    default: ''
+  firebase-app-id:
+    description: VITE_FIREBASE_APP_ID
+    required: false
+    default: ''
+  firebase-measurement-id:
+    description: VITE_FIREBASE_MEASUREMENT_ID
+    required: false
+    default: ''
 
 runs:
   using: composite
@@ -13,6 +33,11 @@ runs:
       shell: bash
       env:
         VITE_BASE_PATH: ${{ inputs.base-path }}
+        VITE_FIREBASE_API_KEY: ${{ inputs.firebase-api-key }}
+        VITE_FIREBASE_AUTH_DOMAIN: ${{ inputs.firebase-auth-domain }}
+        VITE_FIREBASE_PROJECT_ID: ${{ inputs.firebase-project-id }}
+        VITE_FIREBASE_APP_ID: ${{ inputs.firebase-app-id }}
+        VITE_FIREBASE_MEASUREMENT_ID: ${{ inputs.firebase-measurement-id }}
       run: yarn nx build web
 
     - name: Prepare GitHub Pages SPA fallback
