@@ -5,6 +5,10 @@ import { LayoutDashboard, History, Plus, Camera, Play } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  trackOperationFail,
+  trackOperationSuccess,
+} from '../../libs/analytics';
 import dayjs from '../../libs/dayjs';
 import NavButton from './NavButton';
 
@@ -62,6 +66,7 @@ export default function LayoutFooter() {
 
     const resumable = findResumableSchedule(schedules);
     if (resumable) {
+      trackOperationSuccess('workout_resume');
       navigate(`/workout/${resumable.id}`);
       return;
     }
@@ -82,7 +87,11 @@ export default function LayoutFooter() {
         type: 'STARTED',
         start: Date.now(),
       });
+      trackOperationSuccess('workout_start');
       navigate(`/workout/${started?.id ?? created.id}`);
+    } catch (error) {
+      trackOperationFail('workout_start');
+      throw error;
     } finally {
       setIsStarting(false);
     }

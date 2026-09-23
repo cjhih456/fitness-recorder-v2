@@ -8,6 +8,10 @@ import { useNavigate } from 'react-router-dom';
 import ChartSection from '../../components/section/dashboard/chart/ChartSection';
 import TodayRoutineSection from '../../components/section/dashboard/todayRoutine/TodayRoutineSection';
 import PageLoadingSkeleton from '../../components/utils/PageLoadingSkeleton';
+import {
+  trackOperationFail,
+  trackOperationSuccess,
+} from '../../libs/analytics';
 import dayjs from '../../libs/dayjs';
 
 function getTodayParts() {
@@ -67,7 +71,11 @@ export default function Dashboard() {
           presetId: routine.id,
           targetDate: getTodayParts(),
         });
+        trackOperationSuccess('preset_start');
         navigate(`/workout/${schedule.id}`);
+      } catch (error) {
+        trackOperationFail('preset_start');
+        throw error;
       } finally {
         setStartingPresetId(null);
       }

@@ -15,6 +15,10 @@ import {
 } from '../../components/section/routine-edit/types';
 import DeleteRoutineConfirm from '../../components/section/routines/routines/DeleteRoutineConfirm';
 import VirtualList from '../../components/utils/VirtualList';
+import {
+  trackOperationFail,
+  trackOperationSuccess,
+} from '../../libs/analytics';
 
 export default function RoutineEdit() {
   const { t } = useTranslation();
@@ -177,6 +181,7 @@ export default function RoutineEdit() {
   const handleSave = useCallback(async () => {
     if (!canSave) return;
     setIsSaving(true);
+    const operation = isEdit ? 'preset_update' : 'preset_create';
     try {
       if (isEdit && presetId !== undefined && preset) {
         await updatePreset.mutateAsync({
@@ -220,8 +225,12 @@ export default function RoutineEdit() {
         await persistSetsForExercises(created, exercises);
       }
 
+      trackOperationSuccess(operation, { count: exercises.length });
       baselineRef.current = { name: trimmedName, exercises };
       navigate('/routines');
+    } catch (error) {
+      trackOperationFail(operation);
+      throw error;
     } finally {
       setIsSaving(false);
     }
@@ -243,9 +252,15 @@ export default function RoutineEdit() {
 
   const handleDeleteConfirm = useCallback(async () => {
     if (presetId === undefined) return;
-    await deletePreset.mutateAsync(presetId);
-    setDeleteOpen(false);
-    navigate('/routines');
+    try {
+      await deletePreset.mutateAsync(presetId);
+      trackOperationSuccess('preset_delete');
+      setDeleteOpen(false);
+      navigate('/routines');
+    } catch (error) {
+      trackOperationFail('preset_delete');
+      throw error;
+    }
   }, [deletePreset, navigate, presetId]);
 
   const title = isEdit ? t('routines.edit') : t('routines.create');
