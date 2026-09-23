@@ -3,6 +3,9 @@ import * as ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './app/app';
 import './assets/i18n/i18n';
+import { initFirebaseAnalytics } from './libs/analytics';
+
+void initFirebaseAnalytics();
 
 const basename = import.meta.env.BASE_URL.replace(/\/$/, '') || '/';
 

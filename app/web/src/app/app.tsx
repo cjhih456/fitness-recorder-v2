@@ -9,6 +9,7 @@ import DbInitError from '../components/layout/DbInitError';
 import DefaultLayout from '../components/layout/DefaultLayout';
 import PageLoadingSkeleton from '../components/utils/PageLoadingSkeleton';
 import SuspenseBoundary from '../components/utils/SuspenseBoundary';
+import { PageAnalytics } from '../libs/analytics';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const History = lazy(() => import('./pages/History'));
@@ -21,6 +22,7 @@ const Photo = lazy(() => import('./pages/Photo'));
 export function App() {
   return (
     <ThemeProvider defaultTheme="light" enableSystem={false} attribute="class">
+      <PageAnalytics />
       <SuspenseBoundary fallback={<PageLoadingSkeleton />}>
         <GraphQLSQLiteWorkerProvider
           isDev={import.meta.env.DEV}
