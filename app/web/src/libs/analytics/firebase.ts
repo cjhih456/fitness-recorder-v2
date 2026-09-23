@@ -66,7 +66,6 @@ export function initFirebaseAnalytics(): Promise<boolean> {
     }
 
     setAnalyticsPort(createFirebasePort(analyticsInstance));
-    console.log('analyticsInstance', analyticsInstance)
     return true;
   })().catch(() => {
     return false
